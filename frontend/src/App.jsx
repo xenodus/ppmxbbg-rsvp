@@ -150,11 +150,13 @@ export default function App() {
     requireParking != null ||
     attendSolemnisation != null ||
     guests.some((guest) => guest.is_attending != null);
-  const showFullForm =
-    attendingChoice === "yes" ||
-    (hasSavedRsvp && attendingChoice !== null);
   const bigQuestionValue =
     attendingChoice === "yes" ? true : attendingChoice === "no" ? false : null;
+  const showStep2 = attendingChoice === "yes";
+  const showStep3 = showStep2 && attendSolemnisation != null;
+  const showStep4 = showStep3 && requireParking != null;
+  const inviteDetailsComplete =
+    attendSolemnisation != null && requireParking != null;
 
   async function handleDeclineAll() {
     setError("");
@@ -277,56 +279,64 @@ export default function App() {
               onSelectNo={() => handleBigQuestionChoice("no")}
             />
 
-            {hasSavedRsvp && (
+            {hasSavedRsvp && attendingChoice === "yes" && (
               <p className="section-note">You can update your responses at any time.</p>
             )}
 
-            {showFullForm && (
+            {showStep2 && (
+              <ChoiceSection
+                number={RSVP.solemnisation.number}
+                title={RSVP.solemnisation.title}
+                question={RSVP.solemnisation.question}
+                note={RSVP.solemnisation.note}
+                value={attendSolemnisation}
+                yesLabel={RSVP.solemnisation.yes}
+                noLabel={RSVP.solemnisation.no}
+                disabled={formDisabled}
+                onSelectYes={() => setAttendSolemnisation(true)}
+                onSelectNo={() => setAttendSolemnisation(false)}
+              />
+            )}
+
+            {showStep3 && (
               <>
-                <form onSubmit={handleSaveInvite} noValidate>
-                  <ChoiceSection
-                    number={RSVP.solemnisation.number}
-                    title={RSVP.solemnisation.title}
-                    question={RSVP.solemnisation.question}
-                    note={RSVP.solemnisation.note}
-                    value={attendSolemnisation}
-                    yesLabel={RSVP.solemnisation.yes}
-                    noLabel={RSVP.solemnisation.no}
-                    disabled={formDisabled}
-                    onSelectYes={() => setAttendSolemnisation(true)}
-                    onSelectNo={() => setAttendSolemnisation(false)}
-                  />
+                <ChoiceSection
+                  number={RSVP.parking.number}
+                  title={RSVP.parking.title}
+                  question={RSVP.parking.question}
+                  value={requireParking}
+                  yesLabel={RSVP.parking.yes}
+                  noLabel={RSVP.parking.no}
+                  disabled={formDisabled}
+                  onSelectYes={() => setRequireParking(true)}
+                  onSelectNo={() => setRequireParking(false)}
+                />
 
-                  <ChoiceSection
-                    number={RSVP.parking.number}
-                    title={RSVP.parking.title}
-                    question={RSVP.parking.question}
-                    value={requireParking}
-                    yesLabel={RSVP.parking.yes}
-                    noLabel={RSVP.parking.no}
-                    disabled={formDisabled}
-                    onSelectYes={() => setRequireParking(true)}
-                    onSelectNo={() => setRequireParking(false)}
-                  />
-
-                  <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={formDisabled || savingInvite}
-                  >
-                    {savingInvite ? "SAVING..." : "SAVE INVITATION DETAILS"}
-                  </button>
-                </form>
-
-                <section className="guest-section">
-                  <h2 className="section-heading">4. Guests</h2>
-                  <GuestList
-                    guests={guests}
-                    disabled={formDisabled}
-                    onRespond={setActiveGuest}
-                  />
-                </section>
+                {inviteDetailsComplete && (
+                  <form onSubmit={handleSaveInvite} noValidate>
+                    <button
+                      type="submit"
+                      className="submit-btn"
+                      disabled={formDisabled || savingInvite}
+                    >
+                      {savingInvite ? "SAVING..." : "SAVE INVITATION DETAILS"}
+                    </button>
+                  </form>
+                )}
               </>
+            )}
+
+            {showStep4 && (
+              <section className="guest-section">
+                <h2 className="section-heading">
+                  {RSVP.guests.number}. {RSVP.guests.title}
+                </h2>
+                <GuestList
+                  guests={guests}
+                  disabled={formDisabled}
+                  onRespond={setActiveGuest}
+                />
+              </section>
             )}
           </>
         ) : null}
