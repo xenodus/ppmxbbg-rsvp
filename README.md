@@ -285,23 +285,51 @@ make test
 
 ## Database schema
 
+Database: `rsvp` (populated separately; `is_sent` is not used by the API).
+
+### `invites`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `BIGINT UNSIGNED` | Snowflake id (primary key) |
+| `is_sent` | `TINYINT(1)` | Whether the invite has been sent |
+| `require_parking` | `TINYINT(1)` | Nullable until answered |
+| `attend_solemnisation` | `TINYINT(1)` | Nullable until answered |
+| `last_updated` | `DATE` | Nullable |
+
+### `guests`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `INT AUTO_INCREMENT` | Incremental guest id (primary key) |
+| `invite_id` | `BIGINT UNSIGNED` | Foreign key → `invites.id` |
+| `name` | `TEXT` | Guest name |
+| `dietary_restriction` | `TEXT` | Nullable |
+| `is_attending` | `TINYINT(1)` | Nullable until answered |
+| `last_updated` | `DATE` | Nullable |
+
+### Example DDL
+
 ```sql
 CREATE TABLE invites (
-  id BIGINT PRIMARY KEY,
-  is_sent TINYINT(1) NOT NULL DEFAULT 0,
+  id BIGINT UNSIGNED NOT NULL,
+  is_sent TINYINT(1) NULL,
   require_parking TINYINT(1) NULL,
   attend_solemnisation TINYINT(1) NULL,
-  last_updated DATE NULL
+  last_updated DATE NULL,
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE guests (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
-  invite_id BIGINT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
+  invite_id BIGINT UNSIGNED NOT NULL,
   name TEXT NOT NULL,
   dietary_restriction TEXT NULL,
   is_attending TINYINT(1) NULL,
   last_updated DATE NULL,
-  FOREIGN KEY (invite_id) REFERENCES invites(id)
+  PRIMARY KEY (id),
+  KEY idx_guests_invite_id (invite_id),
+  CONSTRAINT fk_guests_invite_id FOREIGN KEY (invite_id) REFERENCES invites (id)
 );
 ```
 
