@@ -232,8 +232,6 @@ form {
 .form-card > .form-section + .form-section,
 .form-card > .form-section + .section-note,
 .form-card > .section-note + .form-section,
-.form-card > .form-section + form,
-.form-card > form + .guest-section,
 .form-card > .form-section + .guest-section {
   margin-top: var(--section-gap);
 }

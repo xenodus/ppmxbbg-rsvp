@@ -178,15 +178,31 @@ func SaveInvite(ctx context.Context, update InviteUpdate) error {
 		return err
 	}
 
-	if update.RequireParking == nil || update.AttendSolemnisation == nil {
-		return errors.New("require_parking and attend_solemnisation are required")
+	if update.RequireParking == nil && update.AttendSolemnisation == nil {
+		return errors.New("at least one of require_parking or attend_solemnisation is required")
 	}
 
-	result, err := conn.ExecContext(ctx, `
-		UPDATE invites
-		SET require_parking = ?, attend_solemnisation = ?
-		WHERE id = ?
-	`, *update.RequireParking, *update.AttendSolemnisation, update.ID)
+	var result sql.Result
+	switch {
+	case update.RequireParking != nil && update.AttendSolemnisation != nil:
+		result, err = conn.ExecContext(ctx, `
+			UPDATE invites
+			SET require_parking = ?, attend_solemnisation = ?
+			WHERE id = ?
+		`, *update.RequireParking, *update.AttendSolemnisation, update.ID)
+	case update.RequireParking != nil:
+		result, err = conn.ExecContext(ctx, `
+			UPDATE invites
+			SET require_parking = ?
+			WHERE id = ?
+		`, *update.RequireParking, update.ID)
+	default:
+		result, err = conn.ExecContext(ctx, `
+			UPDATE invites
+			SET attend_solemnisation = ?
+			WHERE id = ?
+		`, *update.AttendSolemnisation, update.ID)
+	}
 	if err != nil {
 		return err
 	}

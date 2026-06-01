@@ -115,8 +115,10 @@ Save RSVP data. The handler routes by request body:
 | Field | Required | Description |
 |-------|----------|-------------|
 | `id` | yes | Invite id (snowflake, string) |
-| `require_parking` | yes | Whether couple parking is required |
-| `attend_solemnisation` | yes | Whether attending the solemnisation |
+| `require_parking` | no* | Whether couple parking is required |
+| `attend_solemnisation` | no* | Whether attending the solemnisation |
+
+\* At least one of `require_parking` or `attend_solemnisation` must be present. Send one field to update it alone, or both to update together. The frontend saves each choice immediately on selection.
 
 **Example**
 
@@ -133,7 +135,7 @@ curl -X POST "https://YOUR_API_URL/guest" \
 | Status | Body | Cause |
 |--------|------|-------|
 | `400` | `{"error":"id is required"}` | Missing invite id |
-| `400` | `{"error":"require_parking and attend_solemnisation are required"}` | Missing boolean fields |
+| `400` | `{"error":"at least one of require_parking or attend_solemnisation is required"}` | No invite fields to update |
 | `404` | `{"error":"invite not found"}` | Invite id not in database |
 
 #### Guest update

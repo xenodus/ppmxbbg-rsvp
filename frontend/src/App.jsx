@@ -155,8 +155,7 @@ export default function App() {
   const showStep2 = attendingChoice === "yes";
   const showStep3 = showStep2 && attendSolemnisation != null;
   const showStep4 = showStep3 && requireParking != null;
-  const inviteDetailsComplete =
-    attendSolemnisation != null && requireParking != null;
+  const inviteChoicesDisabled = formDisabled || savingInvite;
 
   async function handleDeclineAll() {
     setError("");
@@ -190,32 +189,37 @@ export default function App() {
     }
   }
 
-  async function handleSaveInvite(event) {
-    event.preventDefault();
+  async function handleInviteChoice(field, value) {
+    const previousAttend = attendSolemnisation;
+    const previousParking = requireParking;
+
+    if (field === "attend_solemnisation") {
+      setAttendSolemnisation(value);
+    } else {
+      setRequireParking(value);
+    }
+
     setError("");
-    setSuccess("");
-
-    if (attendSolemnisation === null) {
-      setError("Please let us know about the solemnisation.");
-      return;
-    }
-    if (requireParking === null) {
-      setError("Please let us know about parking.");
-      return;
-    }
-
     setSavingInvite(true);
+
     try {
       const updated = await saveInvite({
         id: inviteId,
-        require_parking: requireParking,
-        attend_solemnisation: attendSolemnisation,
+        [field]: value,
       });
       setGuests(updated.guests || []);
-      setRequireParking(updated.require_parking ?? requireParking);
-      setAttendSolemnisation(updated.attend_solemnisation ?? attendSolemnisation);
-      setSuccess("Invitation details saved.");
+      if (updated.require_parking !== undefined && updated.require_parking !== null) {
+        setRequireParking(updated.require_parking);
+      }
+      if (
+        updated.attend_solemnisation !== undefined &&
+        updated.attend_solemnisation !== null
+      ) {
+        setAttendSolemnisation(updated.attend_solemnisation);
+      }
     } catch (err) {
+      setAttendSolemnisation(previousAttend);
+      setRequireParking(previousParking);
       setError(err.message);
     } finally {
       setSavingInvite(false);
@@ -292,38 +296,24 @@ export default function App() {
                 value={attendSolemnisation}
                 yesLabel={RSVP.solemnisation.yes}
                 noLabel={RSVP.solemnisation.no}
-                disabled={formDisabled}
-                onSelectYes={() => setAttendSolemnisation(true)}
-                onSelectNo={() => setAttendSolemnisation(false)}
+                disabled={inviteChoicesDisabled}
+                onSelectYes={() => handleInviteChoice("attend_solemnisation", true)}
+                onSelectNo={() => handleInviteChoice("attend_solemnisation", false)}
               />
             )}
 
             {showStep3 && (
-              <>
-                <ChoiceSection
-                  number={RSVP.parking.number}
-                  title={RSVP.parking.title}
-                  question={RSVP.parking.question}
-                  value={requireParking}
-                  yesLabel={RSVP.parking.yes}
-                  noLabel={RSVP.parking.no}
-                  disabled={formDisabled}
-                  onSelectYes={() => setRequireParking(true)}
-                  onSelectNo={() => setRequireParking(false)}
-                />
-
-                {inviteDetailsComplete && (
-                  <form onSubmit={handleSaveInvite} noValidate>
-                    <button
-                      type="submit"
-                      className="submit-btn"
-                      disabled={formDisabled || savingInvite}
-                    >
-                      {savingInvite ? "SAVING..." : "SAVE INVITATION DETAILS"}
-                    </button>
-                  </form>
-                )}
-              </>
+              <ChoiceSection
+                number={RSVP.parking.number}
+                title={RSVP.parking.title}
+                question={RSVP.parking.question}
+                value={requireParking}
+                yesLabel={RSVP.parking.yes}
+                noLabel={RSVP.parking.no}
+                disabled={inviteChoicesDisabled}
+                onSelectYes={() => handleInviteChoice("require_parking", true)}
+                onSelectNo={() => handleInviteChoice("require_parking", false)}
+              />
             )}
 
             {showStep4 && (
