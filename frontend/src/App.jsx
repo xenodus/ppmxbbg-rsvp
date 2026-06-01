@@ -177,7 +177,7 @@ export default function App() {
 
         {loading ? (
           <p className="loading-text">Loading invitation details...</p>
-        ) : (
+        ) : !error ? (
           <>
             <form onSubmit={handleSaveInvite} noValidate>
               <YesNoField
@@ -212,7 +212,7 @@ export default function App() {
               />
             </section>
           </>
-        )}
+        ) : null}
       </main>
 
       {activeGuest && (
