@@ -295,18 +295,18 @@ Database: `rsvp` (populated separately).
 | `is_sent` | boolean |
 | `require_parking` | boolean |
 | `attend_solemnisation` | boolean |
-| `last_updated` | date |
+| `last_updated` | datetime, default `NOW()` |
 
 ### `guests`
 
 | Column | Type |
 |--------|------|
-| `id` | sequence (incremental) |
+| `id` | auto incremental (`AUTO_INCREMENT`) |
 | `invite_id` | foreign key → `invites.id` |
 | `name` | text |
 | `dietary_restriction` | text |
 | `is_attending` | boolean |
-| `last_updated` | date |
+| `last_updated` | datetime, default `NOW()` |
 
 One invite (`invites.id`) can have many guests (`guests.invite_id`).
 
@@ -320,7 +320,7 @@ CREATE TABLE invites (
   is_sent BOOLEAN NULL,
   require_parking BOOLEAN NULL,
   attend_solemnisation BOOLEAN NULL,
-  last_updated DATE NULL,
+  last_updated TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
 
@@ -330,7 +330,7 @@ CREATE TABLE guests (
   name TEXT NOT NULL,
   dietary_restriction TEXT NULL,
   is_attending BOOLEAN NULL,
-  last_updated DATE NULL,
+  last_updated TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   FOREIGN KEY (invite_id) REFERENCES invites (id)
 );

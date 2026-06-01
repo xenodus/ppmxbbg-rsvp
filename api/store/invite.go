@@ -117,7 +117,7 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 		invite.AttendSolemnisation = &v
 	}
 	if lastUpdated.Valid {
-		v := lastUpdated.Time.Format("2006-01-02")
+		v := lastUpdated.Time.Format("2006-01-02 15:04:05")
 		invite.LastUpdated = &v
 	}
 
@@ -158,7 +158,7 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 			guest.IsAttending = &v
 		}
 		if guestUpdated.Valid {
-			v := guestUpdated.Time.Format("2006-01-02")
+			v := guestUpdated.Time.Format("2006-01-02 15:04:05")
 			guest.LastUpdated = &v
 		}
 
@@ -184,7 +184,7 @@ func SaveInvite(ctx context.Context, update InviteUpdate) error {
 
 	result, err := conn.ExecContext(ctx, `
 		UPDATE invites
-		SET require_parking = ?, attend_solemnisation = ?, last_updated = CURDATE()
+		SET require_parking = ?, attend_solemnisation = ?
 		WHERE id = ?
 	`, *update.RequireParking, *update.AttendSolemnisation, update.ID)
 	if err != nil {
@@ -219,7 +219,7 @@ func SaveGuest(ctx context.Context, update GuestUpdate) error {
 
 	result, err := conn.ExecContext(ctx, `
 		UPDATE guests
-		SET is_attending = ?, dietary_restriction = ?, last_updated = CURDATE()
+		SET is_attending = ?, dietary_restriction = ?
 		WHERE id = ?
 	`, *update.IsAttending, dietaryRestriction, update.ID)
 	if err != nil {
