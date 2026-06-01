@@ -285,37 +285,41 @@ make test
 
 ## Database schema
 
-Database: `rsvp` (populated separately; `is_sent` is not used by the API).
+Database: `rsvp` (populated separately).
 
 ### `invites`
 
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | `BIGINT UNSIGNED` | Snowflake id (primary key) |
-| `is_sent` | `TINYINT(1)` | Whether the invite has been sent |
-| `require_parking` | `TINYINT(1)` | Nullable until answered |
-| `attend_solemnisation` | `TINYINT(1)` | Nullable until answered |
-| `last_updated` | `DATE` | Nullable |
+| Column | Type |
+|--------|------|
+| `id` | snowflake |
+| `is_sent` | boolean |
+| `require_parking` | boolean |
+| `attend_solemnisation` | boolean |
+| `last_updated` | date |
 
 ### `guests`
 
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | `INT AUTO_INCREMENT` | Incremental guest id (primary key) |
-| `invite_id` | `BIGINT UNSIGNED` | Foreign key → `invites.id` |
-| `name` | `TEXT` | Guest name |
-| `dietary_restriction` | `TEXT` | Nullable |
-| `is_attending` | `TINYINT(1)` | Nullable until answered |
-| `last_updated` | `DATE` | Nullable |
+| Column | Type |
+|--------|------|
+| `id` | sequence (incremental) |
+| `invite_id` | foreign key → `invites.id` |
+| `name` | text |
+| `dietary_restriction` | text |
+| `is_attending` | boolean |
+| `last_updated` | date |
 
-### Example DDL
+One invite (`invites.id`) can have many guests (`guests.invite_id`).
+
+The API reads and updates `require_parking`, `attend_solemnisation`, and guest RSVP fields. `is_sent` is managed outside the API.
+
+### Example MySQL DDL
 
 ```sql
 CREATE TABLE invites (
   id BIGINT UNSIGNED NOT NULL,
-  is_sent TINYINT(1) NULL,
-  require_parking TINYINT(1) NULL,
-  attend_solemnisation TINYINT(1) NULL,
+  is_sent BOOLEAN NULL,
+  require_parking BOOLEAN NULL,
+  attend_solemnisation BOOLEAN NULL,
   last_updated DATE NULL,
   PRIMARY KEY (id)
 );
@@ -325,11 +329,10 @@ CREATE TABLE guests (
   invite_id BIGINT UNSIGNED NOT NULL,
   name TEXT NOT NULL,
   dietary_restriction TEXT NULL,
-  is_attending TINYINT(1) NULL,
+  is_attending BOOLEAN NULL,
   last_updated DATE NULL,
   PRIMARY KEY (id),
-  KEY idx_guests_invite_id (invite_id),
-  CONSTRAINT fk_guests_invite_id FOREIGN KEY (invite_id) REFERENCES invites (id)
+  FOREIGN KEY (invite_id) REFERENCES invites (id)
 );
 ```
 
