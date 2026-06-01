@@ -60,6 +60,15 @@ function ChoiceSection({
   );
 }
 
+function hasSavedRsvpData(invite) {
+  const guestList = invite.guests || [];
+  return (
+    invite.require_parking != null ||
+    invite.attend_solemnisation != null ||
+    guestList.some((guest) => guest.is_attending != null)
+  );
+}
+
 function inferAttendingChoice(invite) {
   const guestList = invite.guests || [];
   if (
@@ -69,12 +78,11 @@ function inferAttendingChoice(invite) {
     return "no";
   }
 
-  const hasStarted =
-    invite.require_parking != null ||
-    invite.attend_solemnisation != null ||
-    guestList.some((guest) => guest.is_attending != null);
+  if (hasSavedRsvpData(invite)) {
+    return "yes";
+  }
 
-  return hasStarted ? "yes" : null;
+  return null;
 }
 
 export default function App() {
@@ -137,6 +145,17 @@ export default function App() {
     };
   }, [inviteId]);
 
+  const formDisabled = loading || !!error || decliningAll;
+  const hasSavedRsvp =
+    requireParking != null ||
+    attendSolemnisation != null ||
+    guests.some((guest) => guest.is_attending != null);
+  const showFullForm =
+    attendingChoice === "yes" ||
+    (hasSavedRsvp && attendingChoice !== null);
+  const bigQuestionValue =
+    attendingChoice === "yes" ? true : attendingChoice === "no" ? false : null;
+
   async function handleDeclineAll() {
     setError("");
     setSuccess("");
@@ -164,6 +183,9 @@ export default function App() {
     }
 
     setAttendingChoice("yes");
+    if (hasSavedRsvp) {
+      setSuccess("You can update your details below.");
+    }
   }
 
   async function handleSaveInvite(event) {
@@ -225,11 +247,6 @@ export default function App() {
     }
   }
 
-  const formDisabled = loading || !!error || decliningAll;
-  const showFullForm = attendingChoice === "yes";
-  const bigQuestionValue =
-    attendingChoice === "yes" ? true : attendingChoice === "no" ? false : null;
-
   return (
     <div className="page">
       <header className="header">
@@ -259,6 +276,10 @@ export default function App() {
               onSelectYes={() => handleBigQuestionChoice("yes")}
               onSelectNo={() => handleBigQuestionChoice("no")}
             />
+
+            {hasSavedRsvp && (
+              <p className="section-note">You can update your responses at any time.</p>
+            )}
 
             {showFullForm && (
               <>
