@@ -122,14 +122,37 @@ Deployment follows the same pattern as [gishathfetch](https://github.com/xenodus
 3. Build the frontend and sync `frontend/dist` to S3.
 4. Invalidate CloudFront if used.
 
-Configure Makefile variables (or GitHub Actions `vars` / `secrets`):
+Configure Makefile variables in `Makefile.include` (copy from `Makefile.include.example`):
 
-- `ECR_REPO`
+- `AWS_ACCOUNT_ID`
+- `ECR_REPO_NAME`
 - `LAMBDA_FUNCTION`
+- `LAMBDA_ROLE_ARN` (one-time `make lambda-create` only)
 - `S3_BUCKET`
 - `CLOUDFRONT_DISTRIBUTION_ID` (optional)
+- `VITE_API_BASE_URL`
+
+### One-time setup
 
 ```bash
+cp Makefile.include.example Makefile.include
+# edit Makefile.include
+
+make ecr-create
+make docker-build docker-tag docker-push
+make lambda-create
+```
+
+### Deploy
+
+```bash
+# API only (build image, push to ECR, update Lambda)
+make deploy-api
+
+# Frontend only (build with VITE_API_BASE_URL, sync to S3, invalidate CloudFront)
+make deploy-frontend
+
+# Both
 make deploy
 ```
 

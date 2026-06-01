@@ -1,0 +1,15 @@
+# Copy to Makefile.include and fill in your values.
+# Makefile.include is gitignored.
+
+AWS_ACCOUNT_ID=123456789012
+AWS_REGION=ap-southeast-1
+
+ECR_REPO_NAME=ppmxbbg-rsvp-api
+LAMBDA_FUNCTION=ppmxbbg-rsvp-api
+LAMBDA_ROLE_ARN=arn:aws:iam::123456789012:role/ppmxbbg-rsvp-lambda
+
+S3_BUCKET=ppmxbbg-rsvp-frontend
+CLOUDFRONT_DISTRIBUTION_ID=
+
+# API Gateway base URL (no trailing slash)
+VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com
