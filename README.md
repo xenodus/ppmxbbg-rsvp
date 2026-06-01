@@ -315,7 +315,8 @@ CREATE TABLE guests (
 ├── frontend/      # React + Vite SPA
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
-└── Makefile.include.example
+├── Makefile.include.example
+└── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
 ```
 
 Wedding copy (couple names, date, venue) is in `frontend/src/constants.js`.
