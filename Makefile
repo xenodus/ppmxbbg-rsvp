@@ -1,4 +1,4 @@
-.PHONY: test api-test frontend-dev frontend-build frontend-update \
+.PHONY: test api-test frontend-dev frontend-build frontend-update check-vite-api-url \
 	docker-build docker-tag docker-push aws-login \
 	lambda-update lambda-wait deploy-api deploy-frontend deploy
 
@@ -18,11 +18,16 @@ IMAGE_NAME ?= ppmxbbg-rsvp-api
 ECR_REGISTRY ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 ECR_REPO ?= $(ECR_REGISTRY)/$(ECR_REPO_NAME)
 LAMBDA_FUNCTION ?= ppmxbbg-rsvp-api
-S3_BUCKET ?= your-rsvp-frontend-bucket
+S3_BUCKET ?= ppmxbbg-rsvp-frontend
 CLOUDFRONT_DISTRIBUTION_ID ?=
 VITE_API_BASE_URL ?=
 
 export AWS_PAGER :=
+
+check-vite-api-url:
+ifeq ($(VITE_API_BASE_URL),)
+	$(error VITE_API_BASE_URL is empty. Set it in Makefile.include — see Makefile.include.example)
+endif
 
 test: api-test
 
@@ -32,10 +37,8 @@ api-test:
 frontend-dev:
 	cd frontend && npm install && npm run dev
 
-frontend-build:
-ifneq ($(VITE_API_BASE_URL),)
+frontend-build: check-vite-api-url
 	echo "VITE_API_BASE_URL=$(VITE_API_BASE_URL)" > frontend/.env
-endif
 	cd frontend && npm install && npm run build
 
 frontend-update: frontend-build
