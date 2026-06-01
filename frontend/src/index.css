@@ -7,6 +7,7 @@
   --border: #d8d4cc;
   --error: #8b3a3a;
   --success: #3a6b4a;
+  --section-gap: 2.25rem;
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Lato", "Helvetica Neue", Arial, sans-serif;
 }
@@ -185,7 +186,6 @@ form {
 }
 
 .submit-btn {
-  margin-top: 1rem;
   align-self: center;
   min-width: 12rem;
   padding: 0.85rem 1.5rem;
@@ -222,15 +222,20 @@ form {
 }
 
 .section-heading {
-  margin: 2rem 0 0.75rem;
+  margin: 0 0 0.75rem;
   font-family: var(--font-serif);
   font-size: 1.35rem;
   font-weight: 400;
   text-align: center;
 }
 
-.form-section:first-child .section-heading {
-  margin-top: 0;
+.form-card > .form-section + .form-section,
+.form-card > .form-section + .section-note,
+.form-card > .section-note + .form-section,
+.form-card > .form-section + form,
+.form-card > form + .guest-section,
+.form-card > .form-section + .guest-section {
+  margin-top: var(--section-gap);
 }
 
 .section-question {
@@ -241,7 +246,7 @@ form {
 }
 
 .section-note {
-  margin: 0 0 1rem;
+  margin: 0;
   text-align: center;
   line-height: 1.5;
   font-size: 0.85rem;
@@ -274,15 +279,11 @@ form {
 }
 
 .section-title {
-  margin: 2rem 0 1rem;
+  margin: 0 0 1rem;
   font-family: var(--font-serif);
   font-size: 1.35rem;
   font-weight: 400;
   text-align: center;
-}
-
-.guest-section {
-  margin-top: 1.5rem;
 }
 
 .guest-list {
