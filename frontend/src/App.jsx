@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { declineAllGuests, fetchInvite, saveGuest, saveInvite } from "./api.js";
+import { fetchInvite, saveGuest, saveInvite } from "./api.js";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
 import { RSVP, WEDDING } from "./constants.js";
@@ -60,29 +60,14 @@ function ChoiceSection({
   );
 }
 
-function hasSavedRsvpData(invite) {
-  const guestList = invite.guests || [];
-  return (
-    invite.require_parking != null ||
-    invite.attend_solemnisation != null ||
-    guestList.some((guest) => guest.is_attending != null)
-  );
-}
+function guestRsvpState(guestList) {
+  const allResponded =
+    guestList.length > 0 && guestList.every((guest) => guest.is_attending != null);
+  const allDeclined =
+    allResponded && guestList.every((guest) => guest.is_attending === false);
+  const anyAttending = guestList.some((guest) => guest.is_attending === true);
 
-function inferAttendingChoice(invite) {
-  const guestList = invite.guests || [];
-  if (
-    guestList.length > 0 &&
-    guestList.every((guest) => guest.is_attending === false)
-  ) {
-    return "no";
-  }
-
-  if (hasSavedRsvpData(invite)) {
-    return "yes";
-  }
-
-  return null;
+  return { allResponded, allDeclined, anyAttending };
 }
 
 export default function App() {
@@ -90,11 +75,9 @@ export default function App() {
   const [guests, setGuests] = useState([]);
   const [requireParking, setRequireParking] = useState(null);
   const [attendSolemnisation, setAttendSolemnisation] = useState(null);
-  const [attendingChoice, setAttendingChoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingInvite, setSavingInvite] = useState(false);
   const [savingGuest, setSavingGuest] = useState(false);
-  const [decliningAll, setDecliningAll] = useState(false);
   const [activeGuest, setActiveGuest] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -123,7 +106,6 @@ export default function App() {
         ) {
           setAttendSolemnisation(invite.attend_solemnisation);
         }
-        setAttendingChoice(inferAttendingChoice(invite));
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -145,49 +127,15 @@ export default function App() {
     };
   }, [inviteId]);
 
-  const formDisabled = loading || !!error || decliningAll;
+  const formDisabled = loading || !!error;
   const hasSavedRsvp =
     requireParking != null ||
     attendSolemnisation != null ||
     guests.some((guest) => guest.is_attending != null);
-  const bigQuestionValue =
-    attendingChoice === "yes" ? true : attendingChoice === "no" ? false : null;
-  const showStep2 = attendingChoice === "yes";
+  const { allResponded, allDeclined, anyAttending } = guestRsvpState(guests);
+  const showStep2 = allResponded && anyAttending;
   const showStep3 = showStep2 && attendSolemnisation != null;
-  const showStep4 = showStep3 && requireParking != null;
   const inviteChoicesDisabled = formDisabled || savingInvite;
-
-  async function handleDeclineAll() {
-    setError("");
-    setSuccess("");
-    setDecliningAll(true);
-
-    try {
-      const updated = await declineAllGuests({ id: inviteId, decline_all: true });
-      setAttendingChoice("no");
-      setGuests(updated.guests || []);
-      setSuccess(RSVP.bigQuestion.declinedMessage);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setDecliningAll(false);
-    }
-  }
-
-  async function handleBigQuestionChoice(choice) {
-    setError("");
-    setSuccess("");
-
-    if (choice === "no") {
-      await handleDeclineAll();
-      return;
-    }
-
-    setAttendingChoice("yes");
-    if (hasSavedRsvp) {
-      setSuccess("You can update your details below.");
-    }
-  }
 
   async function handleInviteChoice(field, value) {
     const previousAttend = attendSolemnisation;
@@ -233,19 +181,24 @@ export default function App() {
 
     try {
       await saveGuest(payload);
-      setGuests((current) =>
-        current.map((guest) =>
-          guest.id === payload.id
-            ? {
-                ...guest,
-                is_attending: payload.is_attending,
-                dietary_restriction: payload.dietary_restriction,
-              }
-            : guest,
-        ),
+      const updatedGuests = guests.map((guest) =>
+        guest.id === payload.id
+          ? {
+              ...guest,
+              is_attending: payload.is_attending,
+              dietary_restriction: payload.dietary_restriction,
+            }
+          : guest,
       );
+      setGuests(updatedGuests);
       setActiveGuest(null);
-      setSuccess("Guest response saved.");
+
+      const { allDeclined: everyoneDeclined } = guestRsvpState(updatedGuests);
+      if (everyoneDeclined) {
+        setSuccess(RSVP.bigQuestion.declinedMessage);
+      } else {
+        setSuccess("Guest response saved.");
+      }
     } catch (err) {
       throw err;
     } finally {
@@ -271,20 +224,24 @@ export default function App() {
           <p className="loading-text">Loading invitation details...</p>
         ) : !error ? (
           <>
-            <ChoiceSection
-              number={RSVP.bigQuestion.number}
-              title={RSVP.bigQuestion.title}
-              question={RSVP.bigQuestion.question}
-              value={bigQuestionValue}
-              yesLabel={RSVP.bigQuestion.yes}
-              noLabel={RSVP.bigQuestion.no}
-              disabled={formDisabled}
-              onSelectYes={() => handleBigQuestionChoice("yes")}
-              onSelectNo={() => handleBigQuestionChoice("no")}
-            />
+            <section className="form-section">
+              <h2 className="section-heading">
+                {RSVP.bigQuestion.number}. {RSVP.bigQuestion.title}
+              </h2>
+              <p className="section-question">{RSVP.bigQuestion.question}</p>
+              <GuestList
+                guests={guests}
+                disabled={formDisabled || savingGuest}
+                onRespond={setActiveGuest}
+              />
+            </section>
 
-            {hasSavedRsvp && attendingChoice === "yes" && (
+            {hasSavedRsvp && anyAttending && (
               <p className="section-note">You can update your responses at any time.</p>
+            )}
+
+            {allDeclined && (
+              <p className="section-note">{RSVP.bigQuestion.declinedMessage}</p>
             )}
 
             {showStep2 && (
@@ -316,18 +273,6 @@ export default function App() {
               />
             )}
 
-            {showStep4 && (
-              <section className="guest-section">
-                <h2 className="section-heading">
-                  {RSVP.guests.number}. {RSVP.guests.title}
-                </h2>
-                <GuestList
-                  guests={guests}
-                  disabled={formDisabled}
-                  onRespond={setActiveGuest}
-                />
-              </section>
-            )}
           </>
         ) : null}
       </main>

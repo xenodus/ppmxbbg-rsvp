@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { RSVP } from "../constants.js";
 
 export default function GuestRespondModal({
   guest,
@@ -64,17 +65,17 @@ export default function GuestRespondModal({
             <div className="attendance-options">
               <button
                 type="button"
-                className={`attendance-btn ${attendance === true ? "is-selected" : ""}`}
+                className={`choice-btn ${attendance === true ? "is-selected" : ""}`}
                 onClick={() => setAttendance(true)}
               >
-                ✦ JOYFULLY ACCEPTS
+                {RSVP.bigQuestion.yes}
               </button>
               <button
                 type="button"
-                className={`attendance-btn ${attendance === false ? "is-selected" : ""}`}
+                className={`choice-btn ${attendance === false ? "is-selected" : ""}`}
                 onClick={() => setAttendance(false)}
               >
-                REGRETFULLY DECLINES
+                {RSVP.bigQuestion.no}
               </button>
             </div>
           </fieldset>

@@ -31,10 +31,6 @@ export const RSVP = {
     yes: "Vroom vroom, yes please! 🚗",
     no: "Nope, catching a ride / public transport / flying in on a pegasus.",
   },
-  guests: {
-    number: "4",
-    title: "Guests",
-  },
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";

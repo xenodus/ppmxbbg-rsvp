@@ -231,8 +231,7 @@ form {
 
 .form-card > .form-section + .form-section,
 .form-card > .form-section + .section-note,
-.form-card > .section-note + .form-section,
-.form-card > .form-section + .guest-section {
+.form-card > .section-note + .form-section {
   margin-top: var(--section-gap);
 }
 
@@ -241,6 +240,10 @@ form {
   text-align: center;
   line-height: 1.5;
   font-size: 0.95rem;
+}
+
+.form-section .guest-list {
+  margin-top: 0.75rem;
 }
 
 .section-note {
