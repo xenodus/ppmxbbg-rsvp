@@ -91,10 +91,10 @@ Wedding copy (names, date, venue) lives in `frontend/src/constants.js`.
 ```bash
 cp api/.env.example api/.env
 # edit api/.env with DB credentials and TEST_GUEST_ID
-cd api && go run cmd/main.go
+cd api && go run ./cmd/local
 ```
 
-With `ENV` unset, `go run cmd/main.go` performs a single local GET using `TEST_GUEST_ID`.
+With `ENV` unset, `go run ./cmd/local` performs a single local GET using `TEST_GUEST_ID`.
 
 ### Frontend
 
