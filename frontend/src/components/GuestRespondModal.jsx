@@ -50,47 +50,53 @@ export default function GuestRespondModal({
           Guest Response
         </h2>
 
-        <label className="field-label" htmlFor="modal-guest-name">
-          FULL NAME
-        </label>
-        <div id="modal-guest-name" className="name-display">
-          {guest.name}
+        <div className="modal-block">
+          <label className="field-label" htmlFor="modal-guest-name">
+            FULL NAME
+          </label>
+          <div id="modal-guest-name" className="name-display">
+            {guest.name}
+          </div>
         </div>
 
         {error && <p className="banner banner-error">{error}</p>}
 
-        <form onSubmit={handleSubmit} noValidate>
-          <fieldset className="attendance-fieldset">
-            <legend className="field-label">WILL THEY BE ATTENDING?</legend>
-            <div className="attendance-options">
-              <button
-                type="button"
-                className={`choice-btn ${attendance === true ? "is-selected" : ""}`}
-                onClick={() => setAttendance(true)}
-              >
-                {RSVP.bigQuestion.yes}
-              </button>
-              <button
-                type="button"
-                className={`choice-btn ${attendance === false ? "is-selected" : ""}`}
-                onClick={() => setAttendance(false)}
-              >
-                {RSVP.bigQuestion.no}
-              </button>
-            </div>
-          </fieldset>
+        <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          <div className="modal-block">
+            <fieldset className="attendance-fieldset">
+              <legend className="field-label">WILL THEY BE ATTENDING?</legend>
+              <div className="attendance-options">
+                <button
+                  type="button"
+                  className={`choice-btn ${attendance === true ? "is-selected" : ""}`}
+                  onClick={() => setAttendance(true)}
+                >
+                  {RSVP.bigQuestion.yes}
+                </button>
+                <button
+                  type="button"
+                  className={`choice-btn ${attendance === false ? "is-selected" : ""}`}
+                  onClick={() => setAttendance(false)}
+                >
+                  {RSVP.bigQuestion.no}
+                </button>
+              </div>
+            </fieldset>
+          </div>
 
-          <label className="field-label" htmlFor="modal-dietary">
-            DIETARY RESTRICTIONS
-          </label>
-          <textarea
-            id="modal-dietary"
-            className="textarea"
-            placeholder="Please let us know of any dietary needs, allergies, or preferences..."
-            value={dietaryRestriction}
-            onChange={(event) => setDietaryRestriction(event.target.value)}
-            rows={4}
-          />
+          <div className="modal-block">
+            <label className="field-label" htmlFor="modal-dietary">
+              DIETARY RESTRICTIONS
+            </label>
+            <textarea
+              id="modal-dietary"
+              className="textarea"
+              placeholder="Please let us know of any dietary needs, allergies, or preferences..."
+              value={dietaryRestriction}
+              onChange={(event) => setDietaryRestriction(event.target.value)}
+              rows={4}
+            />
+          </div>
 
           <button type="submit" className="submit-btn" disabled={submitting}>
             {submitting ? "SAVING..." : "SAVE RESPONSE"}
