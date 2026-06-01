@@ -10,8 +10,8 @@ import (
 func TestRSVPOptionsV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",
-		"routeKey": "OPTIONS /invite",
-		"rawPath":  "/invite",
+		"routeKey": "OPTIONS /guest",
+		"rawPath":  "/guest",
 		"requestContext": map[string]any{
 			"http": map[string]string{"method": "OPTIONS"},
 		},
@@ -24,10 +24,10 @@ func TestRSVPOptionsV2(t *testing.T) {
 	assertStatus(t, resp, http.StatusNoContent)
 }
 
-func TestRSVPGetInviteMissingID(t *testing.T) {
+func TestRSVPGetGuestMissingID(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"httpMethod": "GET",
-		"path":       "/invite",
+		"path":       "/guest",
 	})
 
 	resp, err := RSVP(context.Background(), raw)
@@ -40,8 +40,8 @@ func TestRSVPGetInviteMissingID(t *testing.T) {
 func TestRSVPInvalidMethodV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",
-		"routeKey": "DELETE /invite",
-		"rawPath":  "/invite",
+		"routeKey": "DELETE /guest",
+		"rawPath":  "/guest",
 		"requestContext": map[string]any{
 			"http": map[string]string{"method": "DELETE"},
 		},

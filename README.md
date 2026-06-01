@@ -5,10 +5,9 @@ Wedding RSVP site with a Go Lambda API backed by remote MySQL and a React SPA ho
 ## Architecture
 
 - **Frontend** (`frontend/`): React + Vite single-page app. Guests open a personalised link such as `https://your-domain.com/?id=1234567890123456789`.
-- **Backend** (`api/`): Go Lambda container image. One function handles read and write:
-  - `GET /invite?id={id}` — load invite and guests
-  - `POST /invite` — save invite-level responses
-  - `POST /guest` — save individual guest response
+- **Backend** (`api/`): Go Lambda container image. One function handles read and write on `/guest`:
+  - `GET /guest?id={id}` — load invite and guests
+  - `POST /guest` — save invite-level or individual guest responses
 - **Database**: MySQL `rsvp` database with `invites` and `guests` tables (populated separately).
 
 ## Database schema
@@ -35,7 +34,7 @@ CREATE TABLE guests (
 
 ## API
 
-### `GET /invite?id={id}`
+### `GET /guest?id={id}`
 
 Returns the invite and its guests:
 
@@ -65,9 +64,9 @@ Optional fields are omitted when null.
 { "error": "invite not found" }
 ```
 
-### `POST /invite`
+### `POST /guest`
 
-Request body:
+Invite-level update:
 
 ```json
 {
@@ -77,11 +76,7 @@ Request body:
 }
 ```
 
-Updates invite-level fields and returns the updated invite with guests.
-
-### `POST /guest`
-
-Request body:
+Individual guest update:
 
 ```json
 {
@@ -91,7 +86,7 @@ Request body:
 }
 ```
 
-Updates a single guest response.
+The handler distinguishes invite vs guest updates by the presence of `require_parking` or `attend_solemnisation` in the body. Invite updates return the updated invite with guests; guest updates return `{ "status": "saved" }`.
 
 ## Environment variables (Lambda)
 
@@ -135,7 +130,7 @@ cd frontend && npm install && npm run dev
 
 Open `http://localhost:5173/?id=YOUR_INVITE_ID`.
 
-For local API testing through Vite, set `VITE_API_PROXY_TARGET` to your API Gateway URL and leave `VITE_API_BASE_URL` empty so requests go to `/invite` and `/guest` on the dev server.
+For local API testing through Vite, set `VITE_API_PROXY_TARGET` to your API Gateway URL and leave `VITE_API_BASE_URL` empty so requests go to `/guest` on the dev server.
 
 ## Tests
 
@@ -173,10 +168,9 @@ Map these routes to the same Lambda:
 
 | Method | Path | Integration |
 |--------|------|-------------|
-| GET | `/invite` | Lambda proxy |
-| POST | `/invite` | Lambda proxy |
+| GET | `/guest` | Lambda proxy |
 | POST | `/guest` | Lambda proxy |
-| OPTIONS | `/invite`, `/guest` | Lambda proxy (CORS preflight) |
+| OPTIONS | `/guest` | Lambda proxy (CORS preflight) |
 
 ## Invitation links
 

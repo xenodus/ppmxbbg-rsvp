@@ -11,10 +11,6 @@ export default defineConfig(({ mode }) => {
     server: proxyTarget
       ? {
           proxy: {
-            "/invite": {
-              target: proxyTarget,
-              changeOrigin: true,
-            },
             "/guest": {
               target: proxyTarget,
               changeOrigin: true,

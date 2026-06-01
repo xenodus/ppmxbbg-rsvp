@@ -18,8 +18,8 @@ func main() {
 
 	raw, err := json.Marshal(map[string]any{
 		"version":       "2.0",
-		"rawPath":       "/invite",
-		"routeKey":      "GET /invite",
+		"rawPath":       "/guest",
+		"routeKey":      "GET /guest",
 		"queryStringParameters": map[string]string{"id": os.Getenv("TEST_INVITE_ID")},
 		"requestContext": map[string]any{
 			"http": map[string]string{"method": "GET"},

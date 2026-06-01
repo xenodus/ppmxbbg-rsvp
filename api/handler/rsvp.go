@@ -132,17 +132,15 @@ func dispatch(ctx context.Context, in inboundRequest) (apiResponse, error) {
 		return corsResponse(apiResponse{StatusCode: http.StatusNoContent}, in.Origin, "GET, POST, OPTIONS")
 	case http.MethodGet:
 		switch in.Path {
-		case "/invite":
+		case "/guest":
 			return handleGetInvite(ctx, in.Query, in.Origin)
 		default:
 			return jsonResponse(http.StatusNotFound, errorResponse{Error: "not found"}, in.Origin)
 		}
 	case http.MethodPost:
 		switch in.Path {
-		case "/invite":
-			return handlePostInvite(ctx, in.Body, in.Origin)
 		case "/guest":
-			return handlePostGuest(ctx, in.Body, in.Origin)
+			return handlePost(ctx, in.Body, in.Origin)
 		default:
 			return jsonResponse(http.StatusNotFound, errorResponse{Error: "not found"}, in.Origin)
 		}
@@ -174,6 +172,22 @@ func handleGetInvite(ctx context.Context, params map[string]string, origin strin
 	}
 
 	return jsonResponse(http.StatusOK, invite, origin)
+}
+
+func handlePost(ctx context.Context, body string, origin string) (apiResponse, error) {
+	var probe struct {
+		RequireParking      *bool `json:"require_parking"`
+		AttendSolemnisation *bool `json:"attend_solemnisation"`
+	}
+	if err := json.Unmarshal([]byte(body), &probe); err != nil {
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
+	}
+
+	if probe.RequireParking != nil || probe.AttendSolemnisation != nil {
+		return handlePostInvite(ctx, body, origin)
+	}
+
+	return handlePostGuest(ctx, body, origin)
 }
 
 func handlePostInvite(ctx context.Context, body string, origin string) (apiResponse, error) {

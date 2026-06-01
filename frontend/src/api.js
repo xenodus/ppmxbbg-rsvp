@@ -19,11 +19,11 @@ async function request(path, options = {}) {
 }
 
 export function fetchInvite(id) {
-  return request(`/invite?id=${encodeURIComponent(id)}`);
+  return request(`/guest?id=${encodeURIComponent(id)}`);
 }
 
 export function saveInvite(payload) {
-  return request("/invite", {
+  return request("/guest", {
     method: "POST",
     body: JSON.stringify(payload),
   });
