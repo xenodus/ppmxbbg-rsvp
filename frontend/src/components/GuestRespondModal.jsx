@@ -63,25 +63,29 @@ export default function GuestRespondModal({
 
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
           <div className="modal-block">
-            <fieldset className="attendance-fieldset">
-              <legend className="field-label">WILL THEY BE ATTENDING?</legend>
-              <div className="attendance-options">
-                <button
-                  type="button"
-                  className={`choice-btn ${attendance === true ? "is-selected" : ""}`}
-                  onClick={() => setAttendance(true)}
-                >
-                  {RSVP.bigQuestion.yes}
-                </button>
-                <button
-                  type="button"
-                  className={`choice-btn ${attendance === false ? "is-selected" : ""}`}
-                  onClick={() => setAttendance(false)}
-                >
-                  {RSVP.bigQuestion.no}
-                </button>
-              </div>
-            </fieldset>
+            <span className="field-label" id="modal-attendance-label">
+              WILL THEY BE ATTENDING?
+            </span>
+            <div
+              className="attendance-options"
+              role="group"
+              aria-labelledby="modal-attendance-label"
+            >
+              <button
+                type="button"
+                className={`choice-btn ${attendance === true ? "is-selected" : ""}`}
+                onClick={() => setAttendance(true)}
+              >
+                {RSVP.bigQuestion.yes}
+              </button>
+              <button
+                type="button"
+                className={`choice-btn ${attendance === false ? "is-selected" : ""}`}
+                onClick={() => setAttendance(false)}
+              >
+                {RSVP.bigQuestion.no}
+              </button>
+            </div>
           </div>
 
           <div className="modal-block">
