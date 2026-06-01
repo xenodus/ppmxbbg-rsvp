@@ -1,6 +1,6 @@
 export const WEDDING = {
   inviteLine: "YOU ARE CORDIALLY INVITED",
-  coupleNames: "Sophia & James",
+  coupleNames: "Alvin & Vivian",
   date: "14 . September . 2026",
   venue: "The Grand Estate . Garden Hall",
 };
