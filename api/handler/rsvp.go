@@ -176,6 +176,7 @@ func handleGetInvite(ctx context.Context, params map[string]string, origin strin
 
 func handlePost(ctx context.Context, body string, origin string) (apiResponse, error) {
 	var probe struct {
+		DeclineAll          *bool `json:"decline_all"`
 		RequireParking      *bool `json:"require_parking"`
 		AttendSolemnisation *bool `json:"attend_solemnisation"`
 	}
@@ -183,11 +184,43 @@ func handlePost(ctx context.Context, body string, origin string) (apiResponse, e
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
 	}
 
+	if probe.DeclineAll != nil && *probe.DeclineAll {
+		return handleDeclineAll(ctx, body, origin)
+	}
+
 	if probe.RequireParking != nil || probe.AttendSolemnisation != nil {
 		return handlePostInvite(ctx, body, origin)
 	}
 
 	return handlePostGuest(ctx, body, origin)
+}
+
+func handleDeclineAll(ctx context.Context, body string, origin string) (apiResponse, error) {
+	var req struct {
+		ID string `json:"id"`
+	}
+	if err := json.Unmarshal([]byte(body), &req); err != nil {
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
+	}
+
+	req.ID = strings.TrimSpace(req.ID)
+	if req.ID == "" {
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "id is required"}, origin)
+	}
+
+	if err := store.DeclineAllGuests(ctx, req.ID); errors.Is(err, store.ErrInviteNotFound) {
+		return jsonResponse(http.StatusNotFound, errorResponse{Error: "invite not found"}, origin)
+	} else if err != nil {
+		log.Printf("decline all guests for invite %s: %v", req.ID, err)
+		return jsonResponse(http.StatusInternalServerError, errorResponse{Error: "failed to save response"}, origin)
+	}
+
+	updated, err := store.GetInvite(ctx, req.ID)
+	if err != nil {
+		return jsonResponse(http.StatusOK, map[string]string{"status": "saved"}, origin)
+	}
+
+	return jsonResponse(http.StatusOK, updated, origin)
 }
 
 func handlePostInvite(ctx context.Context, body string, origin string) (apiResponse, error) {

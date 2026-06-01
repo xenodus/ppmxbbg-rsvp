@@ -22,6 +22,13 @@ export function fetchInvite(id) {
   return request(`/guest?id=${encodeURIComponent(id)}`);
 }
 
+export function declineAllGuests(payload) {
+  return request("/guest", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function saveInvite(payload) {
   return request("/guest", {
     method: "POST",

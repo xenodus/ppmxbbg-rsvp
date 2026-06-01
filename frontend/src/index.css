@@ -206,6 +206,7 @@ form {
 
 .submit-btn:disabled,
 .attendance-btn:disabled,
+.choice-btn:disabled,
 .textarea:disabled,
 .respond-btn:disabled {
   opacity: 0.55;
@@ -218,6 +219,58 @@ form {
   color: var(--muted);
   font-style: italic;
   text-align: center;
+}
+
+.section-heading {
+  margin: 2rem 0 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.form-section:first-child .section-heading {
+  margin-top: 0;
+}
+
+.section-question {
+  margin: 0 0 0.75rem;
+  text-align: center;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.section-note {
+  margin: 0 0 1rem;
+  text-align: center;
+  line-height: 1.5;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.choice-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 1rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.choice-btn:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+.choice-btn.is-selected {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
 }
 
 .section-title {

@@ -78,8 +78,27 @@ Null fields (`require_parking`, `attend_solemnisation`, `is_attending`, `dietary
 
 Save RSVP data. The handler routes by request body:
 
+- Body contains `"decline_all": true` → **decline all guests** for the invite
 - Body contains `require_parking` or `attend_solemnisation` → **invite update**
 - Otherwise → **guest update**
+
+#### Decline all guests
+
+**Request body**
+
+```json
+{
+  "id": "1234567890123456789",
+  "decline_all": true
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | yes | Invite id (snowflake, string) |
+| `decline_all` | yes | Must be `true` — marks every guest on the invite as not attending |
+
+**200 OK** — returns the updated invite with guests (all `is_attending: false`).
 
 #### Invite update
 

@@ -236,3 +236,26 @@ func SaveGuest(ctx context.Context, update GuestUpdate) error {
 
 	return nil
 }
+
+func DeclineAllGuests(ctx context.Context, inviteID string) error {
+	conn, err := DB()
+	if err != nil {
+		return err
+	}
+
+	var exists int
+	err = conn.QueryRowContext(ctx, `SELECT 1 FROM invites WHERE id = ?`, inviteID).Scan(&exists)
+	if errors.Is(err, sql.ErrNoRows) {
+		return ErrInviteNotFound
+	}
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.ExecContext(ctx, `
+		UPDATE guests
+		SET is_attending = 0
+		WHERE invite_id = ?
+	`, inviteID)
+	return err
+}
