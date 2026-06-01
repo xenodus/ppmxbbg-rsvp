@@ -4,47 +4,80 @@ Wedding RSVP site with a Go Lambda API backed by remote MySQL and a React SPA ho
 
 ## Architecture
 
-- **Frontend** (`frontend/`): React + Vite single-page app. Guests open a personalised link such as `https://your-domain.com/?id=ABC123`.
-- **Backend** (`api/`): Go Lambda container image. One function handles both read and write:
-  - `GET /guest?id={id}` — load guest record
-  - `POST /guest` — save RSVP
-- **Database**: MySQL `rsvp` database, `guests` table (populated separately).
+- **Frontend** (`frontend/`): React + Vite single-page app. Guests open a personalised link such as `https://your-domain.com/?id=1234567890123456789`.
+- **Backend** (`api/`): Go Lambda container image. One function handles read and write:
+  - `GET /invite?id={id}` — load invite and guests
+  - `POST /invite` — save invite-level responses
+  - `POST /guest` — save individual guest response
+- **Database**: MySQL `rsvp` database with `invites` and `guests` tables (populated separately).
 
 ## Database schema
 
 ```sql
-CREATE TABLE guests (
-  id VARCHAR(6) PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  is_attending TINYINT(1) NULL,
-  comment TEXT NULL,
+CREATE TABLE invites (
+  id BIGINT PRIMARY KEY,
+  is_sent TINYINT(1) NOT NULL DEFAULT 0,
+  require_parking TINYINT(1) NULL,
+  attend_solemnisation TINYINT(1) NULL,
   last_updated DATE NULL
+);
+
+CREATE TABLE guests (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  invite_id BIGINT NOT NULL,
+  name TEXT NOT NULL,
+  dietary_restriction TEXT NULL,
+  is_attending TINYINT(1) NULL,
+  last_updated DATE NULL,
+  FOREIGN KEY (invite_id) REFERENCES invites(id)
 );
 ```
 
 ## API
 
-### `GET /guest?id={id}`
+### `GET /invite?id={id}`
 
-Returns the full guest row when found:
+Returns the invite and its guests:
 
 ```json
 {
-  "id": "ABC123",
-  "name": "Jane Doe",
-  "is_attending": true,
-  "comment": "Vegetarian",
-  "last_updated": "2026-05-01"
+  "id": "1234567890123456789",
+  "require_parking": true,
+  "attend_solemnisation": false,
+  "last_updated": "2026-06-01",
+  "guests": [
+    {
+      "id": 1,
+      "name": "Jane Doe",
+      "is_attending": true,
+      "dietary_restriction": "Vegetarian",
+      "last_updated": "2026-06-01"
+    }
+  ]
 }
 ```
 
-`is_attending`, `comment`, and `last_updated` are omitted when null.
+Optional fields are omitted when null.
 
-**404** when the guest does not exist:
+**404** when the invite does not exist:
 
 ```json
-{ "error": "guest not found" }
+{ "error": "invite not found" }
 ```
+
+### `POST /invite`
+
+Request body:
+
+```json
+{
+  "id": "1234567890123456789",
+  "require_parking": true,
+  "attend_solemnisation": false
+}
+```
+
+Updates invite-level fields and returns the updated invite with guests.
 
 ### `POST /guest`
 
@@ -52,14 +85,13 @@ Request body:
 
 ```json
 {
-  "id": "ABC123",
-  "name": "Jane Doe",
+  "id": 1,
   "is_attending": true,
-  "comment": "Vegetarian"
+  "dietary_restriction": "Vegetarian"
 }
 ```
 
-Updates `name`, `is_attending`, `comment`, and sets `last_updated` to the current date. Returns the updated guest on success.
+Updates a single guest response.
 
 ## Environment variables (Lambda)
 
@@ -90,11 +122,9 @@ Wedding copy (names, date, venue) lives in `frontend/src/constants.js`.
 
 ```bash
 cp api/.env.example api/.env
-# edit api/.env with DB credentials and TEST_GUEST_ID
+# edit api/.env with DB credentials and TEST_INVITE_ID
 cd api && go run ./cmd/local
 ```
-
-With `ENV` unset, `go run ./cmd/local` performs a single local GET using `TEST_GUEST_ID`.
 
 ### Frontend
 
@@ -103,9 +133,9 @@ cp frontend/.env.example frontend/.env
 cd frontend && npm install && npm run dev
 ```
 
-Open `http://localhost:5173/?id=YOUR_GUEST_ID`.
+Open `http://localhost:5173/?id=YOUR_INVITE_ID`.
 
-For local API testing through Vite, set `VITE_API_PROXY_TARGET` to your API Gateway or local proxy URL and leave `VITE_API_BASE_URL` empty so requests go to `/guest` on the dev server.
+For local API testing through Vite, set `VITE_API_PROXY_TARGET` to your API Gateway URL and leave `VITE_API_BASE_URL` empty so requests go to `/invite` and `/guest` on the dev server.
 
 ## Tests
 
@@ -114,13 +144,6 @@ make test
 ```
 
 ## Deployment
-
-Deployment follows the same pattern as [gishathfetch](https://github.com/xenodus/gishathfetch):
-
-1. Build and push the Lambda container image to ECR.
-2. Update the Lambda function.
-3. Build the frontend and sync `frontend/dist` to S3.
-4. Invalidate CloudFront if used.
 
 Configure Makefile variables in `Makefile.include` (copy from `Makefile.include.example`):
 
@@ -139,34 +162,28 @@ cp Makefile.include.example Makefile.include
 ### Deploy
 
 ```bash
-# API only (build image, push to ECR, update Lambda)
 make deploy-api
-
-# Frontend only (build with VITE_API_BASE_URL, sync to S3, invalidate CloudFront)
 make deploy-frontend
-
-# Both
 make deploy
 ```
 
 ### API Gateway routes
 
-Map both routes to the same Lambda:
+Map these routes to the same Lambda:
 
 | Method | Path | Integration |
 |--------|------|-------------|
-| GET | `/guest` | Lambda proxy |
+| GET | `/invite` | Lambda proxy |
+| POST | `/invite` | Lambda proxy |
 | POST | `/guest` | Lambda proxy |
-| OPTIONS | `/guest` | Lambda proxy (CORS preflight) |
-
-Enable CORS at API Gateway or rely on the Lambda response headers.
+| OPTIONS | `/invite`, `/guest` | Lambda proxy (CORS preflight) |
 
 ## Invitation links
 
 Share links in this form:
 
 ```
-https://your-rsvp-domain.com/?id=ABC123
+https://your-rsvp-domain.com/?id=1234567890123456789
 ```
 
-The frontend loads the guest on mount, prefills name (and attendance/comment when present), and shows **Guest not found. Please check your invitation link.** when the id is missing or unknown.
+The frontend loads the invite, lets the user answer parking/solemnisation questions, and provides a guest list where each guest can be responded to individually.

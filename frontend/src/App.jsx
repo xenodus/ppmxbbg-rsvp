@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetchGuest, saveGuest } from "./api.js";
+import { fetchInvite, saveGuest, saveInvite } from "./api.js";
+import GuestList from "./components/GuestList.jsx";
+import GuestRespondModal from "./components/GuestRespondModal.jsx";
 import { WEDDING } from "./constants.js";
 
 function Divider() {
@@ -12,47 +14,76 @@ function Divider() {
   );
 }
 
-function getGuestId() {
+function getInviteId() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id")?.trim() || "";
 }
 
+function YesNoField({ label, value, disabled, onChange }) {
+  return (
+    <fieldset className="attendance-fieldset" disabled={disabled}>
+      <legend className="field-label">{label}</legend>
+      <div className="attendance-options">
+        <button
+          type="button"
+          className={`attendance-btn ${value === true ? "is-selected" : ""}`}
+          onClick={() => onChange(true)}
+        >
+          YES
+        </button>
+        <button
+          type="button"
+          className={`attendance-btn ${value === false ? "is-selected" : ""}`}
+          onClick={() => onChange(false)}
+        >
+          NO
+        </button>
+      </div>
+    </fieldset>
+  );
+}
+
 export default function App() {
-  const guestId = useMemo(() => getGuestId(), []);
-  const [name, setName] = useState("");
-  const [attendance, setAttendance] = useState(null);
-  const [comment, setComment] = useState("");
+  const inviteId = useMemo(() => getInviteId(), []);
+  const [guests, setGuests] = useState([]);
+  const [requireParking, setRequireParking] = useState(null);
+  const [attendSolemnisation, setAttendSolemnisation] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const [savingInvite, setSavingInvite] = useState(false);
+  const [savingGuest, setSavingGuest] = useState(false);
+  const [activeGuest, setActiveGuest] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (!guestId) {
+    if (!inviteId) {
       setLoading(false);
-      setError("Guest not found. Please check your invitation link.");
+      setError("Invite not found. Please check your invitation link.");
       return;
     }
 
     let cancelled = false;
 
-    async function loadGuest() {
+    async function loadInvite() {
       try {
-        const guest = await fetchGuest(guestId);
+        const invite = await fetchInvite(inviteId);
         if (cancelled) return;
 
-        setName(guest.name || "");
-        if (guest.is_attending !== undefined && guest.is_attending !== null) {
-          setAttendance(guest.is_attending);
+        setGuests(invite.guests || []);
+        if (invite.require_parking !== undefined && invite.require_parking !== null) {
+          setRequireParking(invite.require_parking);
         }
-        if (guest.comment) {
-          setComment(guest.comment);
+        if (
+          invite.attend_solemnisation !== undefined &&
+          invite.attend_solemnisation !== null
+        ) {
+          setAttendSolemnisation(invite.attend_solemnisation);
         }
       } catch (err) {
         if (!cancelled) {
           setError(
-            err.message === "guest not found"
-              ? "Guest not found. Please check your invitation link."
+            err.message === "invite not found"
+              ? "Invite not found. Please check your invitation link."
               : err.message,
           );
         }
@@ -63,41 +94,72 @@ export default function App() {
       }
     }
 
-    loadGuest();
+    loadInvite();
     return () => {
       cancelled = true;
     };
-  }, [guestId]);
+  }, [inviteId]);
 
-  async function handleSubmit(event) {
+  async function handleSaveInvite(event) {
     event.preventDefault();
     setError("");
     setSuccess("");
 
-    if (attendance === null) {
-      setError("Please let us know if you will be attending.");
+    if (requireParking === null) {
+      setError("Please let us know if couple parking is required.");
+      return;
+    }
+    if (attendSolemnisation === null) {
+      setError("Please let us know if you will be attending the solemnisation.");
       return;
     }
 
-    setSubmitting(true);
+    setSavingInvite(true);
     try {
-      await saveGuest({
-        id: guestId,
-        name: name.trim(),
-        is_attending: attendance,
-        comment: comment.trim() || null,
+      const updated = await saveInvite({
+        id: inviteId,
+        require_parking: requireParking,
+        attend_solemnisation: attendSolemnisation,
       });
-      setSuccess("Thank you! Your RSVP has been saved.");
+      setGuests(updated.guests || []);
+      setRequireParking(updated.require_parking ?? requireParking);
+      setAttendSolemnisation(updated.attend_solemnisation ?? attendSolemnisation);
+      setSuccess("Invitation details saved.");
     } catch (err) {
       setError(err.message);
     } finally {
-      setSubmitting(false);
+      setSavingInvite(false);
     }
   }
 
-  const nameDisplay = loading
-    ? "Loading guest details..."
-    : name || "—";
+  async function handleSaveGuest(payload) {
+    setSavingGuest(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      await saveGuest(payload);
+      setGuests((current) =>
+        current.map((guest) =>
+          guest.id === payload.id
+            ? {
+                ...guest,
+                is_attending: payload.is_attending,
+                dietary_restriction: payload.dietary_restriction,
+              }
+            : guest,
+        ),
+      );
+      setActiveGuest(null);
+      setSuccess("Guest response saved.");
+    } catch (err) {
+      throw err;
+    } finally {
+      setSavingGuest(false);
+    }
+  }
+
+  const formDisabled = loading || !!error;
 
   return (
     <div className="page">
@@ -113,60 +175,54 @@ export default function App() {
         {error && <p className="banner banner-error">{error}</p>}
         {success && <p className="banner banner-success">{success}</p>}
 
-        <form onSubmit={handleSubmit} noValidate>
-          <label className="field-label" htmlFor="guest-name">
-            FULL NAME
-          </label>
-          <div
-            id="guest-name"
-            className={`name-display ${loading ? "is-loading" : ""}`}
-            aria-live="polite"
-          >
-            {nameDisplay}
-          </div>
+        {loading ? (
+          <p className="loading-text">Loading invitation details...</p>
+        ) : (
+          <>
+            <form onSubmit={handleSaveInvite} noValidate>
+              <YesNoField
+                label="IS COUPLE PARKING REQUIRED?"
+                value={requireParking}
+                disabled={formDisabled}
+                onChange={setRequireParking}
+              />
 
-          <fieldset className="attendance-fieldset" disabled={loading || !!error}>
-            <legend className="field-label">WILL YOU BE ATTENDING?</legend>
-            <div className="attendance-options">
+              <YesNoField
+                label="WILL YOU BE ATTENDING THE SOLEMNISATION?"
+                value={attendSolemnisation}
+                disabled={formDisabled}
+                onChange={setAttendSolemnisation}
+              />
+
               <button
-                type="button"
-                className={`attendance-btn ${attendance === true ? "is-selected" : ""}`}
-                onClick={() => setAttendance(true)}
+                type="submit"
+                className="submit-btn"
+                disabled={formDisabled || savingInvite}
               >
-                ✦ JOYFULLY ACCEPTS
+                {savingInvite ? "SAVING..." : "SAVE INVITATION DETAILS"}
               </button>
-              <button
-                type="button"
-                className={`attendance-btn ${attendance === false ? "is-selected" : ""}`}
-                onClick={() => setAttendance(false)}
-              >
-                REGRETFULLY DECLINES
-              </button>
-            </div>
-          </fieldset>
+            </form>
 
-          <label className="field-label" htmlFor="dietary">
-            DIETARY RESTRICTIONS
-          </label>
-          <textarea
-            id="dietary"
-            className="textarea"
-            placeholder="Please let us know of any dietary needs, allergies, or preferences..."
-            value={comment}
-            onChange={(event) => setComment(event.target.value)}
-            disabled={loading || !!error}
-            rows={5}
-          />
-
-          <button
-            type="submit"
-            className="submit-btn"
-            disabled={loading || submitting || !!error}
-          >
-            {submitting ? "SAVING..." : "SUBMIT RSVP"}
-          </button>
-        </form>
+            <section className="guest-section">
+              <h2 className="section-title">Guests</h2>
+              <GuestList
+                guests={guests}
+                disabled={formDisabled}
+                onRespond={setActiveGuest}
+              />
+            </section>
+          </>
+        )}
       </main>
+
+      {activeGuest && (
+        <GuestRespondModal
+          guest={activeGuest}
+          submitting={savingGuest}
+          onClose={() => setActiveGuest(null)}
+          onSave={handleSaveGuest}
+        />
+      )}
 
       <Divider />
 

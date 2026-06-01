@@ -18,8 +18,15 @@ async function request(path, options = {}) {
   return data;
 }
 
-export function fetchGuest(id) {
-  return request(`/guest?id=${encodeURIComponent(id)}`);
+export function fetchInvite(id) {
+  return request(`/invite?id=${encodeURIComponent(id)}`);
+}
+
+export function saveInvite(payload) {
+  return request("/invite", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 export function saveGuest(payload) {

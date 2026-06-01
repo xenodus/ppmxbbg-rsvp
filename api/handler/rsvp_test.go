@@ -10,7 +10,8 @@ import (
 func TestRSVPOptionsV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",
-		"routeKey": "OPTIONS /guest",
+		"routeKey": "OPTIONS /invite",
+		"rawPath":  "/invite",
 		"requestContext": map[string]any{
 			"http": map[string]string{"method": "OPTIONS"},
 		},
@@ -23,10 +24,10 @@ func TestRSVPOptionsV2(t *testing.T) {
 	assertStatus(t, resp, http.StatusNoContent)
 }
 
-func TestRSVPGetV1(t *testing.T) {
+func TestRSVPGetInviteMissingID(t *testing.T) {
 	raw := mustJSON(map[string]any{
-		"httpMethod":            "GET",
-		"queryStringParameters": map[string]string{},
+		"httpMethod": "GET",
+		"path":       "/invite",
 	})
 
 	resp, err := RSVP(context.Background(), raw)
@@ -39,7 +40,8 @@ func TestRSVPGetV1(t *testing.T) {
 func TestRSVPInvalidMethodV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",
-		"routeKey": "DELETE /guest",
+		"routeKey": "DELETE /invite",
+		"rawPath":  "/invite",
 		"requestContext": map[string]any{
 			"http": map[string]string{"method": "DELETE"},
 		},
@@ -52,9 +54,10 @@ func TestRSVPInvalidMethodV2(t *testing.T) {
 	assertStatus(t, resp, http.StatusMethodNotAllowed)
 }
 
-func TestRSVPInvalidPostBodyV1(t *testing.T) {
+func TestRSVPPostGuestInvalidBody(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"httpMethod": "POST",
+		"path":       "/guest",
 		"body":       "{",
 	})
 
@@ -71,6 +74,19 @@ func TestRSVPInvalidPostBodyV1(t *testing.T) {
 	if body["error"] == "" {
 		t.Fatal("expected error message in body")
 	}
+}
+
+func TestRSVPUnknownPath(t *testing.T) {
+	raw := mustJSON(map[string]any{
+		"httpMethod": "GET",
+		"path":       "/unknown",
+	})
+
+	resp, err := RSVP(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertStatus(t, resp, http.StatusNotFound)
 }
 
 func mustJSON(v any) []byte {

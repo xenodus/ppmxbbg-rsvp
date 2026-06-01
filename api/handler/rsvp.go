@@ -27,11 +27,12 @@ type apiResponse struct {
 }
 
 type inboundRequest struct {
-	Method  string
-	Query   map[string]string
-	Body    string
-	Origin  string
-	UseV2   bool
+	Method string
+	Path   string
+	Query  map[string]string
+	Body   string
+	Origin string
+	UseV2  bool
 }
 
 // RSVP handles both HTTP API payload format 1.0 and 2.0 events.
@@ -70,6 +71,7 @@ func parseInbound(raw json.RawMessage) (inboundRequest, error) {
 
 		return inboundRequest{
 			Method: method,
+			Path:   normalizePath(req.RawPath),
 			Query:  req.QueryStringParameters,
 			Body:   req.Body,
 			Origin: headerOrigin(req.Headers),
@@ -84,11 +86,26 @@ func parseInbound(raw json.RawMessage) (inboundRequest, error) {
 
 	return inboundRequest{
 		Method: req.HTTPMethod,
+		Path:   normalizePath(req.Path),
 		Query:  req.QueryStringParameters,
 		Body:   req.Body,
 		Origin: headerOrigin(req.Headers),
 		UseV2:  false,
 	}, nil
+}
+
+func normalizePath(path string) string {
+	path = strings.TrimSpace(path)
+	if path == "" {
+		return "/"
+	}
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+	if idx := strings.Index(path, "?"); idx >= 0 {
+		path = path[:idx]
+	}
+	return path
 }
 
 func methodFromRouteKey(routeKey string) string {
@@ -114,11 +131,23 @@ func dispatch(ctx context.Context, in inboundRequest) (apiResponse, error) {
 	case http.MethodOptions:
 		return corsResponse(apiResponse{StatusCode: http.StatusNoContent}, in.Origin, "GET, POST, OPTIONS")
 	case http.MethodGet:
-		return handleGet(ctx, in.Query, in.Origin)
+		switch in.Path {
+		case "/invite":
+			return handleGetInvite(ctx, in.Query, in.Origin)
+		default:
+			return jsonResponse(http.StatusNotFound, errorResponse{Error: "not found"}, in.Origin)
+		}
 	case http.MethodPost:
-		return handlePost(ctx, in.Body, in.Origin)
+		switch in.Path {
+		case "/invite":
+			return handlePostInvite(ctx, in.Body, in.Origin)
+		case "/guest":
+			return handlePostGuest(ctx, in.Body, in.Origin)
+		default:
+			return jsonResponse(http.StatusNotFound, errorResponse{Error: "not found"}, in.Origin)
+		}
 	default:
-		log.Printf("unsupported method %q", in.Method)
+		log.Printf("unsupported method %q on %q", in.Method, in.Path)
 		return corsResponse(apiResponse{
 			StatusCode: http.StatusMethodNotAllowed,
 			Body:       `{"error":"method not allowed"}`,
@@ -126,7 +155,7 @@ func dispatch(ctx context.Context, in inboundRequest) (apiResponse, error) {
 	}
 }
 
-func handleGet(ctx context.Context, params map[string]string, origin string) (apiResponse, error) {
+func handleGetInvite(ctx context.Context, params map[string]string, origin string) (apiResponse, error) {
 	id := ""
 	if params != nil {
 		id = strings.TrimSpace(params["id"])
@@ -135,47 +164,62 @@ func handleGet(ctx context.Context, params map[string]string, origin string) (ap
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "id is required"}, origin)
 	}
 
-	guest, err := store.GetGuest(ctx, id)
-	if errors.Is(err, store.ErrGuestNotFound) {
-		return jsonResponse(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin)
+	invite, err := store.GetInvite(ctx, id)
+	if errors.Is(err, store.ErrInviteNotFound) {
+		return jsonResponse(http.StatusNotFound, errorResponse{Error: "invite not found"}, origin)
 	}
 	if err != nil {
-		log.Printf("get guest %s: %v", id, err)
-		return jsonResponse(http.StatusInternalServerError, errorResponse{Error: "failed to load guest"}, origin)
+		log.Printf("get invite %s: %v", id, err)
+		return jsonResponse(http.StatusInternalServerError, errorResponse{Error: "failed to load invite"}, origin)
 	}
 
-	return jsonResponse(http.StatusOK, guest, origin)
+	return jsonResponse(http.StatusOK, invite, origin)
 }
 
-func handlePost(ctx context.Context, body string, origin string) (apiResponse, error) {
-	var guest store.Guest
-	if err := json.Unmarshal([]byte(body), &guest); err != nil {
+func handlePostInvite(ctx context.Context, body string, origin string) (apiResponse, error) {
+	var update store.InviteUpdate
+	if err := json.Unmarshal([]byte(body), &update); err != nil {
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
 	}
 
-	guest.ID = strings.TrimSpace(guest.ID)
-	guest.Name = strings.TrimSpace(guest.Name)
-
-	if guest.ID == "" {
+	update.ID = strings.TrimSpace(update.ID)
+	if update.ID == "" {
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "id is required"}, origin)
 	}
-	if guest.Name == "" {
-		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "name is required"}, origin)
-	}
 
-	if err := store.SaveGuest(ctx, guest); errors.Is(err, store.ErrGuestNotFound) {
-		return jsonResponse(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin)
+	if err := store.SaveInvite(ctx, update); errors.Is(err, store.ErrInviteNotFound) {
+		return jsonResponse(http.StatusNotFound, errorResponse{Error: "invite not found"}, origin)
 	} else if err != nil {
-		log.Printf("save guest %s: %v", guest.ID, err)
-		return jsonResponse(http.StatusInternalServerError, errorResponse{Error: "failed to save guest"}, origin)
+		log.Printf("save invite %s: %v", update.ID, err)
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: err.Error()}, origin)
 	}
 
-	updated, err := store.GetGuest(ctx, guest.ID)
+	updated, err := store.GetInvite(ctx, update.ID)
 	if err != nil {
 		return jsonResponse(http.StatusOK, map[string]string{"status": "saved"}, origin)
 	}
 
 	return jsonResponse(http.StatusOK, updated, origin)
+}
+
+func handlePostGuest(ctx context.Context, body string, origin string) (apiResponse, error) {
+	var update store.GuestUpdate
+	if err := json.Unmarshal([]byte(body), &update); err != nil {
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
+	}
+
+	if update.ID == 0 {
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "id is required"}, origin)
+	}
+
+	if err := store.SaveGuest(ctx, update); errors.Is(err, store.ErrGuestNotFound) {
+		return jsonResponse(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin)
+	} else if err != nil {
+		log.Printf("save guest %d: %v", update.ID, err)
+		return jsonResponse(http.StatusBadRequest, errorResponse{Error: err.Error()}, origin)
+	}
+
+	return jsonResponse(http.StatusOK, map[string]string{"status": "saved"}, origin)
 }
 
 func jsonResponse(status int, payload any, origin string) (apiResponse, error) {
