@@ -127,20 +127,13 @@ Configure Makefile variables in `Makefile.include` (copy from `Makefile.include.
 - `AWS_ACCOUNT_ID`
 - `ECR_REPO_NAME`
 - `LAMBDA_FUNCTION`
-- `LAMBDA_ROLE_ARN` (one-time `make lambda-create` only)
 - `S3_BUCKET`
 - `CLOUDFRONT_DISTRIBUTION_ID` (optional)
 - `VITE_API_BASE_URL`
 
-### One-time setup
-
 ```bash
 cp Makefile.include.example Makefile.include
 # edit Makefile.include
-
-make ecr-create
-make docker-build docker-tag docker-push
-make lambda-create
 ```
 
 ### Deploy

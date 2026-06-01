@@ -1,12 +1,11 @@
 .PHONY: test api-test frontend-dev frontend-build frontend-update \
-	docker-build docker-tag docker-push aws-login ecr-create \
-	lambda-create lambda-update lambda-wait deploy-api deploy-frontend deploy
+	docker-build docker-tag docker-push aws-login \
+	lambda-update lambda-wait deploy-api deploy-frontend deploy
 
 # Override locally by creating Makefile.include, e.g.:
 #   AWS_ACCOUNT_ID=123456789012
 #   ECR_REPO_NAME=ppmxbbg-rsvp-api
 #   LAMBDA_FUNCTION=ppmxbbg-rsvp-api
-#   LAMBDA_ROLE_ARN=arn:aws:iam::123456789012:role/ppmxbbg-rsvp-lambda
 #   S3_BUCKET=ppmxbbg-rsvp-frontend
 #   CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
 #   VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com
@@ -19,7 +18,6 @@ IMAGE_NAME ?= ppmxbbg-rsvp-api
 ECR_REGISTRY ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 ECR_REPO ?= $(ECR_REGISTRY)/$(ECR_REPO_NAME)
 LAMBDA_FUNCTION ?= ppmxbbg-rsvp-api
-LAMBDA_ROLE_ARN ?=
 S3_BUCKET ?= your-rsvp-frontend-bucket
 CLOUDFRONT_DISTRIBUTION_ID ?=
 VITE_API_BASE_URL ?=
@@ -64,24 +62,6 @@ docker-push: aws-login
 aws-login:
 	aws ecr get-login-password --region $(AWS_REGION) \
 		| docker login --username AWS --password-stdin $(ECR_REGISTRY)
-
-ecr-create:
-	aws ecr create-repository \
-		--repository-name $(ECR_REPO_NAME) \
-		--image-scanning-configuration scanOnPush=true \
-		--region $(AWS_REGION)
-
-lambda-create:
-	@test -n "$(LAMBDA_ROLE_ARN)" || (echo "Set LAMBDA_ROLE_ARN in Makefile.include" && exit 1)
-	aws lambda create-function \
-		--function-name $(LAMBDA_FUNCTION) \
-		--package-type Image \
-		--code ImageUri=$(ECR_REPO):latest \
-		--role $(LAMBDA_ROLE_ARN) \
-		--architectures x86_64 \
-		--timeout 30 \
-		--memory-size 256 \
-		--region $(AWS_REGION)
 
 lambda-update:
 	aws lambda update-function-code \

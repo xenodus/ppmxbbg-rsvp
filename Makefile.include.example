@@ -6,7 +6,6 @@ AWS_REGION=ap-southeast-1
 
 ECR_REPO_NAME=ppmxbbg-rsvp-api
 LAMBDA_FUNCTION=ppmxbbg-rsvp-api
-LAMBDA_ROLE_ARN=arn:aws:iam::123456789012:role/ppmxbbg-rsvp-lambda
 
 S3_BUCKET=ppmxbbg-rsvp-frontend
 CLOUDFRONT_DISTRIBUTION_ID=
