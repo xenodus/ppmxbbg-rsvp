@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"slices"
 	"strings"
@@ -19,28 +20,39 @@ type errorResponse struct {
 	Error string `json:"error"`
 }
 
-func RSVP(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+type apiResponse struct {
+	StatusCode int
+	Body       string
+	Headers    map[string]string
+}
+
+// RSVP handles HTTP API Gateway v2 events (payload format 2.0).
+func RSVP(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	method := request.RequestContext.HTTP.Method
 	origin := request.Headers["origin"]
 
-	if request.HTTPMethod == "OPTIONS" {
-		return corsResponse(events.APIGatewayProxyResponse{StatusCode: http.StatusNoContent}, origin, "GET, POST, OPTIONS")
+	if method == http.MethodOptions {
+		return toV2(corsResponse(apiResponse{StatusCode: http.StatusNoContent}, origin, "GET, POST, OPTIONS"))
 	}
 
-	switch request.HTTPMethod {
+	switch method {
 	case http.MethodGet:
-		return handleGet(ctx, request, origin)
+		return toV2(handleGet(ctx, request.QueryStringParameters, origin))
 	case http.MethodPost:
-		return handlePost(ctx, request, origin)
+		return toV2(handlePost(ctx, request.Body, origin))
 	default:
-		return corsResponse(events.APIGatewayProxyResponse{
+		return toV2(corsResponse(apiResponse{
 			StatusCode: http.StatusMethodNotAllowed,
 			Body:       `{"error":"method not allowed"}`,
-		}, origin, "GET, POST, OPTIONS")
+		}, origin, "GET, POST, OPTIONS"))
 	}
 }
 
-func handleGet(ctx context.Context, request events.APIGatewayProxyRequest, origin string) (events.APIGatewayProxyResponse, error) {
-	id := strings.TrimSpace(request.QueryStringParameters["id"])
+func handleGet(ctx context.Context, params map[string]string, origin string) (apiResponse, error) {
+	id := ""
+	if params != nil {
+		id = strings.TrimSpace(params["id"])
+	}
 	if id == "" {
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "id is required"}, origin)
 	}
@@ -50,15 +62,16 @@ func handleGet(ctx context.Context, request events.APIGatewayProxyRequest, origi
 		return jsonResponse(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin)
 	}
 	if err != nil {
+		log.Printf("get guest %s: %v", id, err)
 		return jsonResponse(http.StatusInternalServerError, errorResponse{Error: "failed to load guest"}, origin)
 	}
 
 	return jsonResponse(http.StatusOK, guest, origin)
 }
 
-func handlePost(ctx context.Context, request events.APIGatewayProxyRequest, origin string) (events.APIGatewayProxyResponse, error) {
+func handlePost(ctx context.Context, body string, origin string) (apiResponse, error) {
 	var guest store.Guest
-	if err := json.Unmarshal([]byte(request.Body), &guest); err != nil {
+	if err := json.Unmarshal([]byte(body), &guest); err != nil {
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
 	}
 
@@ -75,6 +88,7 @@ func handlePost(ctx context.Context, request events.APIGatewayProxyRequest, orig
 	if err := store.SaveGuest(ctx, guest); errors.Is(err, store.ErrGuestNotFound) {
 		return jsonResponse(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin)
 	} else if err != nil {
+		log.Printf("save guest %s: %v", guest.ID, err)
 		return jsonResponse(http.StatusInternalServerError, errorResponse{Error: "failed to save guest"}, origin)
 	}
 
@@ -86,16 +100,16 @@ func handlePost(ctx context.Context, request events.APIGatewayProxyRequest, orig
 	return jsonResponse(http.StatusOK, updated, origin)
 }
 
-func jsonResponse(status int, payload any, origin string) (events.APIGatewayProxyResponse, error) {
+func jsonResponse(status int, payload any, origin string) (apiResponse, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(payload); err != nil {
-		return corsResponse(events.APIGatewayProxyResponse{
+		return corsResponse(apiResponse{
 			StatusCode: http.StatusInternalServerError,
 			Body:       `{"error":"failed to encode response"}`,
 		}, origin, "GET, POST, OPTIONS")
 	}
 
-	return corsResponse(events.APIGatewayProxyResponse{
+	return corsResponse(apiResponse{
 		StatusCode: status,
 		Body:       buf.String(),
 		Headers: map[string]string{
@@ -104,7 +118,7 @@ func jsonResponse(status int, payload any, origin string) (events.APIGatewayProx
 	}, origin, "GET, POST, OPTIONS")
 }
 
-func corsResponse(response events.APIGatewayProxyResponse, origin, methods string) (events.APIGatewayProxyResponse, error) {
+func corsResponse(response apiResponse, origin, methods string) (apiResponse, error) {
 	allowed := config.GetAllowedOrigins()
 	if origin != "" && slices.Contains(allowed, origin) {
 		if response.Headers == nil {
@@ -117,4 +131,16 @@ func corsResponse(response events.APIGatewayProxyResponse, origin, methods strin
 	}
 
 	return response, nil
+}
+
+func toV2(response apiResponse, err error) (events.APIGatewayV2HTTPResponse, error) {
+	if err != nil {
+		return events.APIGatewayV2HTTPResponse{}, err
+	}
+
+	return events.APIGatewayV2HTTPResponse{
+		StatusCode: response.StatusCode,
+		Body:       response.Body,
+		Headers:    response.Headers,
+	}, nil
 }

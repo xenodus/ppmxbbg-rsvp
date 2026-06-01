@@ -21,15 +21,22 @@ func init() {
 	}
 }
 
+func runningOnLambda() bool {
+	return os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != ""
+}
+
 func main() {
-	env := os.Getenv("ENV")
-	if env == config.EnvProd || env == config.EnvStaging {
+	if runningOnLambda() {
 		lambda.Start(handler.RSVP)
 		return
 	}
 
-	resp, err := handler.RSVP(context.Background(), events.APIGatewayProxyRequest{
-		HTTPMethod:            "GET",
+	resp, err := handler.RSVP(context.Background(), events.APIGatewayV2HTTPRequest{
+		RequestContext: events.APIGatewayV2HTTPRequestContext{
+			HTTP: events.APIGatewayV2HTTPRequestContextHTTPDescription{
+				Method: "GET",
+			},
+		},
 		QueryStringParameters: map[string]string{"id": os.Getenv("TEST_GUEST_ID")},
 	})
 	if err != nil {

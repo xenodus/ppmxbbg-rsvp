@@ -9,11 +9,20 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+func v2Request(method string, query map[string]string, body string) events.APIGatewayV2HTTPRequest {
+	return events.APIGatewayV2HTTPRequest{
+		Body:                  body,
+		QueryStringParameters: query,
+		RequestContext: events.APIGatewayV2HTTPRequestContext{
+			HTTP: events.APIGatewayV2HTTPRequestContextHTTPDescription{
+				Method: method,
+			},
+		},
+	}
+}
+
 func TestRSVPOptions(t *testing.T) {
-	resp, err := RSVP(context.Background(), events.APIGatewayProxyRequest{
-		HTTPMethod: http.MethodOptions,
-		Headers:    map[string]string{"origin": "http://localhost:5173"},
-	})
+	resp, err := RSVP(context.Background(), v2Request(http.MethodOptions, nil, ""))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -23,9 +32,7 @@ func TestRSVPOptions(t *testing.T) {
 }
 
 func TestRSVPGetMissingID(t *testing.T) {
-	resp, err := RSVP(context.Background(), events.APIGatewayProxyRequest{
-		HTTPMethod: http.MethodGet,
-	})
+	resp, err := RSVP(context.Background(), v2Request(http.MethodGet, map[string]string{}, ""))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -35,9 +42,7 @@ func TestRSVPGetMissingID(t *testing.T) {
 }
 
 func TestRSVPInvalidMethod(t *testing.T) {
-	resp, err := RSVP(context.Background(), events.APIGatewayProxyRequest{
-		HTTPMethod: http.MethodDelete,
-	})
+	resp, err := RSVP(context.Background(), v2Request(http.MethodDelete, nil, ""))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -47,10 +52,7 @@ func TestRSVPInvalidMethod(t *testing.T) {
 }
 
 func TestRSVPInvalidPostBody(t *testing.T) {
-	resp, err := RSVP(context.Background(), events.APIGatewayProxyRequest{
-		HTTPMethod: http.MethodPost,
-		Body:       "{",
-	})
+	resp, err := RSVP(context.Background(), v2Request(http.MethodPost, nil, "{"))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
