@@ -26,25 +26,103 @@ type apiResponse struct {
 	Headers    map[string]string
 }
 
-// RSVP handles HTTP API Gateway v2 events (payload format 2.0).
-func RSVP(ctx context.Context, request events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
-	method := request.RequestContext.HTTP.Method
-	origin := request.Headers["origin"]
+type inboundRequest struct {
+	Method  string
+	Query   map[string]string
+	Body    string
+	Origin  string
+	UseV2   bool
+}
 
-	if method == http.MethodOptions {
-		return toV2(corsResponse(apiResponse{StatusCode: http.StatusNoContent}, origin, "GET, POST, OPTIONS"))
+// RSVP handles both HTTP API payload format 1.0 and 2.0 events.
+func RSVP(ctx context.Context, raw json.RawMessage) (json.RawMessage, error) {
+	in, err := parseInbound(raw)
+	if err != nil {
+		resp, encErr := encodeResponse(false, apiResponse{
+			StatusCode: http.StatusBadRequest,
+			Body:       `{"error":"invalid request"}`,
+		}, nil)
+		return resp, encErr
 	}
 
-	switch method {
+	resp, err := dispatch(ctx, in)
+	return encodeResponse(in.UseV2, resp, err)
+}
+
+func parseInbound(raw json.RawMessage) (inboundRequest, error) {
+	var meta struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(raw, &meta); err != nil {
+		return inboundRequest{}, err
+	}
+
+	if meta.Version == "2.0" {
+		var req events.APIGatewayV2HTTPRequest
+		if err := json.Unmarshal(raw, &req); err != nil {
+			return inboundRequest{}, err
+		}
+
+		method := req.RequestContext.HTTP.Method
+		if method == "" {
+			method = methodFromRouteKey(req.RouteKey)
+		}
+
+		return inboundRequest{
+			Method: method,
+			Query:  req.QueryStringParameters,
+			Body:   req.Body,
+			Origin: headerOrigin(req.Headers),
+			UseV2:  true,
+		}, nil
+	}
+
+	var req events.APIGatewayProxyRequest
+	if err := json.Unmarshal(raw, &req); err != nil {
+		return inboundRequest{}, err
+	}
+
+	return inboundRequest{
+		Method: req.HTTPMethod,
+		Query:  req.QueryStringParameters,
+		Body:   req.Body,
+		Origin: headerOrigin(req.Headers),
+		UseV2:  false,
+	}, nil
+}
+
+func methodFromRouteKey(routeKey string) string {
+	parts := strings.SplitN(routeKey, " ", 2)
+	if len(parts) != 2 {
+		return ""
+	}
+	return strings.ToUpper(parts[0])
+}
+
+func headerOrigin(headers map[string]string) string {
+	if headers == nil {
+		return ""
+	}
+	if origin := headers["origin"]; origin != "" {
+		return origin
+	}
+	return headers["Origin"]
+}
+
+func dispatch(ctx context.Context, in inboundRequest) (apiResponse, error) {
+	switch in.Method {
+	case http.MethodOptions:
+		return corsResponse(apiResponse{StatusCode: http.StatusNoContent}, in.Origin, "GET, POST, OPTIONS")
 	case http.MethodGet:
-		return toV2(handleGet(ctx, request.QueryStringParameters, origin))
+		return handleGet(ctx, in.Query, in.Origin)
 	case http.MethodPost:
-		return toV2(handlePost(ctx, request.Body, origin))
+		return handlePost(ctx, in.Body, in.Origin)
 	default:
-		return toV2(corsResponse(apiResponse{
+		log.Printf("unsupported method %q", in.Method)
+		return corsResponse(apiResponse{
 			StatusCode: http.StatusMethodNotAllowed,
 			Body:       `{"error":"method not allowed"}`,
-		}, origin, "GET, POST, OPTIONS"))
+		}, in.Origin, "GET, POST, OPTIONS")
 	}
 }
 
@@ -133,14 +211,22 @@ func corsResponse(response apiResponse, origin, methods string) (apiResponse, er
 	return response, nil
 }
 
-func toV2(response apiResponse, err error) (events.APIGatewayV2HTTPResponse, error) {
+func encodeResponse(useV2 bool, resp apiResponse, err error) (json.RawMessage, error) {
 	if err != nil {
-		return events.APIGatewayV2HTTPResponse{}, err
+		return nil, err
 	}
 
-	return events.APIGatewayV2HTTPResponse{
-		StatusCode: response.StatusCode,
-		Body:       response.Body,
-		Headers:    response.Headers,
-	}, nil
+	if useV2 {
+		return json.Marshal(events.APIGatewayV2HTTPResponse{
+			StatusCode: resp.StatusCode,
+			Body:       resp.Body,
+			Headers:    resp.Headers,
+		})
+	}
+
+	return json.Marshal(events.APIGatewayProxyResponse{
+		StatusCode: resp.StatusCode,
+		Body:       resp.Body,
+		Headers:    resp.Headers,
+	})
 }

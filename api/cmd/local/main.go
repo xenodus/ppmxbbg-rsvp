@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 
@@ -16,7 +17,8 @@ func main() {
 		log.Println("No .env file found or error loading .env")
 	}
 
-	resp, err := handler.RSVP(context.Background(), events.APIGatewayV2HTTPRequest{
+	raw, err := json.Marshal(events.APIGatewayV2HTTPRequest{
+		Version: "2.0",
 		RequestContext: events.APIGatewayV2HTTPRequestContext{
 			HTTP: events.APIGatewayV2HTTPRequestContextHTTPDescription{
 				Method: "GET",
@@ -27,5 +29,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("status=%d body=%s", resp.StatusCode, resp.Body)
+
+	resp, err := handler.RSVP(context.Background(), raw)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("response=%s", string(resp))
 }

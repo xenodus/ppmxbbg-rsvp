@@ -5,66 +5,102 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
-
-	"github.com/aws/aws-lambda-go/events"
 )
 
-func v2Request(method string, query map[string]string, body string) events.APIGatewayV2HTTPRequest {
-	return events.APIGatewayV2HTTPRequest{
-		Body:                  body,
-		QueryStringParameters: query,
-		RequestContext: events.APIGatewayV2HTTPRequestContext{
-			HTTP: events.APIGatewayV2HTTPRequestContextHTTPDescription{
-				Method: method,
-			},
+func TestRSVPOptionsV2(t *testing.T) {
+	raw := mustJSON(map[string]any{
+		"version":  "2.0",
+		"routeKey": "OPTIONS /guest",
+		"requestContext": map[string]any{
+			"http": map[string]string{"method": "OPTIONS"},
 		},
-	}
-}
+	})
 
-func TestRSVPOptions(t *testing.T) {
-	resp, err := RSVP(context.Background(), v2Request(http.MethodOptions, nil, ""))
+	resp, err := RSVP(context.Background(), raw)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.StatusCode != http.StatusNoContent {
-		t.Fatalf("expected 204, got %d", resp.StatusCode)
-	}
+	assertStatus(t, resp, http.StatusNoContent)
 }
 
-func TestRSVPGetMissingID(t *testing.T) {
-	resp, err := RSVP(context.Background(), v2Request(http.MethodGet, map[string]string{}, ""))
+func TestRSVPGetV1(t *testing.T) {
+	raw := mustJSON(map[string]any{
+		"httpMethod":            "GET",
+		"queryStringParameters": map[string]string{},
+	})
+
+	resp, err := RSVP(context.Background(), raw)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", resp.StatusCode)
-	}
+	assertStatus(t, resp, http.StatusBadRequest)
 }
 
-func TestRSVPInvalidMethod(t *testing.T) {
-	resp, err := RSVP(context.Background(), v2Request(http.MethodDelete, nil, ""))
+func TestRSVPInvalidMethodV2(t *testing.T) {
+	raw := mustJSON(map[string]any{
+		"version":  "2.0",
+		"routeKey": "DELETE /guest",
+		"requestContext": map[string]any{
+			"http": map[string]string{"method": "DELETE"},
+		},
+	})
+
+	resp, err := RSVP(context.Background(), raw)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.StatusCode != http.StatusMethodNotAllowed {
-		t.Fatalf("expected 405, got %d", resp.StatusCode)
-	}
+	assertStatus(t, resp, http.StatusMethodNotAllowed)
 }
 
-func TestRSVPInvalidPostBody(t *testing.T) {
-	resp, err := RSVP(context.Background(), v2Request(http.MethodPost, nil, "{"))
+func TestRSVPInvalidPostBodyV1(t *testing.T) {
+	raw := mustJSON(map[string]any{
+		"httpMethod": "POST",
+		"body":       "{",
+	})
+
+	resp, err := RSVP(context.Background(), raw)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Fatalf("expected 400, got %d", resp.StatusCode)
-	}
+	assertStatus(t, resp, http.StatusBadRequest)
 
-	var body errorResponse
-	if err := json.Unmarshal([]byte(resp.Body), &body); err != nil {
+	var body map[string]string
+	if err := json.Unmarshal(bodyFromResponse(resp), &body); err != nil {
 		t.Fatalf("failed to decode body: %v", err)
 	}
-	if body.Error == "" {
+	if body["error"] == "" {
 		t.Fatal("expected error message in body")
+	}
+}
+
+func mustJSON(v any) []byte {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return raw
+}
+
+func bodyFromResponse(raw []byte) []byte {
+	var v2 struct {
+		Body string `json:"body"`
+	}
+	if err := json.Unmarshal(raw, &v2); err == nil && v2.Body != "" {
+		return []byte(v2.Body)
+	}
+	return raw
+}
+
+func assertStatus(t *testing.T, raw []byte, want int) {
+	t.Helper()
+
+	var envelope struct {
+		StatusCode int `json:"statusCode"`
+	}
+	if err := json.Unmarshal(raw, &envelope); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if envelope.StatusCode != want {
+		t.Fatalf("expected %d, got %d", want, envelope.StatusCode)
 	}
 }
