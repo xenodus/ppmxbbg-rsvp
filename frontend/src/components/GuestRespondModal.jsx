@@ -25,7 +25,7 @@ export default function GuestRespondModal({
       await onSave({
         id: guest.id,
         is_attending: attendance,
-        dietary_restriction: dietaryRestriction.trim() || null,
+        dietary_restriction: dietaryRestriction.trim(),
       });
     } catch (err) {
       setError(err.message);

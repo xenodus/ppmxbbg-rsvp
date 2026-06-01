@@ -212,7 +212,7 @@ func SaveGuest(ctx context.Context, update GuestUpdate) error {
 		return errors.New("is_attending is required")
 	}
 
-	var dietaryRestriction any
+	dietaryRestriction := ""
 	if update.DietaryRestriction != nil {
 		dietaryRestriction = *update.DietaryRestriction
 	}
@@ -254,8 +254,18 @@ func DeclineAllGuests(ctx context.Context, inviteID string) error {
 
 	_, err = conn.ExecContext(ctx, `
 		UPDATE guests
-		SET is_attending = 0
+		SET is_attending = 0, dietary_restriction = ''
 		WHERE invite_id = ?
+	`, inviteID)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.ExecContext(ctx, `
+		UPDATE invites
+		SET require_parking = COALESCE(require_parking, 0),
+		    attend_solemnisation = COALESCE(attend_solemnisation, 0)
+		WHERE id = ?
 	`, inviteID)
 	return err
 }

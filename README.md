@@ -98,7 +98,7 @@ Save RSVP data. The handler routes by request body:
 | `id` | yes | Invite id (snowflake, string) |
 | `decline_all` | yes | Must be `true` — marks every guest on the invite as not attending |
 
-**200 OK** — returns the updated invite with guests (all `is_attending: false`).
+**200 OK** — returns the updated invite with guests (all `is_attending: false`, `dietary_restriction: ""`). Any unset invite booleans are saved as `false`.
 
 #### Invite update
 
@@ -152,7 +152,9 @@ curl -X POST "https://YOUR_API_URL/guest" \
 |-------|----------|-------------|
 | `id` | yes | Guest id (integer) |
 | `is_attending` | yes | `true` = attending, `false` = declining |
-| `dietary_restriction` | no | Dietary needs; send `null` or omit if none |
+| `dietary_restriction` | no | Dietary needs; omit or send `""` if none (stored as empty string, never `null`) |
+
+After any save, nullable RSVP fields are persisted as concrete values: booleans as `true`/`false`, text as `""`.
 
 **Example**
 
