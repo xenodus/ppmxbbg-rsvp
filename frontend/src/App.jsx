@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchInvite, saveGuest, saveInvite } from "./api.js";
+import Countdown from "./components/Countdown.jsx";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
 import { RSVP, WEDDING } from "./constants.js";
@@ -212,6 +213,7 @@ export default function App() {
         <p className="eyebrow">{WEDDING.inviteLine}</p>
         <h1 className="couple-names">{WEDDING.coupleNames}</h1>
         <p className="wedding-date">{WEDDING.date}</p>
+        <Countdown />
       </header>
 
       <Divider />

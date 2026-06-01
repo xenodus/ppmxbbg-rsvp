@@ -2,6 +2,8 @@ export const WEDDING = {
   inviteLine: "YOU ARE CORDIALLY INVITED",
   coupleNames: "Alvin & Vivian",
   date: "1 . November . 2026",
+  /** Wedding start in Singapore (Asia/Singapore). Used by countdown. */
+  dateTime: "2026-11-01T12:00:00+08:00",
   venue: "Hortus @ 18 Marina Gardens Dr, #01-09 Level 2 Flower Dome, Singapore 018953",
 };
 
