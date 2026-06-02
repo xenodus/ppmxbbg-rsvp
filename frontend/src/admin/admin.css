@@ -130,6 +130,11 @@
   color: var(--error);
 }
 
+.admin-copy-done {
+  color: var(--success);
+  border-color: #c7e4d2;
+}
+
 @media (max-width: 600px) {
   .admin-invite-header {
     flex-direction: column;
