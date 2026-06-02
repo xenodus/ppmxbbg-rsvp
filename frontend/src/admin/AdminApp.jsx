@@ -9,6 +9,7 @@ import {
   markInviteSent,
   setStoredToken,
 } from "./adminApi.js";
+import { downloadInvitesCsv } from "./exportCsv.js";
 
 function guestSiteOrigin() {
   const path = window.location.pathname.replace(/admin\.html$/, "");
@@ -302,9 +303,19 @@ export default function AdminApp() {
           <h1>Invites &amp; responses</h1>
           <p className="admin-muted">Manage invitations and view RSVP data.</p>
         </div>
-        <button type="button" className="secondary-btn" onClick={handleLogout}>
-          Sign out
-        </button>
+        <div className="admin-header-actions">
+          <button
+            type="button"
+            className="secondary-btn"
+            disabled={loading || invites.length === 0}
+            onClick={() => downloadInvitesCsv(invites)}
+          >
+            Download CSV
+          </button>
+          <button type="button" className="secondary-btn" onClick={handleLogout}>
+            Sign out
+          </button>
+        </div>
       </header>
 
       {pageError ? <p className="banner banner-error">{pageError}</p> : null}
