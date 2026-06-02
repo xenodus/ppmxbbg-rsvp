@@ -9,8 +9,8 @@ import {
   markInviteSent,
   setStoredToken,
 } from "./adminApi.js";
-import { copyQrCodeToClipboard } from "./copyQrCode.js";
 import { downloadInvitesCsv } from "./exportCsv.js";
+import { generateQrCodeDataUrl } from "./qrCode.js";
 
 function guestSiteOrigin() {
   const path = window.location.pathname.replace(/admin\.html$/, "");
@@ -105,11 +105,40 @@ function LoginForm({ onSuccess, error, loading }) {
   );
 }
 
+function InviteQrCode({ url }) {
+  const [src, setSrc] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    generateQrCodeDataUrl(url, { width: 128 })
+      .then((dataUrl) => {
+        if (!cancelled) setSrc(dataUrl);
+      })
+      .catch(() => {
+        if (!cancelled) setSrc(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  if (!src) return null;
+
+  return (
+    <img
+      className="admin-invite-qr"
+      src={src}
+      alt="QR code for invite link"
+      width={96}
+      height={96}
+    />
+  );
+}
+
 function InviteRow({ invite, onRefresh }) {
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [qrCopied, setQrCopied] = useState(false);
   const summary = inviteSummary(invite);
 
   useEffect(() => {
@@ -118,25 +147,10 @@ function InviteRow({ invite, onRefresh }) {
     return () => window.clearTimeout(timer);
   }, [linkCopied]);
 
-  useEffect(() => {
-    if (!qrCopied) return undefined;
-    const timer = window.setTimeout(() => setQrCopied(false), 2000);
-    return () => window.clearTimeout(timer);
-  }, [qrCopied]);
-
   async function handleCopyLink() {
     try {
       await copyToClipboard(inviteLink(invite.id));
       setLinkCopied(true);
-    } catch (err) {
-      alert(err.message);
-    }
-  }
-
-  async function handleCopyQrCode() {
-    try {
-      await copyQrCodeToClipboard(inviteLink(invite.id));
-      setQrCopied(true);
     } catch (err) {
       alert(err.message);
     }
@@ -156,9 +170,12 @@ function InviteRow({ invite, onRefresh }) {
 
   return (
     <article className="admin-invite-card">
-      <div className="admin-invite-header">
-        <strong>{invite.guests?.map((g) => g.name).join(", ") || "No guests"}</strong>
-        <p className="admin-muted admin-id">ID: {invite.id}</p>
+      <div className="admin-invite-top">
+        <div className="admin-invite-header">
+          <strong>{invite.guests?.map((g) => g.name).join(", ") || "No guests"}</strong>
+          <p className="admin-muted admin-id">ID: {invite.id}</p>
+        </div>
+        <InviteQrCode url={inviteLink(invite.id)} />
       </div>
       <div className="admin-invite-actions">
         <button
@@ -168,14 +185,6 @@ function InviteRow({ invite, onRefresh }) {
           onClick={handleCopyLink}
         >
           {linkCopied ? "Copied!" : "Copy link"}
-        </button>
-        <button
-          type="button"
-          className={qrCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
-          disabled={busy}
-          onClick={handleCopyQrCode}
-        >
-          {qrCopied ? "Copied!" : "Copy QR code"}
         </button>
         <button
           type="button"
