@@ -15,3 +15,4 @@ Follow [INSTRUCTIONS.md](../../INSTRUCTIONS.md) for every task in this repositor
 
 - Merge API or deploy work with a stale README.
 - Open frontend PRs without screenshots when UI changed.
+- Include changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs.

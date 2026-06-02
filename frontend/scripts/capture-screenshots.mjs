@@ -21,11 +21,11 @@ const mockInvite = {
       id: "guest-1",
       name: "Alex Example",
       is_attending: null,
-      attend_solemnisation: null,
       dietary_restriction: "",
     },
   ],
   require_parking: null,
+  attend_solemnisation: null,
 };
 
 const mockInvites = [
@@ -33,13 +33,13 @@ const mockInvites = [
     id: "1234567890123456789",
     is_sent: true,
     require_parking: true,
+    attend_solemnisation: false,
     last_updated: "2026-06-01",
     guests: [
       {
         id: 1,
         name: "Jane Doe",
         is_attending: true,
-        attend_solemnisation: true,
         dietary_restriction: "Vegetarian",
         last_updated: "2026-06-01",
       },
