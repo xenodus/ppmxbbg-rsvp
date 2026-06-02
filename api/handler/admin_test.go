@@ -67,6 +67,29 @@ func TestAdminInvitesUnauthorized(t *testing.T) {
 	assertStatus(t, resp, http.StatusUnauthorized)
 }
 
+func TestAdminLoginWithStagePrefix(t *testing.T) {
+	t.Setenv("ADMIN_USERNAME", "admin")
+	t.Setenv("ADMIN_PASSWORD", "secret")
+	t.Setenv("ADMIN_TOKEN_SECRET", "signing")
+
+	raw := mustJSON(map[string]any{
+		"version":  "2.0",
+		"routeKey": "POST /admin/login",
+		"rawPath":  "/prod/admin/login",
+		"body":     `{"username":"admin","password":"secret"}`,
+		"requestContext": map[string]any{
+			"stage": "prod",
+			"http":  map[string]string{"method": "POST"},
+		},
+	})
+
+	resp, err := RSVP(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertStatus(t, resp, http.StatusOK)
+}
+
 func TestAdminOptionsV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",

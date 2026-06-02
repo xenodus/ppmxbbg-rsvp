@@ -7,6 +7,23 @@ import (
 	"testing"
 )
 
+func TestStripAPIStage(t *testing.T) {
+	tests := []struct {
+		path, stage, want string
+	}{
+		{"/guest", "prod", "/guest"},
+		{"/prod/guest", "prod", "/guest"},
+		{"/prod/admin/login", "prod", "/admin/login"},
+		{"/guest", "$default", "/guest"},
+		{"/$default/guest", "$default", "/$default/guest"},
+	}
+	for _, tc := range tests {
+		if got := stripAPIStage(tc.path, tc.stage); got != tc.want {
+			t.Errorf("stripAPIStage(%q, %q) = %q, want %q", tc.path, tc.stage, got, tc.want)
+		}
+	}
+}
+
 func TestRSVPOptionsV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",

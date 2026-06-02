@@ -18,16 +18,31 @@ export function clearSession() {
   setStoredToken("");
 }
 
+function networkErrorMessage(err) {
+  if (err?.message !== "Failed to fetch") {
+    return err?.message || "Request failed";
+  }
+  if (!API_BASE_URL) {
+    return "Cannot reach the API. For local dev, set VITE_API_PROXY_TARGET in frontend/.env (see README).";
+  }
+  return "Cannot reach the API. Check VITE_API_BASE_URL, API Gateway routes for /admin/*, and FRONTEND_ORIGIN on Lambda.";
+}
+
 async function request(path, options = {}) {
   const token = getStoredToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      },
+    });
+  } catch (err) {
+    throw new Error(networkErrorMessage(err));
+  }
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
