@@ -19,31 +19,31 @@ var (
 )
 
 type Guest struct {
-	ID                 int64   `json:"id"`
-	Name               string  `json:"name"`
-	IsAttending        *bool   `json:"is_attending,omitempty"`
-	DietaryRestriction *string `json:"dietary_restriction,omitempty"`
-	LastUpdated        *string `json:"last_updated,omitempty"`
+	ID                  int64   `json:"id"`
+	Name                string  `json:"name"`
+	IsAttending         *bool   `json:"is_attending,omitempty"`
+	AttendSolemnisation *bool   `json:"attend_solemnisation,omitempty"`
+	DietaryRestriction  *string `json:"dietary_restriction,omitempty"`
+	LastUpdated         *string `json:"last_updated,omitempty"`
 }
 
 type Invite struct {
-	ID                  string  `json:"id"`
-	RequireParking      *bool   `json:"require_parking,omitempty"`
-	AttendSolemnisation *bool   `json:"attend_solemnisation,omitempty"`
-	LastUpdated         *string `json:"last_updated,omitempty"`
-	Guests              []Guest `json:"guests"`
+	ID             string  `json:"id"`
+	RequireParking *bool   `json:"require_parking,omitempty"`
+	LastUpdated    *string `json:"last_updated,omitempty"`
+	Guests         []Guest `json:"guests"`
 }
 
 type InviteUpdate struct {
-	ID                  string `json:"id"`
-	RequireParking      *bool  `json:"require_parking"`
-	AttendSolemnisation *bool  `json:"attend_solemnisation"`
+	ID             string `json:"id"`
+	RequireParking *bool  `json:"require_parking"`
 }
 
 type GuestUpdate struct {
-	ID                 int64   `json:"id"`
-	IsAttending        *bool   `json:"is_attending"`
-	DietaryRestriction *string `json:"dietary_restriction"`
+	ID                  int64   `json:"id"`
+	IsAttending         *bool   `json:"is_attending"`
+	AttendSolemnisation *bool   `json:"attend_solemnisation"`
+	DietaryRestriction  *string `json:"dietary_restriction"`
 }
 
 func DB() (*sql.DB, error) {
@@ -93,14 +93,13 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 
 	var invite Invite
 	var requireParking sql.NullBool
-	var attendSolemnisation sql.NullBool
 	var lastUpdated sql.NullTime
 
 	err = conn.QueryRowContext(ctx, `
-		SELECT id, require_parking, attend_solemnisation, last_updated
+		SELECT id, require_parking, last_updated
 		FROM invites
 		WHERE id = ?
-	`, id).Scan(&invite.ID, &requireParking, &attendSolemnisation, &lastUpdated)
+	`, id).Scan(&invite.ID, &requireParking, &lastUpdated)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrInviteNotFound
 	}
@@ -112,17 +111,13 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 		v := requireParking.Bool
 		invite.RequireParking = &v
 	}
-	if attendSolemnisation.Valid {
-		v := attendSolemnisation.Bool
-		invite.AttendSolemnisation = &v
-	}
 	if lastUpdated.Valid {
 		v := lastUpdated.Time.Format("2006-01-02 15:04:05")
 		invite.LastUpdated = &v
 	}
 
 	rows, err := conn.QueryContext(ctx, `
-		SELECT id, name, dietary_restriction, is_attending, last_updated
+		SELECT id, name, dietary_restriction, is_attending, attend_solemnisation, last_updated
 		FROM guests
 		WHERE invite_id = ?
 		ORDER BY id
@@ -137,6 +132,7 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 		var guest Guest
 		var dietaryRestriction sql.NullString
 		var isAttending sql.NullBool
+		var attendSolemnisation sql.NullBool
 		var guestUpdated sql.NullTime
 
 		if err := rows.Scan(
@@ -144,6 +140,7 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 			&guest.Name,
 			&dietaryRestriction,
 			&isAttending,
+			&attendSolemnisation,
 			&guestUpdated,
 		); err != nil {
 			return nil, err
@@ -156,6 +153,10 @@ func GetInvite(ctx context.Context, id string) (*Invite, error) {
 		if isAttending.Valid {
 			v := isAttending.Bool
 			guest.IsAttending = &v
+		}
+		if attendSolemnisation.Valid {
+			v := attendSolemnisation.Bool
+			guest.AttendSolemnisation = &v
 		}
 		if guestUpdated.Valid {
 			v := guestUpdated.Time.Format("2006-01-02 15:04:05")
@@ -178,31 +179,15 @@ func SaveInvite(ctx context.Context, update InviteUpdate) error {
 		return err
 	}
 
-	if update.RequireParking == nil && update.AttendSolemnisation == nil {
-		return errors.New("at least one of require_parking or attend_solemnisation is required")
+	if update.RequireParking == nil {
+		return errors.New("require_parking is required")
 	}
 
-	var result sql.Result
-	switch {
-	case update.RequireParking != nil && update.AttendSolemnisation != nil:
-		result, err = conn.ExecContext(ctx, `
-			UPDATE invites
-			SET require_parking = ?, attend_solemnisation = ?
-			WHERE id = ?
-		`, *update.RequireParking, *update.AttendSolemnisation, update.ID)
-	case update.RequireParking != nil:
-		result, err = conn.ExecContext(ctx, `
-			UPDATE invites
-			SET require_parking = ?
-			WHERE id = ?
-		`, *update.RequireParking, update.ID)
-	default:
-		result, err = conn.ExecContext(ctx, `
-			UPDATE invites
-			SET attend_solemnisation = ?
-			WHERE id = ?
-		`, *update.AttendSolemnisation, update.ID)
-	}
+	result, err := conn.ExecContext(ctx, `
+		UPDATE invites
+		SET require_parking = ?
+		WHERE id = ?
+	`, *update.RequireParking, update.ID)
 	if err != nil {
 		return err
 	}
@@ -233,11 +218,19 @@ func SaveGuest(ctx context.Context, update GuestUpdate) error {
 		dietaryRestriction = *update.DietaryRestriction
 	}
 
+	var attendSolemnisation sql.NullBool
+	if *update.IsAttending {
+		if update.AttendSolemnisation == nil {
+			return errors.New("attend_solemnisation is required when attending")
+		}
+		attendSolemnisation = sql.NullBool{Bool: *update.AttendSolemnisation, Valid: true}
+	}
+
 	result, err := conn.ExecContext(ctx, `
 		UPDATE guests
-		SET is_attending = ?, dietary_restriction = ?
+		SET is_attending = ?, dietary_restriction = ?, attend_solemnisation = ?
 		WHERE id = ?
-	`, *update.IsAttending, dietaryRestriction, update.ID)
+	`, *update.IsAttending, dietaryRestriction, attendSolemnisation, update.ID)
 	if err != nil {
 		return err
 	}
@@ -270,7 +263,7 @@ func DeclineAllGuests(ctx context.Context, inviteID string) error {
 
 	_, err = conn.ExecContext(ctx, `
 		UPDATE guests
-		SET is_attending = 0, dietary_restriction = ''
+		SET is_attending = 0, dietary_restriction = '', attend_solemnisation = NULL
 		WHERE invite_id = ?
 	`, inviteID)
 	if err != nil {
@@ -279,8 +272,7 @@ func DeclineAllGuests(ctx context.Context, inviteID string) error {
 
 	_, err = conn.ExecContext(ctx, `
 		UPDATE invites
-		SET require_parking = COALESCE(require_parking, 0),
-		    attend_solemnisation = COALESCE(attend_solemnisation, 0)
+		SET require_parking = COALESCE(require_parking, 0)
 		WHERE id = ?
 	`, inviteID)
 	return err

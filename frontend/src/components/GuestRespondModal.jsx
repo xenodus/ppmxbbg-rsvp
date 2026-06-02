@@ -8,10 +8,20 @@ export default function GuestRespondModal({
   onSave,
 }) {
   const [attendance, setAttendance] = useState(guest.is_attending ?? null);
+  const [attendSolemnisation, setAttendSolemnisation] = useState(
+    guest.attend_solemnisation ?? null,
+  );
   const [dietaryRestriction, setDietaryRestriction] = useState(
     guest.dietary_restriction || "",
   );
   const [error, setError] = useState("");
+
+  function handleAttendance(value) {
+    setAttendance(value);
+    if (value === false) {
+      setAttendSolemnisation(null);
+    }
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -22,12 +32,21 @@ export default function GuestRespondModal({
       return;
     }
 
+    if (attendance === true && attendSolemnisation === null) {
+      setError("Please let us know about the solemnisation.");
+      return;
+    }
+
     try {
-      await onSave({
+      const payload = {
         id: guest.id,
         is_attending: attendance,
         dietary_restriction: dietaryRestriction.trim(),
-      });
+      };
+      if (attendance === true) {
+        payload.attend_solemnisation = attendSolemnisation;
+      }
+      await onSave(payload);
     } catch (err) {
       setError(err.message);
     }
@@ -74,19 +93,51 @@ export default function GuestRespondModal({
               <button
                 type="button"
                 className={`choice-btn ${attendance === true ? "is-selected" : ""}`}
-                onClick={() => setAttendance(true)}
+                onClick={() => handleAttendance(true)}
               >
                 {RSVP.bigQuestion.yes}
               </button>
               <button
                 type="button"
                 className={`choice-btn ${attendance === false ? "is-selected" : ""}`}
-                onClick={() => setAttendance(false)}
+                onClick={() => handleAttendance(false)}
               >
                 {RSVP.bigQuestion.no}
               </button>
             </div>
           </div>
+
+          {attendance === true && (
+            <div className="modal-block">
+              <span className="field-label" id="modal-solemnisation-label">
+                THE SOLEMNISATION
+              </span>
+              <p className="section-question">{RSVP.solemnisation.question}</p>
+              {RSVP.solemnisation.note && (
+                <p className="section-note">{RSVP.solemnisation.note}</p>
+              )}
+              <div
+                className="attendance-options"
+                role="group"
+                aria-labelledby="modal-solemnisation-label"
+              >
+                <button
+                  type="button"
+                  className={`choice-btn ${attendSolemnisation === true ? "is-selected" : ""}`}
+                  onClick={() => setAttendSolemnisation(true)}
+                >
+                  {RSVP.solemnisation.yes}
+                </button>
+                <button
+                  type="button"
+                  className={`choice-btn ${attendSolemnisation === false ? "is-selected" : ""}`}
+                  onClick={() => setAttendSolemnisation(false)}
+                >
+                  {RSVP.solemnisation.no}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="modal-block">
             <label className="field-label" htmlFor="modal-dietary">

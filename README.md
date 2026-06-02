@@ -44,13 +44,13 @@ curl "https://YOUR_API_URL/guest?id=1234567890123456789"
 {
   "id": "1234567890123456789",
   "require_parking": true,
-  "attend_solemnisation": false,
   "last_updated": "2026-06-01",
   "guests": [
     {
       "id": 1,
       "name": "Jane Doe",
       "is_attending": true,
+      "attend_solemnisation": true,
       "dietary_restriction": "Vegetarian",
       "last_updated": "2026-06-01"
     },
@@ -62,7 +62,7 @@ curl "https://YOUR_API_URL/guest?id=1234567890123456789"
 }
 ```
 
-Null fields (`require_parking`, `attend_solemnisation`, `is_attending`, `dietary_restriction`, `last_updated`) are omitted from the response.
+Null fields (`require_parking`, `is_attending`, `attend_solemnisation`, `dietary_restriction`, `last_updated`) are omitted from the response.
 
 **Errors**
 
@@ -79,7 +79,7 @@ Null fields (`require_parking`, `attend_solemnisation`, `is_attending`, `dietary
 Save RSVP data. The handler routes by request body:
 
 - Body contains `"decline_all": true` → **decline all guests** for the invite
-- Body contains `require_parking` or `attend_solemnisation` → **invite update**
+- Body contains `require_parking` → **invite update**
 - Otherwise → **guest update**
 
 #### Decline all guests
@@ -98,7 +98,7 @@ Save RSVP data. The handler routes by request body:
 | `id` | yes | Invite id (snowflake, string) |
 | `decline_all` | yes | Must be `true` — marks every guest on the invite as not attending |
 
-**200 OK** — returns the updated invite with guests (all `is_attending: false`, `dietary_restriction: ""`). Any unset invite booleans are saved as `false`.
+**200 OK** — returns the updated invite with guests (all `is_attending: false`, `dietary_restriction: ""`, `attend_solemnisation: null`). Any unset invite booleans are saved as `false`.
 
 #### Invite update
 
@@ -107,25 +107,21 @@ Save RSVP data. The handler routes by request body:
 ```json
 {
   "id": "1234567890123456789",
-  "require_parking": true,
-  "attend_solemnisation": false
+  "require_parking": true
 }
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
 | `id` | yes | Invite id (snowflake, string) |
-| `require_parking` | no* | Whether couple parking is required |
-| `attend_solemnisation` | no* | Whether attending the solemnisation |
-
-\* At least one of `require_parking` or `attend_solemnisation` must be present. Send one field to update it alone, or both to update together. The frontend saves each choice immediately on selection.
+| `require_parking` | yes | Whether couple parking is required |
 
 **Example**
 
 ```bash
 curl -X POST "https://YOUR_API_URL/guest" \
   -H "Content-Type: application/json" \
-  -d '{"id":"1234567890123456789","require_parking":true,"attend_solemnisation":false}'
+  -d '{"id":"1234567890123456789","require_parking":true}'
 ```
 
 **200 OK** — returns the updated invite with guests (same shape as GET).
@@ -135,7 +131,7 @@ curl -X POST "https://YOUR_API_URL/guest" \
 | Status | Body | Cause |
 |--------|------|-------|
 | `400` | `{"error":"id is required"}` | Missing invite id |
-| `400` | `{"error":"at least one of require_parking or attend_solemnisation is required"}` | No invite fields to update |
+| `400` | `{"error":"require_parking is required"}` | Missing parking field |
 | `404` | `{"error":"invite not found"}` | Invite id not in database |
 
 #### Guest update
@@ -146,6 +142,7 @@ curl -X POST "https://YOUR_API_URL/guest" \
 {
   "id": 1,
   "is_attending": true,
+  "attend_solemnisation": true,
   "dietary_restriction": "Vegetarian"
 }
 ```
@@ -154,7 +151,10 @@ curl -X POST "https://YOUR_API_URL/guest" \
 |-------|----------|-------------|
 | `id` | yes | Guest id (integer) |
 | `is_attending` | yes | `true` = attending, `false` = declining |
+| `attend_solemnisation` | yes* | Whether attending the solemnisation |
 | `dietary_restriction` | no | Dietary needs; omit or send `""` if none (stored as empty string, never `null`) |
+
+\* Required when `is_attending` is `true`. Cleared to `null` when declining.
 
 After any save, nullable RSVP fields are persisted as concrete values: booleans as `true`/`false`, text as `""`.
 
@@ -163,7 +163,7 @@ After any save, nullable RSVP fields are persisted as concrete values: booleans 
 ```bash
 curl -X POST "https://YOUR_API_URL/guest" \
   -H "Content-Type: application/json" \
-  -d '{"id":1,"is_attending":true,"dietary_restriction":"Vegetarian"}'
+  -d '{"id":1,"is_attending":true,"attend_solemnisation":true,"dietary_restriction":"Vegetarian"}'
 ```
 
 **200 OK**
@@ -178,6 +178,7 @@ curl -X POST "https://YOUR_API_URL/guest" \
 |--------|------|-------|
 | `400` | `{"error":"id is required"}` | Missing guest id |
 | `400` | `{"error":"is_attending is required"}` | Missing attendance choice |
+| `400` | `{"error":"attend_solemnisation is required when attending"}` | Attending guest missing solemnisation choice |
 | `404` | `{"error":"guest not found"}` | Guest id not in database |
 
 ---
@@ -317,7 +318,6 @@ Database: `rsvp` (populated separately).
 | `id` | snowflake |
 | `is_sent` | boolean |
 | `require_parking` | boolean |
-| `attend_solemnisation` | boolean |
 | `last_updated` | datetime, default `NOW()` |
 
 ### `guests`
@@ -329,11 +329,12 @@ Database: `rsvp` (populated separately).
 | `name` | text |
 | `dietary_restriction` | text |
 | `is_attending` | boolean |
+| `attend_solemnisation` | boolean |
 | `last_updated` | datetime, default `NOW()` |
 
 One invite (`invites.id`) can have many guests (`guests.invite_id`).
 
-The API reads and updates `require_parking`, `attend_solemnisation`, and guest RSVP fields. `is_sent` is managed outside the API.
+The API reads and updates `require_parking` on invites, and `attend_solemnisation`, `is_attending`, and `dietary_restriction` on guests. `is_sent` is managed outside the API.
 
 ### Example MySQL DDL
 
@@ -342,7 +343,6 @@ CREATE TABLE invites (
   id BIGINT UNSIGNED NOT NULL,
   is_sent BOOLEAN NULL,
   require_parking BOOLEAN NULL,
-  attend_solemnisation BOOLEAN NULL,
   last_updated TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
@@ -353,10 +353,26 @@ CREATE TABLE guests (
   name TEXT NOT NULL,
   dietary_restriction TEXT NULL,
   is_attending BOOLEAN NULL,
+  attend_solemnisation BOOLEAN NULL,
   last_updated TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   FOREIGN KEY (invite_id) REFERENCES invites (id)
 );
+```
+
+### Migration from invite-level solemnisation
+
+If your database still has `attend_solemnisation` on `invites`, run:
+
+```sql
+ALTER TABLE guests ADD COLUMN attend_solemnisation BOOLEAN NULL;
+
+UPDATE guests g
+JOIN invites i ON g.invite_id = i.id
+SET g.attend_solemnisation = i.attend_solemnisation
+WHERE i.attend_solemnisation IS NOT NULL;
+
+ALTER TABLE invites DROP COLUMN attend_solemnisation;
 ```
 
 ---
