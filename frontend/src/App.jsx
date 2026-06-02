@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchInvite, saveGuest, saveInvite } from "./api.js";
 import Countdown from "./components/Countdown.jsx";
 import Faq from "./components/Faq.jsx";
+import GettingThere from "./components/GettingThere.jsx";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
 import { RSVP, WEDDING } from "./constants.js";
@@ -215,6 +216,7 @@ export default function App() {
         <h1 className="couple-names">{WEDDING.coupleNames}</h1>
         <nav className="page-nav" aria-label="Page sections">
           <a href="#rsvp">RSVP</a>
+          <a href="#getting-there">Getting There</a>
           <a href="#faq">FAQ</a>
         </nav>
         <p className="wedding-date">{WEDDING.date}</p>
@@ -286,6 +288,10 @@ export default function App() {
           </>
         ) : null}
       </main>
+
+      <Divider />
+
+      <GettingThere />
 
       <Divider />
 
