@@ -7,15 +7,15 @@
 -include Makefile.include
 
 AWS_REGION ?= ap-southeast-1
-AWS_ACCOUNT_ID ?= 123456789012
+AWS_ACCOUNT_ID ?= 206363131200
 ECR_REPO_NAME ?= ppmxbbg-rsvp-api
 IMAGE_NAME ?= ppmxbbg-rsvp-api
 ECR_REGISTRY ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 ECR_REPO ?= $(ECR_REGISTRY)/$(ECR_REPO_NAME)
 LAMBDA_FUNCTION ?= ppmxbbg-rsvp-api
 S3_BUCKET ?= ppmxbbg-rsvp-frontend
-CLOUDFRONT_DISTRIBUTION_ID ?= E1234567890ABC
-VITE_API_BASE_URL ?= https://YOUR_API_ID.execute-api.ap-southeast-1.amazonaws.com
+CLOUDFRONT_DISTRIBUTION_ID ?=
+VITE_API_BASE_URL ?= https://s0vujknrw1.execute-api.ap-southeast-1.amazonaws.com
 AWS_DEPLOY_ROLE_NAME ?= github-actions-ppmxbbg-rsvp-deploy
 AWS_DEPLOY_ROLE_ARN := arn:aws:iam::$(AWS_ACCOUNT_ID):role/$(AWS_DEPLOY_ROLE_NAME)
 
