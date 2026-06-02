@@ -96,14 +96,25 @@
 .admin-invite-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+.admin-invite-header > div:first-child {
+  min-width: 0;
 }
 
 .admin-invite-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.admin-mark-sent-btn {
+  min-width: 7.25rem;
+  white-space: nowrap;
 }
 
 .admin-summary {
