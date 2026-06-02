@@ -5,7 +5,9 @@ import Faq from "./components/Faq.jsx";
 import GettingThere from "./components/GettingThere.jsx";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
-import { RSVP, WEDDING } from "./constants.js";
+import { RSVP, RSVP_CUTOFF, WEDDING } from "./constants.js";
+
+const RSVP_CUTOFF_MS = new Date(RSVP_CUTOFF.dateTime).getTime();
 
 function Divider() {
   return (
@@ -75,6 +77,7 @@ function guestRsvpState(guestList) {
 
 export default function App() {
   const inviteId = useMemo(() => getInviteId(), []);
+  const [now, setNow] = useState(() => new Date());
   const [guests, setGuests] = useState([]);
   const [requireParking, setRequireParking] = useState(null);
   const [attendSolemnisation, setAttendSolemnisation] = useState(null);
@@ -84,8 +87,22 @@ export default function App() {
   const [activeGuest, setActiveGuest] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const rsvpClosed = now.getTime() >= RSVP_CUTOFF_MS;
 
   useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (rsvpClosed) {
+      setLoading(false);
+      setActiveGuest(null);
+      setError("");
+      setSuccess("");
+      return;
+    }
+
     if (!inviteId) {
       setLoading(false);
       setError("Invite not found. Please check your invitation link.");
@@ -128,9 +145,9 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [inviteId]);
+  }, [inviteId, rsvpClosed]);
 
-  const formDisabled = loading || !!error;
+  const formDisabled = loading || !!error || rsvpClosed;
   const hasSavedRsvp =
     requireParking != null ||
     attendSolemnisation != null ||
@@ -232,7 +249,9 @@ export default function App() {
         {error && <p className="banner banner-error">{error}</p>}
         {success && <p className="banner banner-success">{success}</p>}
 
-        {loading ? (
+        {rsvpClosed ? (
+          <p className="closed-message">{RSVP_CUTOFF.closedMessage}</p>
+        ) : loading ? (
           <p className="loading-text">Loading invitation details...</p>
         ) : !error ? (
           <>
@@ -297,7 +316,7 @@ export default function App() {
 
       <Faq />
 
-      {activeGuest && (
+      {activeGuest && !rsvpClosed && (
         <GuestRespondModal
           guest={activeGuest}
           submitting={savingGuest}

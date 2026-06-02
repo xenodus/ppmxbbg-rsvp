@@ -382,11 +382,16 @@ form {
 }
 
 .loading-text,
-.empty-guests {
+.empty-guests,
+.closed-message {
   margin: 0;
   color: var(--muted);
   font-style: italic;
   text-align: center;
+}
+
+.closed-message {
+  line-height: 1.6;
 }
 
 .section-heading {
