@@ -344,7 +344,7 @@ If MySQL is in a VPC, attach the Lambda to the same VPC/subnets/security groups 
 
 ### API Gateway routes
 
-Map all routes to the same Lambda function:
+Map all routes to the same Lambda function. Route paths are without the stage name (e.g. `/admin/login`, not `/prod/admin/login`); the Lambda strips the stage from the request path when your invoke URL includes a stage such as `/prod`.
 
 | Method | Path |
 |--------|------|
@@ -374,8 +374,8 @@ LAMBDA_FUNCTION=ppmxbbg-rsvp-api
 S3_BUCKET=ppmxbbg-rsvp-frontend
 CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
 
-# API Gateway base URL — no trailing slash
-VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com
+# API Gateway invoke URL (include the stage name if your API uses one)
+VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com/prod
 ```
 
 ### Deploy commands

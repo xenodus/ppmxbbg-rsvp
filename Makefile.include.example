@@ -10,6 +10,6 @@ LAMBDA_FUNCTION=ppmxbbg-rsvp-api
 S3_BUCKET=ppmxbbg-rsvp-frontend
 CLOUDFRONT_DISTRIBUTION_ID=
 
-# API Gateway → Stages → Invoke URL (no trailing slash)
+# API Gateway → Stages → Invoke URL (include stage path, no trailing slash)
 # Find in AWS Console: API Gateway → your API → Stages
-VITE_API_BASE_URL=https://YOUR_API_ID.execute-api.ap-southeast-1.amazonaws.com
+VITE_API_BASE_URL=https://YOUR_API_ID.execute-api.ap-southeast-1.amazonaws.com/prod
