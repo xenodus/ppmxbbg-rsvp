@@ -495,7 +495,6 @@ CREATE TABLE guests (
 ├── api/           # Go Lambda (handler, store, config)
 ├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
 ├── Dockerfile     # Lambda container image
-├── .github/workflows/   # CI (deploy on merge to master via OIDC)
 ├── Makefile       # Build and deploy commands
 ├── Makefile.include.example
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
