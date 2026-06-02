@@ -326,7 +326,7 @@ export default function AdminApp() {
         </form>
       </section>
 
-      <section>
+      <section className="admin-list-section">
         <h2>All invites ({invites.length})</h2>
         {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
         <div className="admin-invite-list">
