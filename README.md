@@ -481,21 +481,6 @@ CREATE TABLE guests (
 );
 ```
 
-### Migration from invite-level solemnisation
-
-If your database still has `attend_solemnisation` on `invites`, run:
-
-```sql
-ALTER TABLE guests ADD COLUMN attend_solemnisation BOOLEAN NULL;
-
-UPDATE guests g
-JOIN invites i ON g.invite_id = i.id
-SET g.attend_solemnisation = i.attend_solemnisation
-WHERE i.attend_solemnisation IS NOT NULL;
-
-ALTER TABLE invites DROP COLUMN attend_solemnisation;
-```
-
 ---
 
 ## Project layout
