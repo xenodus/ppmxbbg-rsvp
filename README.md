@@ -364,7 +364,7 @@ Set your AWS account id, API Gateway URL, and CloudFront distribution id in the 
 cp Makefile.include.example Makefile.include
 ```
 
-See [`Makefile.include.example`](Makefile.include.example) for the same variables. Include the API Gateway stage in `VITE_API_BASE_URL` when your API uses one (e.g. `.../prod`).
+See [`Makefile.include.example`](Makefile.include.example) for the same variables.
 
 ### Deploy commands
 

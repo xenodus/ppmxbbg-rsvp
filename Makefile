@@ -15,7 +15,7 @@ ECR_REPO ?= $(ECR_REGISTRY)/$(ECR_REPO_NAME)
 LAMBDA_FUNCTION ?= ppmxbbg-rsvp-api
 S3_BUCKET ?= ppmxbbg-rsvp-frontend
 CLOUDFRONT_DISTRIBUTION_ID ?= E1234567890ABC
-VITE_API_BASE_URL ?= https://YOUR_API_ID.execute-api.ap-southeast-1.amazonaws.com/prod
+VITE_API_BASE_URL ?= https://YOUR_API_ID.execute-api.ap-southeast-1.amazonaws.com
 AWS_DEPLOY_ROLE_NAME ?= github-actions-ppmxbbg-rsvp-deploy
 AWS_DEPLOY_ROLE_ARN := arn:aws:iam::$(AWS_ACCOUNT_ID):role/$(AWS_DEPLOY_ROLE_NAME)
 
