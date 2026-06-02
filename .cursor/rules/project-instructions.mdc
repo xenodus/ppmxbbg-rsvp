@@ -1,0 +1,17 @@
+---
+description: Project conventions from INSTRUCTIONS.md
+alwaysApply: true
+---
+
+Follow [INSTRUCTIONS.md](../../INSTRUCTIONS.md) for every task in this repository.
+
+## Requirements
+
+- **README**: Keep [README.md](../../README.md) in sync with code in the same change when you touch API endpoints, deployment/Makefile flow, database schema, local dev, or project layout (see INSTRUCTIONS.md for section mapping).
+- **Frontend PRs**: Changes under `frontend/` require desktop (~1280px) and mobile (~390px) screenshots in the PR description; commit images under `docs/screenshots/` and reference branch raw URLs (see INSTRUCTIONS.md).
+- **PR checklist**: Before opening a PR, verify the checklist at the end of INSTRUCTIONS.md (README API/Deployment, `Makefile.include.example`, examples, screenshots).
+
+## Do not
+
+- Merge API or deploy work with a stale README.
+- Open frontend PRs without screenshots when UI changed.
