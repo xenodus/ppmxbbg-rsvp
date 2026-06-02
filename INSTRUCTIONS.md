@@ -30,7 +30,7 @@ Update the **Deployment** section when you change:
 - Required AWS resources (Lambda, ECR, API Gateway, S3, CloudFront)
 - Environment variables (Lambda or frontend build-time)
 - API Gateway routes or CORS configuration
-- `Makefile.include.example` when new or renamed deploy variables are added
+- the **Makefile** when new or renamed deploy variables are added
 
 ### Other README sections
 
@@ -92,6 +92,6 @@ Group screenshots under **Desktop** and **Mobile** headings so reviewers can com
 
 - [ ] README API section matches current endpoints and payloads
 - [ ] README Deployment section matches current Makefile and env vars
-- [ ] `Makefile.include.example` updated if deploy config changed
+- [ ] Makefile deploy variables updated if deploy config changed
 - [ ] Examples in README tested or verified against the code
 - [ ] Frontend changes include desktop and mobile screenshots in the PR description

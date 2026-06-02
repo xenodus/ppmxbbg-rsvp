@@ -358,13 +358,7 @@ Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes 
 
 ### Configure deploy variables
 
-Set your AWS account id, API Gateway URL, and CloudFront distribution id in the **Makefile** (defaults at the top of the file). For local-only overrides without editing the Makefile, copy the example include:
-
-```bash
-cp Makefile.include.example Makefile.include
-```
-
-See [`Makefile.include.example`](Makefile.include.example) for the same variables.
+Set your AWS account id, API Gateway URL, and CloudFront distribution id in the **Makefile** (defaults near the top of the file).
 
 ### Deploy commands
 
@@ -496,7 +490,6 @@ CREATE TABLE guests (
 ├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
-├── Makefile.include.example
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
 ```
 

@@ -3,9 +3,7 @@
 	lambda-update lambda-wait deploy-api deploy-frontend deploy \
 	print-aws-deploy-role-arn print-aws-region
 
-# Production deploy settings (also used by GitHub Actions). Override locally via Makefile.include.
--include Makefile.include
-
+# Deploy settings (also used by GitHub Actions).
 AWS_REGION ?= ap-southeast-1
 AWS_ACCOUNT_ID ?= 206363131200
 ECR_REPO_NAME ?= ppmxbbg-rsvp-api
@@ -23,7 +21,7 @@ export AWS_PAGER :=
 
 check-vite-api-url:
 ifeq ($(VITE_API_BASE_URL),)
-	$(error VITE_API_BASE_URL is empty. Set it in the Makefile or Makefile.include)
+	$(error VITE_API_BASE_URL is empty. Set it in the Makefile)
 endif
 
 test: api-test
