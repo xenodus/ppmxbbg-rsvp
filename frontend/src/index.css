@@ -272,7 +272,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.35rem;
-  flex: 1;
 }
 
 .nav-drawer-links a {
@@ -285,28 +284,6 @@ body {
 
 .nav-drawer-links a:hover {
   color: var(--muted);
-}
-
-.nav-drawer-rsvp {
-  display: block;
-  margin-top: auto;
-  padding: 0.95rem 1.25rem;
-  border: 1px solid var(--text);
-  border-radius: 999px;
-  color: var(--text);
-  text-align: center;
-  text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.nav-drawer-rsvp:hover {
-  background: var(--text);
-  color: #fff;
 }
 
 .card-title {

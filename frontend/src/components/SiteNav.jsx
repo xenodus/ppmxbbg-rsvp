@@ -7,7 +7,6 @@ export default function SiteNav({ coupleNames, inviteValid }) {
   const [scrolled, setScrolled] = useState(false);
 
   const links = [
-    { href: "#top", label: "Home" },
     { href: "#rsvp", label: "RSVP" },
     ...(inviteValid
       ? [
@@ -101,10 +100,6 @@ export default function SiteNav({ coupleNames, inviteValid }) {
             </a>
           ))}
         </nav>
-
-        <a href="#rsvp" className="nav-drawer-rsvp" onClick={closeMenu}>
-          RSVP
-        </a>
       </aside>
     </>
   );

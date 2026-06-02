@@ -241,7 +241,7 @@ export default function App() {
   }
 
   return (
-    <div id="top" className="page">
+    <div className="page">
       <SiteNav coupleNames={WEDDING.coupleNames} inviteValid={inviteValid} />
 
       <header className="header">
