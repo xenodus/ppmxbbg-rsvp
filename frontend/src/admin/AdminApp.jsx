@@ -234,28 +234,30 @@ function InviteRow({ invite, onRefresh }) {
         · Parking: {formatBool(invite.require_parking)}
       </p>
       {expanded ? (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Guest</th>
-              <th>Attending</th>
-              <th>Solemnisation</th>
-              <th>Dietary</th>
-              <th>Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(invite.guests || []).map((guest) => (
-              <tr key={guest.id}>
-                <td>{guest.name}</td>
-                <td>{formatBool(guest.is_attending)}</td>
-                <td>{formatBool(guest.attend_solemnisation)}</td>
-                <td>{guest.dietary_restriction || "—"}</td>
-                <td>{guest.last_updated || "—"}</td>
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Attending</th>
+                <th>Solemnisation</th>
+                <th>Dietary</th>
+                <th>Updated</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(invite.guests || []).map((guest) => (
+                <tr key={guest.id}>
+                  <td>{guest.name}</td>
+                  <td>{formatBool(guest.is_attending)}</td>
+                  <td>{formatBool(guest.attend_solemnisation)}</td>
+                  <td>{guest.dietary_restriction || "—"}</td>
+                  <td>{guest.last_updated || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : null}
     </article>
   );
