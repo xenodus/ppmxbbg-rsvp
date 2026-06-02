@@ -47,7 +47,7 @@
 .admin-input,
 .admin-textarea {
   width: 100%;
-  margin: 0.35rem 0 1rem;
+  margin: var(--field-control-gap) 0 var(--field-block-gap);
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -69,11 +69,6 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   flex-shrink: 0;
-}
-
-.admin-search-input {
-  margin-top: 0;
-  margin-bottom: 1rem;
 }
 
 .admin-create,

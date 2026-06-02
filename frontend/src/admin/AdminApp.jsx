@@ -407,18 +407,20 @@ export default function AdminApp() {
             ? ` (${filteredInvites.length} of ${invites.length})`
             : ` (${invites.length})`}
         </h2>
-        <label className="field-label" htmlFor="guest-search">
-          Search by guest name
-        </label>
-        <input
-          id="guest-search"
-          type="search"
-          className="admin-input admin-search-input"
-          placeholder="e.g. Jane"
-          value={guestSearch}
-          onChange={(e) => setGuestSearch(e.target.value)}
-          autoComplete="off"
-        />
+        <div className="field-group">
+          <label className="field-label" htmlFor="guest-search">
+            Search by guest name
+          </label>
+          <input
+            id="guest-search"
+            type="search"
+            className="admin-input"
+            placeholder="e.g. Jane"
+            value={guestSearch}
+            onChange={(e) => setGuestSearch(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
         {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
         {!loading && invites.length > 0 && searchActive && filteredInvites.length === 0 ? (
           <p className="admin-muted">No invites match that guest name.</p>
