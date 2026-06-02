@@ -383,27 +383,7 @@ make deploy
 
 Merging a pull request into `master` runs [`.github/workflows/deploy-on-merge.yml`](.github/workflows/deploy-on-merge.yml), which assumes an IAM role via GitHub OIDC (no long-lived AWS keys in the repo).
 
-**One-time AWS setup** — run locally with admin IAM credentials (or adjust names to match your resources):
-
-```bash
-export AWS_REGION=ap-southeast-1
-export GITHUB_ORG=xenodus
-export GITHUB_REPO=ppmxbbg-rsvp
-export ECR_REPO_NAME=ppmxbbg-rsvp-api
-export LAMBDA_FUNCTION=ppmxbbg-rsvp-api
-export S3_BUCKET=ppmxbbg-rsvp-frontend
-export CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC   # optional
-
-./scripts/setup-github-actions-oidc.sh
-```
-
-The script:
-
-1. Creates the `token.actions.githubusercontent.com` OIDC provider (if missing).
-2. Creates/updates IAM role `github-actions-ppmxbbg-rsvp-deploy` trusted for `repo:ORG/REPO:pull_request`.
-3. Attaches deploy policy (ECR push, Lambda code update, S3 sync, optional CloudFront invalidation).
-
-Equivalent manual commands:
+**One-time AWS setup** — run locally with admin IAM credentials (adjust names to match your resources and Makefile):
 
 ```bash
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -411,18 +391,95 @@ AWS_REGION=ap-southeast-1
 GITHUB_ORG=xenodus
 GITHUB_REPO=ppmxbbg-rsvp
 
-# OIDC provider (once per account)
+# 1) OIDC provider (once per AWS account)
 aws iam create-open-id-connect-provider \
   --url https://token.actions.githubusercontent.com \
   --client-id-list sts.amazonaws.com \
   --thumbprint-list 6938fd6efa2149a011f78167e9d1c4eb1c93d07b
 
-# Trust policy → save as trust.json, then:
+# 2) trust.json — only merged PRs on this repo (matches deploy-on-merge.yml)
+cat > trust.json <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": {
+      "Federated": "arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
+    },
+    "Action": "sts:AssumeRoleWithWebIdentity",
+    "Condition": {
+      "StringEquals": {
+        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+      },
+      "StringLike": {
+        "token.actions.githubusercontent.com:sub": "repo:${GITHUB_ORG}/${GITHUB_REPO}:pull_request"
+      }
+    }
+  }]
+}
+EOF
+
 aws iam create-role \
   --role-name github-actions-ppmxbbg-rsvp-deploy \
   --assume-role-policy-document file://trust.json
 
-# Deploy policy → save as deploy-policy.json, then:
+# 3) deploy-policy.json — ECR, Lambda, S3, CloudFront (match Makefile defaults)
+cat > deploy-policy.json <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ECRAuth",
+      "Effect": "Allow",
+      "Action": "ecr:GetAuthorizationToken",
+      "Resource": "*"
+    },
+    {
+      "Sid": "ECRPush",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:CompleteLayerUpload",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart"
+      ],
+      "Resource": "arn:aws:ecr:${AWS_REGION}:${AWS_ACCOUNT_ID}:repository/ppmxbbg-rsvp-api"
+    },
+    {
+      "Sid": "LambdaDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:UpdateFunctionCode"
+      ],
+      "Resource": "arn:aws:lambda:${AWS_REGION}:${AWS_ACCOUNT_ID}:function:ppmxbbg-rsvp-api"
+    },
+    {
+      "Sid": "S3Deploy",
+      "Effect": "Allow",
+      "Action": [
+        "s3:DeleteObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::ppmxbbg-rsvp-frontend",
+        "arn:aws:s3:::ppmxbbg-rsvp-frontend/*"
+      ]
+    },
+    {
+      "Sid": "CloudFrontInvalidate",
+      "Effect": "Allow",
+      "Action": "cloudfront:CreateInvalidation",
+      "Resource": "arn:aws:cloudfront::${AWS_ACCOUNT_ID}:distribution/E1234567890ABC"
+    }
+  ]
+}
+EOF
+
 aws iam create-policy \
   --policy-name github-actions-ppmxbbg-rsvp-deploy \
   --policy-document file://deploy-policy.json
@@ -431,8 +488,6 @@ aws iam attach-role-policy \
   --role-name github-actions-ppmxbbg-rsvp-deploy \
   --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/github-actions-ppmxbbg-rsvp-deploy
 ```
-
-Use the JSON from [`scripts/setup-github-actions-oidc.sh`](scripts/setup-github-actions-oidc.sh) for `trust.json` and `deploy-policy.json` if you prefer not to run the script.
 
 **Makefile** — set `AWS_ACCOUNT_ID`, `VITE_API_BASE_URL`, and `CLOUDFRONT_DISTRIBUTION_ID` to your real values before the first CI deploy. Other deploy targets (`ECR_REPO_NAME`, `LAMBDA_FUNCTION`, `S3_BUCKET`, `AWS_REGION`, `AWS_DEPLOY_ROLE_NAME`) use the committed defaults. GitHub Actions reads the OIDC role ARN and region from the Makefile; no repository variables are required.
 
@@ -555,7 +610,6 @@ CREATE TABLE guests (
 ├── .github/workflows/   # CI (deploy on merge to master via OIDC)
 ├── Makefile       # Build and deploy commands
 ├── Makefile.include.example
-├── scripts/       # AWS OIDC setup helper
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
 ```
 
