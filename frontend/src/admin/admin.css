@@ -94,22 +94,18 @@
 }
 
 .admin-invite-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  flex-wrap: nowrap;
+  margin: 0;
 }
 
-.admin-invite-header > div:first-child {
-  min-width: 0;
+.admin-invite-header .admin-id {
+  margin: 0.25rem 0 0;
 }
 
 .admin-invite-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  flex-shrink: 0;
+  margin-top: 0.75rem;
 }
 
 .admin-mark-sent-btn {
@@ -144,12 +140,6 @@
 .admin-copy-done {
   color: var(--success);
   border-color: #c7e4d2;
-}
-
-@media (max-width: 600px) {
-  .admin-invite-header {
-    flex-direction: column;
-  }
 }
 
 .primary-btn,
