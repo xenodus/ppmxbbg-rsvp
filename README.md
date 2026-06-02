@@ -354,29 +354,11 @@ Map all routes to the same Lambda function. Route paths are without the stage na
 | `POST`, `OPTIONS` | `/admin/login` |
 | `GET`, `POST`, `PATCH`, `DELETE`, `OPTIONS` | `/admin/invites` |
 
-Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes allow the `Authorization` header (set by the Lambda response). Admin routes allow the `Authorization` header (set by the Lambda response).
+Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes allow the `Authorization` header (set by the Lambda response).
 
 ### Configure deploy variables
 
-```bash
-cp Makefile.include.example Makefile.include
-```
-
-Edit `Makefile.include`:
-
-```makefile
-AWS_ACCOUNT_ID=123456789012
-AWS_REGION=ap-southeast-1
-
-ECR_REPO_NAME=ppmxbbg-rsvp-api
-LAMBDA_FUNCTION=ppmxbbg-rsvp-api
-
-S3_BUCKET=ppmxbbg-rsvp-frontend
-CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
-
-# API Gateway invoke URL (include the stage name if your API uses one)
-VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com/prod
-```
+Set your AWS account id, API Gateway URL, and CloudFront distribution id in the **Makefile** (defaults near the top of the file).
 
 ### Deploy commands
 
@@ -402,8 +384,6 @@ open "https://YOUR_CLOUDFRONT_URL/?id=YOUR_INVITE_ID"
 
 # Admin UI
 open "https://YOUR_CLOUDFRONT_URL/admin.html"
-```
-
 ```
 
 ### Invitation links
@@ -510,7 +490,6 @@ CREATE TABLE guests (
 ├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
-├── Makefile.include.example
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
 ```
 

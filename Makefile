@@ -1,18 +1,11 @@
 .PHONY: test api-test frontend-dev frontend-build frontend-update check-vite-api-url \
 	docker-build docker-tag docker-push aws-login \
-	lambda-update lambda-wait deploy-api deploy-frontend deploy
+	lambda-update lambda-wait deploy-api deploy-frontend deploy \
+	print-aws-deploy-role-arn print-aws-region
 
-# Override locally by creating Makefile.include, e.g.:
-#   AWS_ACCOUNT_ID=123456789012
-#   ECR_REPO_NAME=ppmxbbg-rsvp-api
-#   LAMBDA_FUNCTION=ppmxbbg-rsvp-api
-#   S3_BUCKET=ppmxbbg-rsvp-frontend
-#   CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
-#   VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com
--include Makefile.include
-
+# Deploy settings (also used by GitHub Actions).
 AWS_REGION ?= ap-southeast-1
-AWS_ACCOUNT_ID ?= your-account-id
+AWS_ACCOUNT_ID ?= 206363131200
 ECR_REPO_NAME ?= ppmxbbg-rsvp-api
 IMAGE_NAME ?= ppmxbbg-rsvp-api
 ECR_REGISTRY ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
@@ -20,13 +13,15 @@ ECR_REPO ?= $(ECR_REGISTRY)/$(ECR_REPO_NAME)
 LAMBDA_FUNCTION ?= ppmxbbg-rsvp-api
 S3_BUCKET ?= ppmxbbg-rsvp-frontend
 CLOUDFRONT_DISTRIBUTION_ID ?=
-VITE_API_BASE_URL ?=
+VITE_API_BASE_URL ?= https://s0vujknrw1.execute-api.ap-southeast-1.amazonaws.com
+AWS_DEPLOY_ROLE_NAME ?= github-actions-ppmxbbg-rsvp-deploy
+AWS_DEPLOY_ROLE_ARN := arn:aws:iam::$(AWS_ACCOUNT_ID):role/$(AWS_DEPLOY_ROLE_NAME)
 
 export AWS_PAGER :=
 
 check-vite-api-url:
 ifeq ($(VITE_API_BASE_URL),)
-	$(error VITE_API_BASE_URL is empty. Set it in Makefile.include — see Makefile.include.example)
+	$(error VITE_API_BASE_URL is empty. Set it in the Makefile)
 endif
 
 test: api-test
@@ -84,3 +79,9 @@ deploy-api: docker-build docker-tag docker-push lambda-update
 deploy-frontend: frontend-update
 
 deploy: deploy-api deploy-frontend
+
+print-aws-deploy-role-arn:
+	@echo $(AWS_DEPLOY_ROLE_ARN)
+
+print-aws-region:
+	@echo $(AWS_REGION)
