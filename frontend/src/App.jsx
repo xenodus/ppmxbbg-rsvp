@@ -25,6 +25,8 @@ function getInviteId() {
   return params.get("id")?.trim() || "";
 }
 
+const RESPONSE_SAVED_MESSAGE = "Response saved.";
+
 function ChoiceSection({
   number,
   title,
@@ -34,6 +36,7 @@ function ChoiceSection({
   yesLabel,
   noLabel,
   disabled,
+  savedMessage,
   onSelectYes,
   onSelectNo,
 }) {
@@ -62,6 +65,7 @@ function ChoiceSection({
           {noLabel}
         </button>
       </div>
+      {savedMessage && <p className="choice-saved">{savedMessage}</p>}
     </section>
   );
 }
@@ -101,7 +105,7 @@ function guestSaveSuccessMessage(guestList) {
   if (everyoneDeclined) {
     return RSVP.bigQuestion.declinedMessage;
   }
-  return "Response saved.";
+  return RESPONSE_SAVED_MESSAGE;
 }
 
 export default function App() {
@@ -115,6 +119,7 @@ export default function App() {
   const [activeGuest, setActiveGuest] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [parkingSavedMessage, setParkingSavedMessage] = useState("");
   const [inviteValid, setInviteValid] = useState(false);
   const rsvpClosed = now.getTime() >= RSVP_CUTOFF_MS;
 
@@ -198,6 +203,7 @@ export default function App() {
     const previousParking = requireParking;
     setRequireParking(value);
     setError("");
+    setParkingSavedMessage("");
     setSavingInvite(true);
 
     try {
@@ -209,8 +215,10 @@ export default function App() {
       if (updated.require_parking !== undefined && updated.require_parking !== null) {
         setRequireParking(updated.require_parking);
       }
+      setParkingSavedMessage(RESPONSE_SAVED_MESSAGE);
     } catch (err) {
       setRequireParking(previousParking);
+      setParkingSavedMessage("");
       setError(err.message);
     } finally {
       setSavingInvite(false);
@@ -308,6 +316,7 @@ export default function App() {
                 yesLabel={RSVP.parking.yes}
                 noLabel={RSVP.parking.no}
                 disabled={inviteChoicesDisabled}
+                savedMessage={parkingSavedMessage}
                 onSelectYes={() => handleInviteChoice(true)}
                 onSelectNo={() => handleInviteChoice(false)}
               />
