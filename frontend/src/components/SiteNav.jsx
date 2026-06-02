@@ -56,8 +56,10 @@ export default function SiteNav({ coupleNames, inviteValid }) {
     <>
       <button
         type="button"
-        className={`nav-fab${scrolled ? " is-scrolled" : ""}`}
-        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        className={`nav-fab${scrolled ? " is-scrolled" : ""}${menuOpen ? " is-hidden" : ""}`}
+        aria-label="Open menu"
+        aria-hidden={menuOpen}
+        tabIndex={menuOpen ? -1 : 0}
         aria-expanded={menuOpen}
         aria-controls="site-nav-drawer"
         onClick={() => setMenuOpen((open) => !open)}

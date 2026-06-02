@@ -137,7 +137,7 @@ body {
 .nav-fab {
   position: fixed;
   top: 1rem;
-  right: 1rem;
+  left: 1rem;
   z-index: 1100;
   display: inline-flex;
   align-items: center;
@@ -156,7 +156,15 @@ body {
     border-color 0.25s ease,
     border-radius 0.25s ease,
     padding 0.25s ease,
-    gap 0.25s ease;
+    gap 0.25s ease,
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+.nav-fab.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .nav-fab.is-scrolled {
@@ -744,7 +752,7 @@ form {
 
   .nav-fab {
     top: 0.75rem;
-    right: 0.75rem;
+    left: 0.75rem;
   }
 
   .form-card,
