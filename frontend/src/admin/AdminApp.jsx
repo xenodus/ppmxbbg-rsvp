@@ -106,7 +106,23 @@ function LoginForm({ onSuccess, error, loading }) {
 function InviteRow({ invite, onRefresh }) {
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const summary = inviteSummary(invite);
+
+  useEffect(() => {
+    if (!linkCopied) return undefined;
+    const timer = window.setTimeout(() => setLinkCopied(false), 2000);
+    return () => window.clearTimeout(timer);
+  }, [linkCopied]);
+
+  async function handleCopyLink() {
+    try {
+      await copyToClipboard(inviteLink(invite.id));
+      setLinkCopied(true);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
 
   async function run(action) {
     setBusy(true);
@@ -130,13 +146,11 @@ function InviteRow({ invite, onRefresh }) {
         <div className="admin-invite-actions">
           <button
             type="button"
-            className="secondary-btn"
+            className={linkCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
             disabled={busy}
-            onClick={() =>
-              copyToClipboard(inviteLink(invite.id)).catch((err) => alert(err.message))
-            }
+            onClick={handleCopyLink}
           >
-            Copy link
+            {linkCopied ? "Copied!" : "Copy link"}
           </button>
           <button
             type="button"
