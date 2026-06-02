@@ -19,6 +19,27 @@ function inviteLink(id) {
   return `${guestSiteOrigin()}?id=${encodeURIComponent(id)}`;
 }
 
+async function copyToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    if (!document.execCommand("copy")) {
+      throw new Error("Copy is not supported in this browser.");
+    }
+  } finally {
+    document.body.removeChild(textarea);
+  }
+}
+
 function formatBool(value) {
   if (value === true) return "Yes";
   if (value === false) return "No";
@@ -111,7 +132,9 @@ function InviteRow({ invite, onRefresh }) {
             type="button"
             className="secondary-btn"
             disabled={busy}
-            onClick={() => navigator.clipboard.writeText(inviteLink(invite.id))}
+            onClick={() =>
+              copyToClipboard(inviteLink(invite.id)).catch((err) => alert(err.message))
+            }
           >
             Copy link
           </button>
@@ -242,7 +265,13 @@ export default function AdminApp() {
       const data = await createInvite(guests);
       setGuestNames("");
       if (data.invite?.id) {
-        await navigator.clipboard.writeText(inviteLink(data.invite.id));
+        try {
+          await copyToClipboard(inviteLink(data.invite.id));
+        } catch (err) {
+          alert(
+            `Invite created, but the link could not be copied automatically:\n\n${inviteLink(data.invite.id)}\n\n${err.message}`,
+          );
+        }
       }
       await loadInvites();
     } catch (err) {
@@ -297,7 +326,7 @@ export default function AdminApp() {
         </form>
       </section>
 
-      <section>
+      <section className="admin-list-section">
         <h2>All invites ({invites.length})</h2>
         {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
         <div className="admin-invite-list">
