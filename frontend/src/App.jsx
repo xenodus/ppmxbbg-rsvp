@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchInvite, saveGuest, saveInvite } from "./api.js";
 import Countdown from "./components/Countdown.jsx";
+import Faq from "./components/Faq.jsx";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
 import { RSVP, WEDDING } from "./constants.js";
@@ -212,13 +213,20 @@ export default function App() {
       <header className="header">
         <p className="eyebrow">{WEDDING.inviteLine}</p>
         <h1 className="couple-names">{WEDDING.coupleNames}</h1>
+        <nav className="page-nav" aria-label="Page sections">
+          <a href="#rsvp">RSVP</a>
+          <a href="#faq">FAQ</a>
+        </nav>
         <p className="wedding-date">{WEDDING.date}</p>
         <Countdown />
       </header>
 
       <Divider />
 
-      <main className="form-card">
+      <main id="rsvp" className="form-card" aria-labelledby="rsvp-heading">
+        <h2 id="rsvp-heading" className="card-title">
+          RSVP
+        </h2>
         {error && <p className="banner banner-error">{error}</p>}
         {success && <p className="banner banner-success">{success}</p>}
 
@@ -278,6 +286,10 @@ export default function App() {
           </>
         ) : null}
       </main>
+
+      <Divider />
+
+      <Faq />
 
       {activeGuest && (
         <GuestRespondModal
