@@ -188,7 +188,6 @@ function InviteRow({ invite, onRefresh }) {
         {summary.responded}/{summary.guests} guests responded · {summary.attending} attending
         · Sent: {formatBool(invite.is_sent)}
         · Parking: {formatBool(invite.require_parking)}
-        · Solemnisation: {formatBool(invite.attend_solemnisation)}
       </p>
       {expanded ? (
         <table className="admin-table">
@@ -196,6 +195,7 @@ function InviteRow({ invite, onRefresh }) {
             <tr>
               <th>Guest</th>
               <th>Attending</th>
+              <th>Solemnisation</th>
               <th>Dietary</th>
               <th>Updated</th>
             </tr>
@@ -205,6 +205,7 @@ function InviteRow({ invite, onRefresh }) {
               <tr key={guest.id}>
                 <td>{guest.name}</td>
                 <td>{formatBool(guest.is_attending)}</td>
+                <td>{formatBool(guest.attend_solemnisation)}</td>
                 <td>{guest.dietary_restriction || "—"}</td>
                 <td>{guest.last_updated || "—"}</td>
               </tr>

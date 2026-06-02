@@ -27,7 +27,7 @@ export const RSVP = {
     no: "Skipping the ceremony, but absolutely ready for lunch!",
   },
   parking: {
-    number: "3",
+    number: "2",
     title: "Parking",
     question: "How are you rolling up to the venue? Need a parking coupon?",
     yes: "Vroom vroom, yes please! 🚗",

@@ -72,13 +72,23 @@ function guestRsvpState(guestList) {
   const allDeclined =
     allResponded && guestList.every((guest) => guest.is_attending === false);
   const anyAttending = guestList.some((guest) => guest.is_attending === true);
+  const attendingGuests = guestList.filter((guest) => guest.is_attending === true);
+  const allAttendingAnsweredSolemnisation =
+    attendingGuests.length > 0 &&
+    attendingGuests.every((guest) => guest.attend_solemnisation != null);
 
-  return { allResponded, allDeclined, anyAttending };
+  return { allResponded, allDeclined, anyAttending, allAttendingAnsweredSolemnisation };
 }
 
 function guestResponseUnchanged(guest, payload) {
   if (!guest || guest.is_attending !== payload.is_attending) {
     return false;
+  }
+
+  if (payload.is_attending === true) {
+    if (guest.attend_solemnisation !== payload.attend_solemnisation) {
+      return false;
+    }
   }
 
   const savedDietary = (guest.dietary_restriction || "").trim();
@@ -99,7 +109,6 @@ export default function App() {
   const [now, setNow] = useState(() => new Date());
   const [guests, setGuests] = useState([]);
   const [requireParking, setRequireParking] = useState(null);
-  const [attendSolemnisation, setAttendSolemnisation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingInvite, setSavingInvite] = useState(false);
   const [savingGuest, setSavingGuest] = useState(false);
@@ -142,12 +151,6 @@ export default function App() {
           if (invite.require_parking !== undefined && invite.require_parking !== null) {
             setRequireParking(invite.require_parking);
           }
-          if (
-            invite.attend_solemnisation !== undefined &&
-            invite.attend_solemnisation !== null
-          ) {
-            setAttendSolemnisation(invite.attend_solemnisation);
-          }
           setError("");
         }
       } catch (err) {
@@ -182,43 +185,31 @@ export default function App() {
   const formDisabled = loading || !!error || rsvpClosed;
   const hasSavedRsvp =
     requireParking != null ||
-    attendSolemnisation != null ||
-    guests.some((guest) => guest.is_attending != null);
-  const { allResponded, allDeclined, anyAttending } = guestRsvpState(guests);
-  const showStep2 = allResponded && anyAttending;
-  const showStep3 = showStep2 && attendSolemnisation != null;
+    guests.some(
+      (guest) =>
+        guest.is_attending != null || guest.attend_solemnisation != null,
+    );
+  const { allDeclined, anyAttending, allAttendingAnsweredSolemnisation } =
+    guestRsvpState(guests);
+  const showParking = anyAttending && allAttendingAnsweredSolemnisation;
   const inviteChoicesDisabled = formDisabled || savingInvite;
 
-  async function handleInviteChoice(field, value) {
-    const previousAttend = attendSolemnisation;
+  async function handleInviteChoice(value) {
     const previousParking = requireParking;
-
-    if (field === "attend_solemnisation") {
-      setAttendSolemnisation(value);
-    } else {
-      setRequireParking(value);
-    }
-
+    setRequireParking(value);
     setError("");
     setSavingInvite(true);
 
     try {
       const updated = await saveInvite({
         id: inviteId,
-        [field]: value,
+        require_parking: value,
       });
       setGuests(updated.guests || []);
       if (updated.require_parking !== undefined && updated.require_parking !== null) {
         setRequireParking(updated.require_parking);
       }
-      if (
-        updated.attend_solemnisation !== undefined &&
-        updated.attend_solemnisation !== null
-      ) {
-        setAttendSolemnisation(updated.attend_solemnisation);
-      }
     } catch (err) {
-      setAttendSolemnisation(previousAttend);
       setRequireParking(previousParking);
       setError(err.message);
     } finally {
@@ -247,6 +238,8 @@ export default function App() {
               ...guest,
               is_attending: payload.is_attending,
               dietary_restriction: payload.dietary_restriction,
+              attend_solemnisation:
+                payload.is_attending === true ? payload.attend_solemnisation : null,
             }
           : guest,
       );
@@ -306,22 +299,7 @@ export default function App() {
               <p className="section-note">{RSVP.bigQuestion.declinedMessage}</p>
             )}
 
-            {showStep2 && (
-              <ChoiceSection
-                number={RSVP.solemnisation.number}
-                title={RSVP.solemnisation.title}
-                question={RSVP.solemnisation.question}
-                note={RSVP.solemnisation.note}
-                value={attendSolemnisation}
-                yesLabel={RSVP.solemnisation.yes}
-                noLabel={RSVP.solemnisation.no}
-                disabled={inviteChoicesDisabled}
-                onSelectYes={() => handleInviteChoice("attend_solemnisation", true)}
-                onSelectNo={() => handleInviteChoice("attend_solemnisation", false)}
-              />
-            )}
-
-            {showStep3 && (
+            {showParking && (
               <ChoiceSection
                 number={RSVP.parking.number}
                 title={RSVP.parking.title}
@@ -330,8 +308,8 @@ export default function App() {
                 yesLabel={RSVP.parking.yes}
                 noLabel={RSVP.parking.no}
                 disabled={inviteChoicesDisabled}
-                onSelectYes={() => handleInviteChoice("require_parking", true)}
-                onSelectNo={() => handleInviteChoice("require_parking", false)}
+                onSelectYes={() => handleInviteChoice(true)}
+                onSelectNo={() => handleInviteChoice(false)}
               />
             )}
 

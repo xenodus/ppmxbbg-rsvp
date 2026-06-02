@@ -30,8 +30,8 @@ func ListInvites(ctx context.Context) ([]AdminInvite, error) {
 	}
 
 	rows, err := conn.QueryContext(ctx, `
-		SELECT i.id, i.is_sent, i.require_parking, i.attend_solemnisation, i.last_updated,
-		       g.id, g.name, g.dietary_restriction, g.is_attending, g.last_updated
+		SELECT i.id, i.is_sent, i.require_parking, i.last_updated,
+		       g.id, g.name, g.dietary_restriction, g.is_attending, g.attend_solemnisation, g.last_updated
 		FROM invites i
 		LEFT JOIN guests g ON g.invite_id = i.id
 		ORDER BY i.id ASC, g.id ASC
@@ -46,17 +46,18 @@ func ListInvites(ctx context.Context) ([]AdminInvite, error) {
 
 	for rows.Next() {
 		var inviteID string
-		var isSent, requireParking, attendSolemnisation sql.NullBool
+		var isSent, requireParking sql.NullBool
 		var inviteUpdated sql.NullTime
 		var guestID sql.NullInt64
 		var guestName sql.NullString
 		var dietaryRestriction sql.NullString
 		var isAttending sql.NullBool
+		var attendSolemnisation sql.NullBool
 		var guestUpdated sql.NullTime
 
 		if err := rows.Scan(
-			&inviteID, &isSent, &requireParking, &attendSolemnisation, &inviteUpdated,
-			&guestID, &guestName, &dietaryRestriction, &isAttending, &guestUpdated,
+			&inviteID, &isSent, &requireParking, &inviteUpdated,
+			&guestID, &guestName, &dietaryRestriction, &isAttending, &attendSolemnisation, &guestUpdated,
 		); err != nil {
 			return nil, err
 		}
@@ -71,10 +72,6 @@ func ListInvites(ctx context.Context) ([]AdminInvite, error) {
 			if requireParking.Valid {
 				v := requireParking.Bool
 				inv.RequireParking = &v
-			}
-			if attendSolemnisation.Valid {
-				v := attendSolemnisation.Bool
-				inv.AttendSolemnisation = &v
 			}
 			if inviteUpdated.Valid {
 				v := inviteUpdated.Time.Format("2006-01-02 15:04:05")
@@ -93,6 +90,10 @@ func ListInvites(ctx context.Context) ([]AdminInvite, error) {
 			if isAttending.Valid {
 				v := isAttending.Bool
 				guest.IsAttending = &v
+			}
+			if attendSolemnisation.Valid {
+				v := attendSolemnisation.Bool
+				guest.AttendSolemnisation = &v
 			}
 			if guestUpdated.Valid {
 				v := guestUpdated.Time.Format("2006-01-02 15:04:05")

@@ -70,6 +70,8 @@ Screenshots are written to `docs/screenshots/` by default.
 
 Use mocked invite data when the UI depends on a valid invitation (the capture script does this automatically).
 
+**Do not include changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs.** Update mock data locally when you run the script if the API shape changed; commit only the PNGs under `docs/screenshots/`, not the script.
+
 ### Adding screenshots to the PR
 
 **Commit the images** under `docs/screenshots/` in the same PR as the frontend change, then reference them with the branch raw URL so GitHub does not serve stale cached uploads:
@@ -87,6 +89,7 @@ Group screenshots under **Desktop** and **Mobile** headings so reviewers can com
 - Do not merge API or deploy work with a stale README.
 - Prefer updating the README in the **same commit** as the code change.
 - If a change is experimental, still note it in the README or revert before merging.
+- Do not commit changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs (screenshot PNGs only).
 
 ## Checklist before opening a PR
 

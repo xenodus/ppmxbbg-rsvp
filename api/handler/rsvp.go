@@ -200,9 +200,8 @@ func handleGetInvite(ctx context.Context, params map[string]string, origin strin
 
 func handlePost(ctx context.Context, body string, origin string) (apiResponse, error) {
 	var probe struct {
-		DeclineAll          *bool `json:"decline_all"`
-		RequireParking      *bool `json:"require_parking"`
-		AttendSolemnisation *bool `json:"attend_solemnisation"`
+		DeclineAll     *bool `json:"decline_all"`
+		RequireParking *bool `json:"require_parking"`
 	}
 	if err := json.Unmarshal([]byte(body), &probe); err != nil {
 		return jsonResponse(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin)
@@ -212,7 +211,7 @@ func handlePost(ctx context.Context, body string, origin string) (apiResponse, e
 		return handleDeclineAll(ctx, body, origin)
 	}
 
-	if probe.RequireParking != nil || probe.AttendSolemnisation != nil {
+	if probe.RequireParking != nil {
 		return handlePostInvite(ctx, body, origin)
 	}
 
