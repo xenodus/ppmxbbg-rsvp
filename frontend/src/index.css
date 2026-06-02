@@ -728,8 +728,33 @@ form {
   }
 
   .nav-fab {
-    top: 1.125rem;
-    left: 1.125rem;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.7rem;
+    border-radius: 0.65rem;
+  }
+
+  .nav-fab.is-scrolled {
+    gap: 0.55rem;
+    padding: 0.55rem 0.95rem 0.55rem 0.8rem;
+  }
+
+  .nav-fab-icon {
+    gap: 0.28rem;
+    width: 1.05rem;
+  }
+
+  .nav-fab-icon span {
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  .nav-fab-label {
+    font-size: 0.72rem;
+  }
+
+  .nav-fab.is-scrolled .nav-fab-label {
+    max-width: 3.5rem;
   }
 
   .form-card,
