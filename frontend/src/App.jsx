@@ -87,6 +87,7 @@ export default function App() {
   const [activeGuest, setActiveGuest] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [inviteValid, setInviteValid] = useState(false);
   const rsvpClosed = now.getTime() >= RSVP_CUTOFF_MS;
 
   useEffect(() => {
@@ -95,39 +96,45 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (rsvpClosed) {
-      setLoading(false);
-      setActiveGuest(null);
-      setError("");
-      setSuccess("");
-      return;
-    }
-
     if (!inviteId) {
       setLoading(false);
-      setError("Invite not found. Please check your invitation link.");
+      setInviteValid(false);
+      setActiveGuest(null);
+      setSuccess("");
+      if (!rsvpClosed) {
+        setError("Invite not found. Please check your invitation link.");
+      } else {
+        setError("");
+      }
       return;
     }
 
     let cancelled = false;
+    setLoading(true);
 
     async function loadInvite() {
       try {
         const invite = await fetchInvite(inviteId);
         if (cancelled) return;
 
-        setGuests(invite.guests || []);
-        if (invite.require_parking !== undefined && invite.require_parking !== null) {
-          setRequireParking(invite.require_parking);
-        }
-        if (
-          invite.attend_solemnisation !== undefined &&
-          invite.attend_solemnisation !== null
-        ) {
-          setAttendSolemnisation(invite.attend_solemnisation);
+        setInviteValid(true);
+        if (!rsvpClosed) {
+          setGuests(invite.guests || []);
+          if (invite.require_parking !== undefined && invite.require_parking !== null) {
+            setRequireParking(invite.require_parking);
+          }
+          if (
+            invite.attend_solemnisation !== undefined &&
+            invite.attend_solemnisation !== null
+          ) {
+            setAttendSolemnisation(invite.attend_solemnisation);
+          }
+          setError("");
         }
       } catch (err) {
-        if (!cancelled) {
+        if (cancelled) return;
+        setInviteValid(false);
+        if (!rsvpClosed) {
           setError(
             err.message === "invite not found"
               ? "Invite not found. Please check your invitation link."
@@ -139,6 +146,12 @@ export default function App() {
           setLoading(false);
         }
       }
+    }
+
+    if (rsvpClosed) {
+      setActiveGuest(null);
+      setSuccess("");
+      setError("");
     }
 
     loadInvite();
@@ -233,8 +246,12 @@ export default function App() {
         <h1 className="couple-names">{WEDDING.coupleNames}</h1>
         <nav className="page-nav" aria-label="Page sections">
           <a href="#rsvp">RSVP</a>
-          <a href="#getting-there">Getting There</a>
-          <a href="#faq">FAQ</a>
+          {inviteValid && (
+            <>
+              <a href="#getting-there">Getting There</a>
+              <a href="#faq">FAQ</a>
+            </>
+          )}
         </nav>
         <p className="wedding-date">{WEDDING.date}</p>
         <Countdown />
@@ -308,13 +325,17 @@ export default function App() {
         ) : null}
       </main>
 
-      <Divider />
+      {inviteValid && (
+        <>
+          <Divider />
 
-      <GettingThere />
+          <GettingThere />
 
-      <Divider />
+          <Divider />
 
-      <Faq />
+          <Faq />
+        </>
+      )}
 
       {activeGuest && !rsvpClosed && (
         <GuestRespondModal
