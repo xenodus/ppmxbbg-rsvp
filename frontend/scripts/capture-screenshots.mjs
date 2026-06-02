@@ -13,6 +13,7 @@ const outputDir =
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}/`;
 const INVITE_URL = `${PREVIEW_URL}?id=screenshot-demo`;
+const ADMIN_URL = `${PREVIEW_URL}admin.html`;
 
 const mockInvite = {
   guests: [
@@ -26,6 +27,36 @@ const mockInvite = {
   require_parking: null,
   attend_solemnisation: null,
 };
+
+const mockInvites = [
+  {
+    id: "1234567890123456789",
+    is_sent: true,
+    require_parking: true,
+    attend_solemnisation: false,
+    last_updated: "2026-06-01",
+    guests: [
+      {
+        id: 1,
+        name: "Jane Doe",
+        is_attending: true,
+        dietary_restriction: "Vegetarian",
+        last_updated: "2026-06-01",
+      },
+      {
+        id: 2,
+        name: "John Doe",
+        is_attending: false,
+        last_updated: "2026-05-28",
+      },
+    ],
+  },
+  {
+    id: "9876543210987654321",
+    is_sent: false,
+    guests: [{ id: 3, name: "Alex Example" }],
+  },
+];
 
 async function waitForServer(url, timeoutMs = 30000) {
   const start = Date.now();
@@ -63,6 +94,20 @@ async function mockInviteApi(page) {
   });
 }
 
+async function mockAdminApi(page) {
+  await page.route("**/admin/invites**", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.fulfill({ status: 405, body: "Method not allowed" });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(mockInvites),
+    });
+  });
+}
+
 async function captureSet(browser, { name, viewport, isMobile }) {
   const context = await browser.newContext({
     viewport,
@@ -96,6 +141,35 @@ async function captureSet(browser, { name, viewport, isMobile }) {
   await context.close();
 }
 
+async function captureAdminSet(browser, { name, viewport, isMobile }) {
+  const context = await browser.newContext({
+    viewport,
+    ...(isMobile ? devices["iPhone 13"] : {}),
+  });
+  const page = await context.newPage();
+  await mockAdminApi(page);
+  await page.addInitScript(() => {
+    sessionStorage.setItem("admin_token", "screenshot-demo-token");
+  });
+
+  await page.goto(ADMIN_URL, { waitUntil: "networkidle" });
+  await page.waitForSelector("button:has-text('Download CSV')");
+  await page.screenshot({
+    path: path.join(outputDir, `admin-${name}.png`),
+    fullPage: true,
+  });
+
+  await page.getByRole("button", { name: "Responses" }).first().click();
+  await page.waitForSelector(".admin-table");
+  await page.waitForTimeout(350);
+  await page.screenshot({
+    path: path.join(outputDir, `admin-${name}-responses.png`),
+    fullPage: true,
+  });
+
+  await context.close();
+}
+
 async function main() {
   await mkdir(outputDir, { recursive: true });
 
@@ -112,6 +186,18 @@ async function main() {
     });
 
     await captureSet(browser, {
+      name: "mobile",
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+    });
+
+    await captureAdminSet(browser, {
+      name: "desktop",
+      viewport: { width: 1280, height: 900 },
+      isMobile: false,
+    });
+
+    await captureAdminSet(browser, {
       name: "mobile",
       viewport: { width: 390, height: 844 },
       isMobile: true,
