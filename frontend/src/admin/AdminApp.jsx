@@ -155,7 +155,7 @@ function InviteRow({ invite, onRefresh }) {
           </button>
           <button
             type="button"
-            className="secondary-btn"
+            className="secondary-btn admin-mark-sent-btn"
             disabled={busy}
             onClick={() =>
               run(() => markInviteSent(invite.id, !(invite.is_sent === true)))
