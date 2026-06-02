@@ -8,6 +8,8 @@
   --error: #8b3a3a;
   --success: #3a6b4a;
   --section-gap: 2.25rem;
+  --field-control-gap: 0.75rem;
+  --field-block-gap: 1.25rem;
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Lato", "Helvetica Neue", Arial, sans-serif;
 }
@@ -411,6 +413,22 @@ form {
 .field-label {
   display: block;
   margin-top: 0.5rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--field-control-gap);
+  margin-bottom: var(--field-block-gap);
+}
+
+.field-group .field-label {
+  margin-top: 0;
+}
+
+.field-group .admin-input,
+.field-group .admin-textarea {
+  margin: 0;
 }
 
 .name-display,

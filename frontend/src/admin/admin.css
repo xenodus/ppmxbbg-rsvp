@@ -47,7 +47,7 @@
 .admin-input,
 .admin-textarea {
   width: 100%;
-  margin: 0.35rem 0 1rem;
+  margin: var(--field-control-gap) 0 var(--field-block-gap);
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -91,6 +91,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 1rem 1.1rem;
+  overflow: hidden;
 }
 
 .admin-invite-top {
@@ -136,10 +137,16 @@
   color: var(--muted);
 }
 
+.admin-table-wrap {
+  margin-top: 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .admin-table {
   width: 100%;
+  min-width: 32rem;
   border-collapse: collapse;
-  margin-top: 1rem;
   font-size: 0.9rem;
 }
 

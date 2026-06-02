@@ -59,6 +59,18 @@ function inviteSummary(invite) {
   return { guests: guests.length, responded, attending };
 }
 
+function inviteMatchesGuestSearch(invite, query) {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return true;
+  return (invite.guests || []).some((guest) =>
+    (guest.name || "").toLowerCase().includes(needle),
+  );
+}
+
+function filterInvitesByGuestName(invites, query) {
+  return invites.filter((invite) => inviteMatchesGuestSearch(invite, query));
+}
+
 function LoginForm({ onSuccess, error, loading }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -222,28 +234,30 @@ function InviteRow({ invite, onRefresh }) {
         · Parking: {formatBool(invite.require_parking)}
       </p>
       {expanded ? (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Guest</th>
-              <th>Attending</th>
-              <th>Solemnisation</th>
-              <th>Dietary</th>
-              <th>Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(invite.guests || []).map((guest) => (
-              <tr key={guest.id}>
-                <td>{guest.name}</td>
-                <td>{formatBool(guest.is_attending)}</td>
-                <td>{formatBool(guest.attend_solemnisation)}</td>
-                <td>{guest.dietary_restriction || "—"}</td>
-                <td>{guest.last_updated || "—"}</td>
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Attending</th>
+                <th>Solemnisation</th>
+                <th>Dietary</th>
+                <th>Updated</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(invite.guests || []).map((guest) => (
+                <tr key={guest.id}>
+                  <td>{guest.name}</td>
+                  <td>{formatBool(guest.is_attending)}</td>
+                  <td>{formatBool(guest.attend_solemnisation)}</td>
+                  <td>{guest.dietary_restriction || "—"}</td>
+                  <td>{guest.last_updated || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : null}
     </article>
   );
@@ -256,6 +270,7 @@ export default function AdminApp() {
   const [loginError, setLoginError] = useState("");
   const [pageError, setPageError] = useState("");
   const [guestNames, setGuestNames] = useState("");
+  const [guestSearch, setGuestSearch] = useState("");
   const [creating, setCreating] = useState(false);
 
   const loadInvites = useCallback(async () => {
@@ -343,6 +358,9 @@ export default function AdminApp() {
     );
   }
 
+  const filteredInvites = filterInvitesByGuestName(invites, guestSearch);
+  const searchActive = guestSearch.trim().length > 0;
+
   return (
     <div className="admin-page">
       <header className="admin-header">
@@ -385,10 +403,32 @@ export default function AdminApp() {
       </section>
 
       <section className="admin-list-section">
-        <h2>All invites ({invites.length})</h2>
+        <h2>
+          All invites
+          {searchActive
+            ? ` (${filteredInvites.length} of ${invites.length})`
+            : ` (${invites.length})`}
+        </h2>
+        <div className="field-group">
+          <label className="field-label" htmlFor="guest-search">
+            Search by guest name
+          </label>
+          <input
+            id="guest-search"
+            type="search"
+            className="admin-input"
+            placeholder="e.g. Jane"
+            value={guestSearch}
+            onChange={(e) => setGuestSearch(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
         {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
+        {!loading && invites.length > 0 && searchActive && filteredInvites.length === 0 ? (
+          <p className="admin-muted">No invites match that guest name.</p>
+        ) : null}
         <div className="admin-invite-list">
-          {invites.map((invite) => (
+          {filteredInvites.map((invite) => (
             <InviteRow key={invite.id} invite={invite} onRefresh={loadInvites} />
           ))}
         </div>
