@@ -27,12 +27,13 @@ type apiResponse struct {
 }
 
 type inboundRequest struct {
-	Method string
-	Path   string
-	Query  map[string]string
-	Body   string
-	Origin string
-	UseV2  bool
+	Method  string
+	Path    string
+	Query   map[string]string
+	Body    string
+	Origin  string
+	Headers map[string]string
+	UseV2   bool
 }
 
 // RSVP handles both HTTP API payload format 1.0 and 2.0 events.
@@ -71,11 +72,12 @@ func parseInbound(raw json.RawMessage) (inboundRequest, error) {
 
 		return inboundRequest{
 			Method: method,
-			Path:   normalizePath(req.RawPath),
+			Path:   normalizePath(req.RawPath, req.RequestContext.Stage),
 			Query:  req.QueryStringParameters,
 			Body:   req.Body,
-			Origin: headerOrigin(req.Headers),
-			UseV2:  true,
+			Origin:  headerOrigin(req.Headers),
+			Headers: req.Headers,
+			UseV2:   true,
 		}, nil
 	}
 
@@ -86,15 +88,16 @@ func parseInbound(raw json.RawMessage) (inboundRequest, error) {
 
 	return inboundRequest{
 		Method: req.HTTPMethod,
-		Path:   normalizePath(req.Path),
+		Path:   normalizePath(req.Path, req.RequestContext.Stage),
 		Query:  req.QueryStringParameters,
 		Body:   req.Body,
-		Origin: headerOrigin(req.Headers),
-		UseV2:  false,
+		Origin:  headerOrigin(req.Headers),
+		Headers: req.Headers,
+		UseV2:   false,
 	}, nil
 }
 
-func normalizePath(path string) string {
+func normalizePath(path, stage string) string {
 	path = strings.TrimSpace(path)
 	if path == "" {
 		return "/"
@@ -104,6 +107,23 @@ func normalizePath(path string) string {
 	}
 	if idx := strings.Index(path, "?"); idx >= 0 {
 		path = path[:idx]
+	}
+	return stripAPIStage(path, stage)
+}
+
+// stripAPIStage removes a leading /{stage} segment from HTTP API paths when the
+// invoke URL includes a named stage (e.g. .../prod/admin/login → /admin/login).
+func stripAPIStage(path, stage string) string {
+	stage = strings.TrimSpace(stage)
+	if stage == "" || stage == "$default" {
+		return path
+	}
+	prefix := "/" + stage
+	if path == prefix {
+		return "/"
+	}
+	if strings.HasPrefix(path, prefix+"/") {
+		return path[len(prefix):]
 	}
 	return path
 }
@@ -127,6 +147,10 @@ func headerOrigin(headers map[string]string) string {
 }
 
 func dispatch(ctx context.Context, in inboundRequest) (apiResponse, error) {
+	if isAdminPath(in.Path) {
+		return dispatchAdmin(ctx, in)
+	}
+
 	switch in.Method {
 	case http.MethodOptions:
 		return corsResponse(apiResponse{StatusCode: http.StatusNoContent}, in.Origin, "GET, POST, OPTIONS")

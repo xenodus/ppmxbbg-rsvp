@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchInvite, saveGuest, saveInvite } from "./api.js";
 import Countdown from "./components/Countdown.jsx";
+import Faq from "./components/Faq.jsx";
+import GettingThere from "./components/GettingThere.jsx";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
-import { RSVP, WEDDING } from "./constants.js";
+import SiteNav from "./components/SiteNav.jsx";
+import { RSVP, RSVP_CUTOFF, WEDDING } from "./constants.js";
+
+const RSVP_CUTOFF_MS = new Date(RSVP_CUTOFF.dateTime).getTime();
 
 function Divider() {
   return (
@@ -75,8 +80,33 @@ function guestRsvpState(guestList) {
   return { allResponded, allDeclined, anyAttending, allAttendingAnsweredSolemnisation };
 }
 
+function guestResponseUnchanged(guest, payload) {
+  if (!guest || guest.is_attending !== payload.is_attending) {
+    return false;
+  }
+
+  if (payload.is_attending === true) {
+    if (guest.attend_solemnisation !== payload.attend_solemnisation) {
+      return false;
+    }
+  }
+
+  const savedDietary = (guest.dietary_restriction || "").trim();
+  const nextDietary = (payload.dietary_restriction || "").trim();
+  return savedDietary === nextDietary;
+}
+
+function guestSaveSuccessMessage(guestList) {
+  const { allDeclined: everyoneDeclined } = guestRsvpState(guestList);
+  if (everyoneDeclined) {
+    return RSVP.bigQuestion.declinedMessage;
+  }
+  return "Response saved.";
+}
+
 export default function App() {
   const inviteId = useMemo(() => getInviteId(), []);
+  const [now, setNow] = useState(() => new Date());
   const [guests, setGuests] = useState([]);
   const [requireParking, setRequireParking] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -85,27 +115,48 @@ export default function App() {
   const [activeGuest, setActiveGuest] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [inviteValid, setInviteValid] = useState(false);
+  const rsvpClosed = now.getTime() >= RSVP_CUTOFF_MS;
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (!inviteId) {
       setLoading(false);
-      setError("Invite not found. Please check your invitation link.");
+      setInviteValid(false);
+      setActiveGuest(null);
+      setSuccess("");
+      if (!rsvpClosed) {
+        setError("Invite not found. Please check your invitation link.");
+      } else {
+        setError("");
+      }
       return;
     }
 
     let cancelled = false;
+    setLoading(true);
 
     async function loadInvite() {
       try {
         const invite = await fetchInvite(inviteId);
         if (cancelled) return;
 
-        setGuests(invite.guests || []);
-        if (invite.require_parking !== undefined && invite.require_parking !== null) {
-          setRequireParking(invite.require_parking);
+        setInviteValid(true);
+        if (!rsvpClosed) {
+          setGuests(invite.guests || []);
+          if (invite.require_parking !== undefined && invite.require_parking !== null) {
+            setRequireParking(invite.require_parking);
+          }
+          setError("");
         }
       } catch (err) {
-        if (!cancelled) {
+        if (cancelled) return;
+        setInviteValid(false);
+        if (!rsvpClosed) {
           setError(
             err.message === "invite not found"
               ? "Invite not found. Please check your invitation link."
@@ -119,13 +170,19 @@ export default function App() {
       }
     }
 
+    if (rsvpClosed) {
+      setActiveGuest(null);
+      setSuccess("");
+      setError("");
+    }
+
     loadInvite();
     return () => {
       cancelled = true;
     };
-  }, [inviteId]);
+  }, [inviteId, rsvpClosed]);
 
-  const formDisabled = loading || !!error;
+  const formDisabled = loading || !!error || rsvpClosed;
   const hasSavedRsvp =
     requireParking != null ||
     guests.some(
@@ -161,9 +218,17 @@ export default function App() {
   }
 
   async function handleSaveGuest(payload) {
-    setSavingGuest(true);
     setError("");
     setSuccess("");
+
+    const existing = guests.find((guest) => guest.id === payload.id);
+    if (guestResponseUnchanged(existing, payload)) {
+      setActiveGuest(null);
+      setSuccess(guestSaveSuccessMessage(guests));
+      return;
+    }
+
+    setSavingGuest(true);
 
     try {
       await saveGuest(payload);
@@ -180,13 +245,7 @@ export default function App() {
       );
       setGuests(updatedGuests);
       setActiveGuest(null);
-
-      const { allDeclined: everyoneDeclined } = guestRsvpState(updatedGuests);
-      if (everyoneDeclined) {
-        setSuccess(RSVP.bigQuestion.declinedMessage);
-      } else {
-        setSuccess("Guest response saved.");
-      }
+      setSuccess(guestSaveSuccessMessage(updatedGuests));
     } catch (err) {
       throw err;
     } finally {
@@ -196,6 +255,8 @@ export default function App() {
 
   return (
     <div className="page">
+      <SiteNav coupleNames={WEDDING.coupleNames} inviteValid={inviteValid} />
+
       <header className="header">
         <p className="eyebrow">{WEDDING.inviteLine}</p>
         <h1 className="couple-names">{WEDDING.coupleNames}</h1>
@@ -205,11 +266,16 @@ export default function App() {
 
       <Divider />
 
-      <main className="form-card">
+      <main id="rsvp" className="form-card" aria-labelledby="rsvp-heading">
+        <h2 id="rsvp-heading" className="card-title">
+          RSVP
+        </h2>
         {error && <p className="banner banner-error">{error}</p>}
         {success && <p className="banner banner-success">{success}</p>}
 
-        {loading ? (
+        {rsvpClosed ? (
+          <p className="closed-message">{RSVP_CUTOFF.closedMessage}</p>
+        ) : loading ? (
           <p className="loading-text">Loading invitation details...</p>
         ) : !error ? (
           <>
@@ -251,7 +317,19 @@ export default function App() {
         ) : null}
       </main>
 
-      {activeGuest && (
+      {inviteValid && (
+        <>
+          <Divider />
+
+          <GettingThere />
+
+          <Divider />
+
+          <Faq />
+        </>
+      )}
+
+      {activeGuest && !rsvpClosed && (
         <GuestRespondModal
           guest={activeGuest}
           submitting={savingGuest}
