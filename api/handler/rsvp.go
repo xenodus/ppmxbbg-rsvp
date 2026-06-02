@@ -27,12 +27,13 @@ type apiResponse struct {
 }
 
 type inboundRequest struct {
-	Method string
-	Path   string
-	Query  map[string]string
-	Body   string
-	Origin string
-	UseV2  bool
+	Method  string
+	Path    string
+	Query   map[string]string
+	Body    string
+	Origin  string
+	Headers map[string]string
+	UseV2   bool
 }
 
 // RSVP handles both HTTP API payload format 1.0 and 2.0 events.
@@ -74,8 +75,9 @@ func parseInbound(raw json.RawMessage) (inboundRequest, error) {
 			Path:   normalizePath(req.RawPath),
 			Query:  req.QueryStringParameters,
 			Body:   req.Body,
-			Origin: headerOrigin(req.Headers),
-			UseV2:  true,
+			Origin:  headerOrigin(req.Headers),
+			Headers: req.Headers,
+			UseV2:   true,
 		}, nil
 	}
 
@@ -89,8 +91,9 @@ func parseInbound(raw json.RawMessage) (inboundRequest, error) {
 		Path:   normalizePath(req.Path),
 		Query:  req.QueryStringParameters,
 		Body:   req.Body,
-		Origin: headerOrigin(req.Headers),
-		UseV2:  false,
+		Origin:  headerOrigin(req.Headers),
+		Headers: req.Headers,
+		UseV2:   false,
 	}, nil
 }
 
@@ -127,6 +130,10 @@ func headerOrigin(headers map[string]string) string {
 }
 
 func dispatch(ctx context.Context, in inboundRequest) (apiResponse, error) {
+	if isAdminPath(in.Path) {
+		return dispatchAdmin(ctx, in)
+	}
+
 	switch in.Method {
 	case http.MethodOptions:
 		return corsResponse(apiResponse{StatusCode: http.StatusNoContent}, in.Origin, "GET, POST, OPTIONS")

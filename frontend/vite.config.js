@@ -5,18 +5,24 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const proxyTarget = env.VITE_API_PROXY_TARGET;
 
+  const proxy = proxyTarget
+    ? {
+        "/guest": { target: proxyTarget, changeOrigin: true },
+        "/admin": { target: proxyTarget, changeOrigin: true },
+      }
+    : undefined;
+
   return {
     plugins: [react()],
     base: "",
-    server: proxyTarget
-      ? {
-          proxy: {
-            "/guest": {
-              target: proxyTarget,
-              changeOrigin: true,
-            },
-          },
-        }
-      : undefined,
+    build: {
+      rollupOptions: {
+        input: {
+          main: "index.html",
+          admin: "admin.html",
+        },
+      },
+    },
+    server: proxy ? { proxy } : undefined,
   };
 });
