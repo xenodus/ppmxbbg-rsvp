@@ -1,5 +1,6 @@
-# Copy to Makefile.include and fill in your values.
-# Makefile.include is gitignored.
+# Optional local overrides — copy to Makefile.include (gitignored).
+# Defaults for deploy are in the Makefile; only create this file if you need
+# machine-specific values without editing the Makefile.
 
 AWS_ACCOUNT_ID=123456789012
 AWS_REGION=ap-southeast-1
@@ -8,7 +9,7 @@ ECR_REPO_NAME=ppmxbbg-rsvp-api
 LAMBDA_FUNCTION=ppmxbbg-rsvp-api
 
 S3_BUCKET=ppmxbbg-rsvp-frontend
-CLOUDFRONT_DISTRIBUTION_ID=
+CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
 
 # API Gateway → Stages → Invoke URL (include stage path, no trailing slash)
 # Find in AWS Console: API Gateway → your API → Stages

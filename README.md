@@ -354,29 +354,17 @@ Map all routes to the same Lambda function. Route paths are without the stage na
 | `POST`, `OPTIONS` | `/admin/login` |
 | `GET`, `POST`, `PATCH`, `DELETE`, `OPTIONS` | `/admin/invites` |
 
-Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes allow the `Authorization` header (set by the Lambda response). Admin routes allow the `Authorization` header (set by the Lambda response).
+Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes allow the `Authorization` header (set by the Lambda response).
 
 ### Configure deploy variables
+
+Set your AWS account id, API Gateway URL, and CloudFront distribution id in the **Makefile** (defaults at the top of the file). For local-only overrides without editing the Makefile, copy the example include:
 
 ```bash
 cp Makefile.include.example Makefile.include
 ```
 
-Edit `Makefile.include`:
-
-```makefile
-AWS_ACCOUNT_ID=123456789012
-AWS_REGION=ap-southeast-1
-
-ECR_REPO_NAME=ppmxbbg-rsvp-api
-LAMBDA_FUNCTION=ppmxbbg-rsvp-api
-
-S3_BUCKET=ppmxbbg-rsvp-frontend
-CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
-
-# API Gateway invoke URL (include the stage name if your API uses one)
-VITE_API_BASE_URL=https://abc123.execute-api.ap-southeast-1.amazonaws.com/prod
-```
+See [`Makefile.include.example`](Makefile.include.example) for the same variables. Include the API Gateway stage in `VITE_API_BASE_URL` when your API uses one (e.g. `.../prod`).
 
 ### Deploy commands
 
@@ -446,17 +434,7 @@ aws iam attach-role-policy \
 
 Use the JSON from [`scripts/setup-github-actions-oidc.sh`](scripts/setup-github-actions-oidc.sh) for `trust.json` and `deploy-policy.json` if you prefer not to run the script.
 
-**GitHub repository variables** (Settings → Secrets and variables → Actions → Variables):
-
-| Variable | Example |
-|----------|---------|
-| `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::123456789012:role/github-actions-ppmxbbg-rsvp-deploy` |
-| `AWS_REGION` | `ap-southeast-1` |
-| `ECR_REPO_NAME` | `ppmxbbg-rsvp-api` |
-| `LAMBDA_FUNCTION` | `ppmxbbg-rsvp-api` |
-| `S3_BUCKET` | `ppmxbbg-rsvp-frontend` |
-| `CLOUDFRONT_DISTRIBUTION_ID` | `E1234567890ABC` |
-| `VITE_API_BASE_URL` | `https://abc123.execute-api.ap-southeast-1.amazonaws.com` |
+**Makefile** — set `AWS_ACCOUNT_ID`, `VITE_API_BASE_URL`, and `CLOUDFRONT_DISTRIBUTION_ID` to your real values before the first CI deploy. Other deploy targets (`ECR_REPO_NAME`, `LAMBDA_FUNCTION`, `S3_BUCKET`, `AWS_REGION`, `AWS_DEPLOY_ROLE_NAME`) use the committed defaults. GitHub Actions reads the OIDC role ARN and region from the Makefile; no repository variables are required.
 
 ### Verify after deploy
 
@@ -469,8 +447,6 @@ open "https://YOUR_CLOUDFRONT_URL/?id=YOUR_INVITE_ID"
 
 # Admin UI
 open "https://YOUR_CLOUDFRONT_URL/admin.html"
-```
-
 ```
 
 ### Invitation links
