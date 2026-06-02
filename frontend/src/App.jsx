@@ -5,6 +5,7 @@ import Faq from "./components/Faq.jsx";
 import GettingThere from "./components/GettingThere.jsx";
 import GuestList from "./components/GuestList.jsx";
 import GuestRespondModal from "./components/GuestRespondModal.jsx";
+import SiteNav from "./components/SiteNav.jsx";
 import { RSVP, RSVP_CUTOFF, WEDDING } from "./constants.js";
 
 const RSVP_CUTOFF_MS = new Date(RSVP_CUTOFF.dateTime).getTime();
@@ -240,19 +241,12 @@ export default function App() {
   }
 
   return (
-    <div className="page">
+    <div id="top" className="page">
+      <SiteNav coupleNames={WEDDING.coupleNames} inviteValid={inviteValid} />
+
       <header className="header">
         <p className="eyebrow">{WEDDING.inviteLine}</p>
         <h1 className="couple-names">{WEDDING.coupleNames}</h1>
-        <nav className="page-nav" aria-label="Page sections">
-          <a href="#rsvp">RSVP</a>
-          {inviteValid && (
-            <>
-              <a href="#getting-there">Getting There</a>
-              <a href="#faq">FAQ</a>
-            </>
-          )}
-        </nav>
         <p className="wedding-date">{WEDDING.date}</p>
         <Countdown />
       </header>
