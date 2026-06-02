@@ -12,13 +12,30 @@ Go Lambda API + React SPA for wedding RSVPs. One invite can include multiple gue
 
 Base URL: your API Gateway URL, e.g. `https://abc123.execute-api.ap-southeast-1.amazonaws.com`
 
-All endpoints use the `/guest` path.
+### Endpoint list
+
+#### Public — guest RSVP (no authentication)
 
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/guest?id={invite_id}` | Load invite and all guests |
-| `POST` | `/guest` | Save invite-level or guest-level RSVP |
+| `POST` | `/guest` | Save RSVP (guest update, invite update, or decline all — see body shape below) |
 | `OPTIONS` | `/guest` | CORS preflight |
+
+#### Admin — login or bearer token
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/admin/login` | None | Sign in; returns bearer token |
+| `OPTIONS` | `/admin/login` | None | CORS preflight |
+| `GET` | `/admin/invites` | Bearer | List all invites with guests and RSVP responses |
+| `GET` | `/admin/invites?id={invite_id}` | Bearer | Get one invite |
+| `POST` | `/admin/invites` | Bearer | Create invite and guests |
+| `PATCH` | `/admin/invites` | Bearer | Update invite (`is_sent` only) |
+| `DELETE` | `/admin/invites?id={invite_id}` | Bearer | Delete invite and its guests |
+| `OPTIONS` | `/admin/invites` | None | CORS preflight |
+
+Admin requests (except login) send `Authorization: Bearer {token}` from `POST /admin/login`. Credentials are `ADMIN_USERNAME` and `ADMIN_PASSWORD` on Lambda.
 
 ---
 
@@ -182,6 +199,118 @@ curl -X POST "https://YOUR_API_URL/guest" \
 
 ---
 
+### POST /admin/login
+
+**Request body**
+
+```json
+{
+  "username": "admin",
+  "password": "your-password"
+}
+```
+
+**200 OK**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "expires_at": "2026-06-03T12:00:00Z"
+}
+```
+
+| Status | Body | Cause |
+|--------|------|-------|
+| `401` | `{"error":"invalid username or password"}` | Wrong credentials |
+| `503` | `{"error":"admin login is not configured"}` | `ADMIN_USERNAME` or `ADMIN_PASSWORD` not set on Lambda |
+
+---
+
+### GET /admin/invites
+
+List every invite with guests and RSVP fields (`is_sent`, `require_parking`, `attend_solemnisation`, `is_attending`, `dietary_restriction`, etc.).
+
+**Example**
+
+```bash
+curl -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://YOUR_API_URL/admin/invites"
+```
+
+**200 OK** — JSON array of invite objects.
+
+**Get one invite** — same path with `?id={invite_id}`.
+
+---
+
+### POST /admin/invites
+
+Create a new invite. The server generates a snowflake `id`.
+
+**Request body**
+
+```json
+{
+  "guests": ["Jane Doe", "John Doe"],
+  "is_sent": false
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `guests` | yes | Guest names (at least one) |
+| `is_sent` | no | Whether the invite link was sent |
+
+**201 Created**
+
+```json
+{
+  "invite": {
+    "id": "1234567890123456789",
+    "is_sent": false,
+    "guests": [{ "id": 1, "name": "Jane Doe" }]
+  }
+}
+```
+
+---
+
+### PATCH /admin/invites
+
+Update invite metadata. Only `is_sent` is supported today.
+
+**Request body**
+
+```json
+{
+  "id": "1234567890123456789",
+  "is_sent": true
+}
+```
+
+**200 OK** — updated invite object, or `{"status":"saved"}`.
+
+---
+
+### DELETE /admin/invites
+
+**Query parameters**
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `id` | yes | Invite id to delete |
+
+**Example**
+
+```bash
+curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" \
+  "https://YOUR_API_URL/admin/invites?id=1234567890123456789"
+```
+
+**200 OK** — `{"status":"deleted"}`.
+
+---
+
 ## Deployment
 
 ### Prerequisites
@@ -207,6 +336,9 @@ Set these in the AWS Lambda console (or your IaC):
 | `DB_PASSWORD` | `***` | MySQL password |
 | `DB_NAME` | `rsvp` | Database name |
 | `FRONTEND_ORIGIN` | `https://d111.cloudfront.net` | CloudFront or custom domain URL for CORS |
+| `ADMIN_USERNAME` | `admin` | Admin login username |
+| `ADMIN_PASSWORD` | `***` | Admin login password |
+| `ADMIN_TOKEN_SECRET` | *(optional)* | Signs session tokens; defaults to `ADMIN_PASSWORD` if unset |
 
 If MySQL is in a VPC, attach the Lambda to the same VPC/subnets/security groups and add the `AWSLambdaVPCAccessExecutionRole` policy.
 
@@ -219,8 +351,10 @@ Map all routes to the same Lambda function:
 | `GET` | `/guest` |
 | `POST` | `/guest` |
 | `OPTIONS` | `/guest` |
+| `POST`, `OPTIONS` | `/admin/login` |
+| `GET`, `POST`, `PATCH`, `DELETE`, `OPTIONS` | `/admin/invites` |
 
-Set CORS allowed origin to your CloudFront URL (or custom domain).
+Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes allow the `Authorization` header (set by the Lambda response). Admin routes allow the `Authorization` header (set by the Lambda response).
 
 ### Configure deploy variables
 
@@ -265,6 +399,11 @@ curl "https://YOUR_API_URL/guest?id=YOUR_INVITE_ID"
 
 # Frontend
 open "https://YOUR_CLOUDFRONT_URL/?id=YOUR_INVITE_ID"
+
+# Admin UI
+open "https://YOUR_CLOUDFRONT_URL/admin.html"
+```
+
 ```
 
 ### Invitation links
@@ -296,7 +435,9 @@ cd frontend && npm install && npm run dev
 
 Open `http://localhost:5173/?id=YOUR_INVITE_ID`.
 
-To proxy API calls through Vite during dev, set `VITE_API_PROXY_TARGET` in `frontend/.env` to your API Gateway URL and leave `VITE_API_BASE_URL` empty.
+Admin UI: `http://localhost:5173/admin.html` (set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `api/.env` when running the API locally).
+
+To proxy API calls through Vite during dev, set `VITE_API_PROXY_TARGET` in `frontend/.env` to your API Gateway URL and leave `VITE_API_BASE_URL` empty. The dev server proxies `/guest` and `/admin` to that target.
 
 ### Tests
 
@@ -333,7 +474,7 @@ Database: `rsvp` (populated separately).
 
 One invite (`invites.id`) can have many guests (`guests.invite_id`).
 
-The API reads and updates `require_parking`, `attend_solemnisation`, and guest RSVP fields. `is_sent` is managed outside the API.
+The public API reads and updates `require_parking`, `attend_solemnisation`, and guest RSVP fields. Admin routes can create/delete invites and update `is_sent`.
 
 ### Example MySQL DDL
 
@@ -366,7 +507,7 @@ CREATE TABLE guests (
 ```text
 .
 ├── api/           # Go Lambda (handler, store, config)
-├── frontend/      # React + Vite SPA
+├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
 ├── Makefile.include.example
