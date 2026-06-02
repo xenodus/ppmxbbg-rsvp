@@ -391,6 +391,73 @@ make deploy-frontend
 make deploy
 ```
 
+### CI/CD (GitHub Actions, OIDC)
+
+Merging a pull request into `master` runs [`.github/workflows/deploy-on-merge.yml`](.github/workflows/deploy-on-merge.yml), which assumes an IAM role via GitHub OIDC (no long-lived AWS keys in the repo).
+
+**One-time AWS setup** — run locally with admin IAM credentials (or adjust names to match your resources):
+
+```bash
+export AWS_REGION=ap-southeast-1
+export GITHUB_ORG=xenodus
+export GITHUB_REPO=ppmxbbg-rsvp
+export ECR_REPO_NAME=ppmxbbg-rsvp-api
+export LAMBDA_FUNCTION=ppmxbbg-rsvp-api
+export S3_BUCKET=ppmxbbg-rsvp-frontend
+export CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC   # optional
+
+./scripts/setup-github-actions-oidc.sh
+```
+
+The script:
+
+1. Creates the `token.actions.githubusercontent.com` OIDC provider (if missing).
+2. Creates/updates IAM role `github-actions-ppmxbbg-rsvp-deploy` trusted for `repo:ORG/REPO:pull_request`.
+3. Attaches deploy policy (ECR push, Lambda code update, S3 sync, optional CloudFront invalidation).
+
+Equivalent manual commands:
+
+```bash
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION=ap-southeast-1
+GITHUB_ORG=xenodus
+GITHUB_REPO=ppmxbbg-rsvp
+
+# OIDC provider (once per account)
+aws iam create-open-id-connect-provider \
+  --url https://token.actions.githubusercontent.com \
+  --client-id-list sts.amazonaws.com \
+  --thumbprint-list 6938fd6efa2149a011f78167e9d1c4eb1c93d07b
+
+# Trust policy → save as trust.json, then:
+aws iam create-role \
+  --role-name github-actions-ppmxbbg-rsvp-deploy \
+  --assume-role-policy-document file://trust.json
+
+# Deploy policy → save as deploy-policy.json, then:
+aws iam create-policy \
+  --policy-name github-actions-ppmxbbg-rsvp-deploy \
+  --policy-document file://deploy-policy.json
+
+aws iam attach-role-policy \
+  --role-name github-actions-ppmxbbg-rsvp-deploy \
+  --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/github-actions-ppmxbbg-rsvp-deploy
+```
+
+Use the JSON from [`scripts/setup-github-actions-oidc.sh`](scripts/setup-github-actions-oidc.sh) for `trust.json` and `deploy-policy.json` if you prefer not to run the script.
+
+**GitHub repository variables** (Settings → Secrets and variables → Actions → Variables):
+
+| Variable | Example |
+|----------|---------|
+| `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::123456789012:role/github-actions-ppmxbbg-rsvp-deploy` |
+| `AWS_REGION` | `ap-southeast-1` |
+| `ECR_REPO_NAME` | `ppmxbbg-rsvp-api` |
+| `LAMBDA_FUNCTION` | `ppmxbbg-rsvp-api` |
+| `S3_BUCKET` | `ppmxbbg-rsvp-frontend` |
+| `CLOUDFRONT_DISTRIBUTION_ID` | `E1234567890ABC` |
+| `VITE_API_BASE_URL` | `https://abc123.execute-api.ap-southeast-1.amazonaws.com` |
+
 ### Verify after deploy
 
 ```bash
@@ -509,8 +576,10 @@ CREATE TABLE guests (
 ├── api/           # Go Lambda (handler, store, config)
 ├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
 ├── Dockerfile     # Lambda container image
+├── .github/workflows/   # CI (deploy on merge to master via OIDC)
 ├── Makefile       # Build and deploy commands
 ├── Makefile.include.example
+├── scripts/       # AWS OIDC setup helper
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
 ```
 
