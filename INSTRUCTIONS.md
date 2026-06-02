@@ -66,17 +66,19 @@ npx playwright install chromium
 npm run screenshots
 ```
 
-Screenshots are written to `.pr-screenshots/` by default. Override the output directory with `SCREENSHOT_DIR` if needed.
+Screenshots are written to `docs/screenshots/` by default.
 
 Use mocked invite data when the UI depends on a valid invitation (the capture script does this automatically).
 
 ### Adding screenshots to the PR
 
-Reference each image in the PR body with HTML, using the artifact path produced in this environment:
+**Commit the images** under `docs/screenshots/` in the same PR as the frontend change, then reference them with the branch raw URL so GitHub does not serve stale cached uploads:
 
 ```html
-<img alt="Desktop drawer open" src="/opt/cursor/artifacts/screenshots/desktop-drawer.png" width="720" />
+<img alt="Desktop drawer open" src="https://github.com/OWNER/REPO/raw/BRANCH/docs/screenshots/desktop-drawer.png" width="720" />
 ```
+
+Replace `OWNER`, `REPO`, and `BRANCH` with the real values (e.g. your `cursor/...` feature branch). Re-run the capture script and commit updated PNGs whenever the UI changes.
 
 Group screenshots under **Desktop** and **Mobile** headings so reviewers can compare layouts quickly.
 

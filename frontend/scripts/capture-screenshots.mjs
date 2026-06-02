@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(__dirname, "..");
 const outputDir =
   process.env.SCREENSHOT_DIR ||
-  path.resolve(frontendRoot, "../.pr-screenshots");
+  path.resolve(frontendRoot, "../docs/screenshots");
 
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://127.0.0.1:${PREVIEW_PORT}/`;
