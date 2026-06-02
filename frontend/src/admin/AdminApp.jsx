@@ -157,57 +157,55 @@ function InviteRow({ invite, onRefresh }) {
   return (
     <article className="admin-invite-card">
       <div className="admin-invite-header">
-        <div>
-          <strong>{invite.guests?.map((g) => g.name).join(", ") || "No guests"}</strong>
-          <p className="admin-muted admin-id">ID: {invite.id}</p>
-        </div>
-        <div className="admin-invite-actions">
-          <button
-            type="button"
-            className={linkCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
-            disabled={busy}
-            onClick={handleCopyLink}
-          >
-            {linkCopied ? "Copied!" : "Copy link"}
-          </button>
-          <button
-            type="button"
-            className={qrCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
-            disabled={busy}
-            onClick={handleCopyQrCode}
-          >
-            {qrCopied ? "Copied!" : "Copy QR code"}
-          </button>
-          <button
-            type="button"
-            className="secondary-btn admin-mark-sent-btn"
-            disabled={busy}
-            onClick={() =>
-              run(() => markInviteSent(invite.id, !(invite.is_sent === true)))
+        <strong>{invite.guests?.map((g) => g.name).join(", ") || "No guests"}</strong>
+        <p className="admin-muted admin-id">ID: {invite.id}</p>
+      </div>
+      <div className="admin-invite-actions">
+        <button
+          type="button"
+          className={linkCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
+          disabled={busy}
+          onClick={handleCopyLink}
+        >
+          {linkCopied ? "Copied!" : "Copy link"}
+        </button>
+        <button
+          type="button"
+          className={qrCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
+          disabled={busy}
+          onClick={handleCopyQrCode}
+        >
+          {qrCopied ? "Copied!" : "Copy QR code"}
+        </button>
+        <button
+          type="button"
+          className="secondary-btn admin-mark-sent-btn"
+          disabled={busy}
+          onClick={() =>
+            run(() => markInviteSent(invite.id, !(invite.is_sent === true)))
+          }
+        >
+          {invite.is_sent ? "Mark unsent" : "Mark sent"}
+        </button>
+        <button
+          type="button"
+          className="secondary-btn admin-danger"
+          disabled={busy}
+          onClick={() => {
+            if (window.confirm("Delete this invite and all guests?")) {
+              run(() => deleteInvite(invite.id));
             }
-          >
-            {invite.is_sent ? "Mark unsent" : "Mark sent"}
-          </button>
-          <button
-            type="button"
-            className="secondary-btn admin-danger"
-            disabled={busy}
-            onClick={() => {
-              if (window.confirm("Delete this invite and all guests?")) {
-                run(() => deleteInvite(invite.id));
-              }
-            }}
-          >
-            Delete
-          </button>
-          <button
-            type="button"
-            className="secondary-btn"
-            onClick={() => setExpanded((v) => !v)}
-          >
-            {expanded ? "Hide" : "Responses"}
-          </button>
-        </div>
+          }}
+        >
+          Delete
+        </button>
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? "Hide" : "Responses"}
+        </button>
       </div>
       <p className="admin-summary">
         {summary.responded}/{summary.guests} guests responded · {summary.attending} attending
