@@ -76,6 +76,24 @@ function guestRsvpState(guestList) {
   return { allResponded, allDeclined, anyAttending };
 }
 
+function guestResponseUnchanged(guest, payload) {
+  if (!guest || guest.is_attending !== payload.is_attending) {
+    return false;
+  }
+
+  const savedDietary = (guest.dietary_restriction || "").trim();
+  const nextDietary = (payload.dietary_restriction || "").trim();
+  return savedDietary === nextDietary;
+}
+
+function guestSaveSuccessMessage(guestList) {
+  const { allDeclined: everyoneDeclined } = guestRsvpState(guestList);
+  if (everyoneDeclined) {
+    return RSVP.bigQuestion.declinedMessage;
+  }
+  return "Response saved.";
+}
+
 export default function App() {
   const inviteId = useMemo(() => getInviteId(), []);
   const [now, setNow] = useState(() => new Date());
@@ -209,9 +227,17 @@ export default function App() {
   }
 
   async function handleSaveGuest(payload) {
-    setSavingGuest(true);
     setError("");
     setSuccess("");
+
+    const existing = guests.find((guest) => guest.id === payload.id);
+    if (guestResponseUnchanged(existing, payload)) {
+      setActiveGuest(null);
+      setSuccess(guestSaveSuccessMessage(guests));
+      return;
+    }
+
+    setSavingGuest(true);
 
     try {
       await saveGuest(payload);
@@ -226,13 +252,7 @@ export default function App() {
       );
       setGuests(updatedGuests);
       setActiveGuest(null);
-
-      const { allDeclined: everyoneDeclined } = guestRsvpState(updatedGuests);
-      if (everyoneDeclined) {
-        setSuccess(RSVP.bigQuestion.declinedMessage);
-      } else {
-        setSuccess("Guest response saved.");
-      }
+      setSuccess(guestSaveSuccessMessage(updatedGuests));
     } catch (err) {
       throw err;
     } finally {
