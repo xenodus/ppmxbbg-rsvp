@@ -9,6 +9,7 @@ import {
   markInviteSent,
   setStoredToken,
 } from "./adminApi.js";
+import { copyQrCodeToClipboard } from "./copyQrCode.js";
 import { downloadInvitesCsv } from "./exportCsv.js";
 
 function guestSiteOrigin() {
@@ -108,6 +109,7 @@ function InviteRow({ invite, onRefresh }) {
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [qrCopied, setQrCopied] = useState(false);
   const summary = inviteSummary(invite);
 
   useEffect(() => {
@@ -116,10 +118,25 @@ function InviteRow({ invite, onRefresh }) {
     return () => window.clearTimeout(timer);
   }, [linkCopied]);
 
+  useEffect(() => {
+    if (!qrCopied) return undefined;
+    const timer = window.setTimeout(() => setQrCopied(false), 2000);
+    return () => window.clearTimeout(timer);
+  }, [qrCopied]);
+
   async function handleCopyLink() {
     try {
       await copyToClipboard(inviteLink(invite.id));
       setLinkCopied(true);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function handleCopyQrCode() {
+    try {
+      await copyQrCodeToClipboard(inviteLink(invite.id));
+      setQrCopied(true);
     } catch (err) {
       alert(err.message);
     }
@@ -152,6 +169,14 @@ function InviteRow({ invite, onRefresh }) {
             onClick={handleCopyLink}
           >
             {linkCopied ? "Copied!" : "Copy link"}
+          </button>
+          <button
+            type="button"
+            className={qrCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
+            disabled={busy}
+            onClick={handleCopyQrCode}
+          >
+            {qrCopied ? "Copied!" : "Copy QR code"}
           </button>
           <button
             type="button"
