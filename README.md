@@ -489,6 +489,8 @@ CREATE TABLE guests (
 .
 ├── api/           # Go Lambda (handler, store, config)
 ├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
+│   ├── public/reference/     # Landing PNG design sources (not served in prod)
+│   └── src/assets/landing/   # WebP for production; originals/ holds PNG sources
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
