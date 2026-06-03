@@ -1,7 +1,8 @@
 import { LANDING } from "../landingContent.js";
-import rsvpDateArt from "../assets/landing/RSVP_Date.png";
-import rsvpVenueArt from "../assets/landing/RSVP_Venue.png";
-import rsvpArt from "../assets/landing/RSVP.png";
+import rsvpDateArt from "../assets/landing/RSVP_Date.webp";
+import rsvpVenueArt from "../assets/landing/RSVP_Venue.webp";
+import rsvpArt from "../assets/landing/RSVP.webp";
+import coupleSprite from "../assets/landing/RSVP_Site_GIF.webp";
 import "../landing.css";
 
 export default function LandingPage() {
@@ -16,11 +17,15 @@ export default function LandingPage() {
             <span className="landing-hero-line landing-hero-line--sub">{hero.line2}</span>
           </h1>
           <div
-            className="landing-couple-animation"
+            className="landing-asset landing-couple-animation"
             role="img"
             aria-label={hero.animationLabel}
           >
-            <div className="landing-couple-animation__sheet" aria-hidden="true" />
+            <div
+              className="landing-couple-animation__sheet"
+              style={{ backgroundImage: `url(${coupleSprite})` }}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </section>
@@ -28,7 +33,7 @@ export default function LandingPage() {
       <section className="landing-section landing-date" aria-label="Wedding date">
         <div className="landing-section-frame">
           <img
-            className="landing-date-art"
+            className="landing-asset landing-date-art"
             src={rsvpDateArt}
             alt={date.imageAlt}
             width={1080}
@@ -41,7 +46,7 @@ export default function LandingPage() {
       <section className="landing-section landing-venue" aria-labelledby="landing-venue-heading">
         <div className="landing-section-frame">
           <img
-            className="landing-section-bg"
+            className="landing-asset landing-section-bg"
             src={rsvpVenueArt}
             alt=""
             width={1080}
@@ -61,7 +66,7 @@ export default function LandingPage() {
       <section className="landing-section landing-rsvp" aria-labelledby="landing-rsvp-heading">
         <div className="landing-section-frame">
           <img
-            className="landing-section-bg"
+            className="landing-asset landing-section-bg"
             src={rsvpArt}
             alt=""
             width={1080}
