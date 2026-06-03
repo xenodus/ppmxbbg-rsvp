@@ -55,12 +55,15 @@
   font-size: clamp(1.65rem, 6.5vw, 2.45rem);
 }
 
+/* Sprite sheet: 9720×1080 — 9 frames, 1080×1080 each */
 .landing-couple-animation {
-  width: min(100%, 540px);
-  aspect-ratio: 1;
+  width: 100%;
+  max-width: var(--landing-section-max);
+  aspect-ratio: 1 / 1;
   background-image: url("/couple-animation/RSVP_Site_GIF.png");
   background-repeat: no-repeat;
-  background-size: 900% 100%;
+  background-size: 900% auto;
+  background-position: 0 0;
   animation: landing-couple-sprite 1.35s steps(9) infinite;
 }
 
@@ -69,6 +72,7 @@
     background-position: 0 0;
   }
   to {
+    /* Shift through all 9 frames (0% … 100% of scrollable width) */
     background-position: 100% 0;
   }
 }
