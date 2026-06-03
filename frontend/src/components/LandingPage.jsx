@@ -1,4 +1,7 @@
 import { LANDING } from "../landingContent.js";
+import rsvpDateArt from "../assets/landing/RSVP_Date.png";
+import rsvpVenueArt from "../assets/landing/RSVP_Venue.png";
+import rsvpArt from "../assets/landing/RSVP.png";
 import "../landing.css";
 
 export default function LandingPage() {
@@ -26,11 +29,11 @@ export default function LandingPage() {
         <div className="landing-section-frame">
           <img
             className="landing-date-art"
-            src="/RSVP_Date.png"
+            src={rsvpDateArt}
             alt={date.imageAlt}
             width={1080}
             height={677}
-            loading="lazy"
+            decoding="async"
           />
         </div>
       </section>
@@ -39,11 +42,11 @@ export default function LandingPage() {
         <div className="landing-section-frame">
           <img
             className="landing-section-bg"
-            src="/RSVP_Venue.png"
+            src={rsvpVenueArt}
             alt=""
             width={1080}
             height={661}
-            loading="lazy"
+            decoding="async"
           />
           <div className="landing-section-overlay landing-venue-overlay">
             <h2 id="landing-venue-heading" className="landing-venue-heading">
@@ -59,11 +62,11 @@ export default function LandingPage() {
         <div className="landing-section-frame">
           <img
             className="landing-section-bg"
-            src="/RSVP.png"
+            src={rsvpArt}
             alt=""
             width={1080}
             height={960}
-            loading="lazy"
+            decoding="async"
           />
           <div className="landing-section-overlay landing-rsvp-overlay">
             <p id="landing-rsvp-heading" className="landing-rsvp-lead">
