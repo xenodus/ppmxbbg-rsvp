@@ -57,7 +57,6 @@
 
 /* Sprite sheet: 9720×1080 — 9 horizontal frames, 1080×1080 each */
 .landing-couple-animation {
-  --sprite-frames: 9;
   width: 100%;
   max-width: var(--landing-section-max);
   aspect-ratio: 1 / 1;
@@ -65,21 +64,51 @@
 }
 
 .landing-couple-animation__sheet {
-  width: calc(100% * var(--sprite-frames));
+  width: 900%;
   height: 100%;
   background-image: url("/couple-animation/RSVP_Site_GIF.png");
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  animation: landing-couple-sprite 1.35s steps(var(--sprite-frames)) infinite;
+  animation: landing-couple-sprite 1.35s linear infinite;
 }
 
+/* Hold each frame; steps() cannot use CSS variables in most browsers */
 @keyframes landing-couple-sprite {
-  from {
-    transform: translateX(0);
+  0%,
+  11.111% {
+    transform: translate3d(0, 0, 0);
   }
-  to {
-    /* Jump one frame at a time; no smooth scroll between frames */
-    transform: translateX(calc(-100% / var(--sprite-frames) * (var(--sprite-frames) - 1)));
+  11.112%,
+  22.222% {
+    transform: translate3d(-11.111111%, 0, 0);
+  }
+  22.223%,
+  33.333% {
+    transform: translate3d(-22.222222%, 0, 0);
+  }
+  33.334%,
+  44.444% {
+    transform: translate3d(-33.333333%, 0, 0);
+  }
+  44.445%,
+  55.555% {
+    transform: translate3d(-44.444444%, 0, 0);
+  }
+  55.556%,
+  66.666% {
+    transform: translate3d(-55.555556%, 0, 0);
+  }
+  66.667%,
+  77.777% {
+    transform: translate3d(-66.666667%, 0, 0);
+  }
+  77.778%,
+  88.888% {
+    transform: translate3d(-77.777778%, 0, 0);
+  }
+  88.889%,
+  100% {
+    transform: translate3d(-88.888889%, 0, 0);
   }
 }
 
