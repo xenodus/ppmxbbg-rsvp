@@ -16,7 +16,9 @@ export default function LandingPage() {
             className="landing-couple-animation"
             role="img"
             aria-label={hero.animationLabel}
-          />
+          >
+            <div className="landing-couple-animation__sheet" aria-hidden="true" />
+          </div>
         </div>
       </section>
 

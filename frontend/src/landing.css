@@ -55,25 +55,31 @@
   font-size: clamp(1.65rem, 6.5vw, 2.45rem);
 }
 
-/* Sprite sheet: 9720×1080 — 9 frames, 1080×1080 each */
+/* Sprite sheet: 9720×1080 — 9 horizontal frames, 1080×1080 each */
 .landing-couple-animation {
+  --sprite-frames: 9;
   width: 100%;
   max-width: var(--landing-section-max);
   aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.landing-couple-animation__sheet {
+  width: calc(100% * var(--sprite-frames));
+  height: 100%;
   background-image: url("/couple-animation/RSVP_Site_GIF.png");
   background-repeat: no-repeat;
-  background-size: 900% auto;
-  background-position: 0 0;
-  animation: landing-couple-sprite 1.35s steps(9) infinite;
+  background-size: 100% 100%;
+  animation: landing-couple-sprite 1.35s steps(var(--sprite-frames)) infinite;
 }
 
 @keyframes landing-couple-sprite {
   from {
-    background-position: 0 0;
+    transform: translateX(0);
   }
   to {
-    /* Shift through all 9 frames (0% … 100% of scrollable width) */
-    background-position: 100% 0;
+    /* Jump one frame at a time; no smooth scroll between frames */
+    transform: translateX(calc(-100% / var(--sprite-frames) * (var(--sprite-frames) - 1)));
   }
 }
 
@@ -193,8 +199,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing-couple-animation {
+  .landing-couple-animation__sheet {
     animation: none;
-    background-position: 0 0;
+    transform: translateX(0);
   }
 }
