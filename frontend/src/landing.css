@@ -230,6 +230,6 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-couple-animation__sheet {
     animation: none;
-    transform: translateX(-2px);
+    transform: translateX(0);
   }
 }
