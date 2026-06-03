@@ -2,6 +2,7 @@ import { LANDING } from "../landingContent.js";
 import rsvpDateArt from "../assets/landing/RSVP_Date.webp";
 import rsvpVenueArt from "../assets/landing/RSVP_Venue.webp";
 import rsvpArt from "../assets/landing/RSVP.webp";
+import coupleSprite from "../assets/landing/RSVP_Site_GIF.webp";
 import "../landing.css";
 
 export default function LandingPage() {
@@ -20,7 +21,11 @@ export default function LandingPage() {
             role="img"
             aria-label={hero.animationLabel}
           >
-            <div className="landing-couple-animation__sheet" aria-hidden="true" />
+            <div
+              className="landing-couple-animation__sheet"
+              style={{ backgroundImage: `url(${coupleSprite})` }}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </section>
