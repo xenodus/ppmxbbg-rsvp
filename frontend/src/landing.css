@@ -76,7 +76,7 @@
 @keyframes landing-couple-sprite {
   0%,
   11.111% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(-2px, 0, 0);
   }
   11.112%,
   22.222% {
@@ -230,6 +230,6 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-couple-animation__sheet {
     animation: none;
-    transform: translateX(0);
+    transform: translateX(-2px);
   }
 }
