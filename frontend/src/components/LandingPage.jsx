@@ -61,10 +61,11 @@ export default function LandingPage() {
             {rsvp.lead}
           </p>
           <p className="landing-rsvp-deadline">{rsvp.deadline}</p>
-          <button type="button" className="landing-rsvp-cta">
-            {rsvp.cta}
-          </button>
         </div>
+        <button type="button" className="landing-rsvp-cta">
+          <span className="landing-rsvp-cta-line">{rsvp.ctaLine1}</span>
+          <span className="landing-rsvp-cta-line">{rsvp.ctaLine2}</span>
+        </button>
       </section>
     </div>
   );

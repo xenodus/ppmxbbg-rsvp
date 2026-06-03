@@ -15,6 +15,7 @@ export const LANDING = {
   rsvp: {
     lead: "We'd love to celebrate with you! Kindly chope by...",
     deadline: "11 Sept 2026, Friday",
-    cta: "Click here to Chope!",
+    ctaLine1: "Click here",
+    ctaLine2: "to Chope!",
   },
 };
