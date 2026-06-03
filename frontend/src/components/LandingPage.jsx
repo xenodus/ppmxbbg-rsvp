@@ -1,7 +1,7 @@
 import { LANDING } from "../landingContent.js";
-import rsvpDateArt from "../assets/landing/RSVP_Date.png";
-import rsvpVenueArt from "../assets/landing/RSVP_Venue.png";
-import rsvpArt from "../assets/landing/RSVP.png";
+import rsvpDateArt from "../assets/landing/RSVP_Date.webp";
+import rsvpVenueArt from "../assets/landing/RSVP_Venue.webp";
+import rsvpArt from "../assets/landing/RSVP.webp";
 import "../landing.css";
 
 export default function LandingPage() {
