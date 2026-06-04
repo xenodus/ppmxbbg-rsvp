@@ -50,12 +50,14 @@ function FaqItem({ item }) {
   );
 }
 
-function FaqBody() {
+function FaqBody({ embedded = false }) {
   return (
     <>
-      <h2 id="faq-heading" className="card-title">
-        {FAQ.pageTitle}
-      </h2>
+      {!embedded && (
+        <h2 id="faq-heading" className="card-title">
+          {FAQ.pageTitle}
+        </h2>
+      )}
 
       {FAQ.sections.map((section) => (
         <div key={section.title} className="faq-section">
@@ -72,8 +74,8 @@ function FaqBody() {
 export default function Faq({ embedded = false }) {
   if (embedded) {
     return (
-      <div className="faq-card landing-faq-card" aria-labelledby="faq-heading">
-        <FaqBody />
+      <div className="faq-card landing-faq-card" aria-label="Wedding day frequently asked questions">
+        <FaqBody embedded />
       </div>
     );
   }

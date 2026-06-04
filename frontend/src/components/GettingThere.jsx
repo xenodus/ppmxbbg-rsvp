@@ -42,14 +42,16 @@ function AdventureOption({ option }) {
   );
 }
 
-function GettingThereBody() {
+function GettingThereBody({ embedded = false }) {
   const { adventure, wetWeather } = GETTING_THERE;
 
   return (
     <>
-      <h2 id="getting-there-heading" className="card-title">
-        {GETTING_THERE.pageTitle}
-      </h2>
+      {!embedded && (
+        <h2 id="getting-there-heading" className="card-title">
+          {GETTING_THERE.pageTitle}
+        </h2>
+      )}
       <p className="card-intro">{GETTING_THERE.intro}</p>
 
       <div className="faq-section">
@@ -76,9 +78,9 @@ export default function GettingThere({ embedded = false }) {
     return (
       <div
         className="faq-card landing-getting-there-card"
-        aria-labelledby="getting-there-heading"
+        aria-label="Getting to the wedding"
       >
-        <GettingThereBody />
+        <GettingThereBody embedded />
       </div>
     );
   }
