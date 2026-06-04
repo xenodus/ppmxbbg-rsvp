@@ -95,6 +95,9 @@ func TestAdminOptionsV2(t *testing.T) {
 		"version":  "2.0",
 		"routeKey": "OPTIONS /admin/invites",
 		"rawPath":  "/admin/invites",
+		"headers": map[string]string{
+			"origin": "https://d123.cloudfront.net",
+		},
 		"requestContext": map[string]any{
 			"http": map[string]string{"method": "OPTIONS"},
 		},
@@ -105,6 +108,7 @@ func TestAdminOptionsV2(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	assertStatus(t, resp, http.StatusNoContent)
+	assertHeader(t, resp, "Access-Control-Allow-Origin", "https://d123.cloudfront.net")
 }
 
 func TestAdminLoginNotConfigured(t *testing.T) {
