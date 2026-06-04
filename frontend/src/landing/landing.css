@@ -120,6 +120,23 @@ html.landing-page body {
   scroll-margin-top: 0;
 }
 
+@media (min-width: 641px) {
+  .rsvp-modal-backdrop {
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .rsvp-modal-card {
+    width: min(100%, 42rem);
+    height: auto;
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
+    border: 1px solid var(--border);
+    overflow-y: auto;
+  }
+}
+
 .nav-drawer-link {
   appearance: none;
   margin: 0;
