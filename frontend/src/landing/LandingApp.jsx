@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Faq from "../components/Faq.jsx";
 import GettingThere from "../components/GettingThere.jsx";
 import RsvpModal from "../components/RsvpModal.jsx";
 import SiteNav from "../components/SiteNav.jsx";
@@ -15,7 +16,6 @@ import {
 
 export default function LandingApp() {
   const [rsvpOpen, setRsvpOpen] = useState(false);
-  const [inviteValid, setInviteValid] = useState(false);
 
   function openRsvp() {
     setRsvpOpen(true);
@@ -23,11 +23,7 @@ export default function LandingApp() {
 
   return (
     <>
-      <SiteNav
-        coupleNames={WEDDING.coupleNames}
-        inviteValid={inviteValid}
-        onRsvpOpen={openRsvp}
-      />
+      <SiteNav coupleNames={WEDDING.coupleNames} onRsvpOpen={openRsvp} />
 
       <main className="landing">
         <section className="landing-section landing-section--hero" aria-label="Welcome animation">
@@ -122,14 +118,11 @@ export default function LandingApp() {
             loading="lazy"
             decoding="async"
           />
+          <Faq embedded />
         </section>
       </main>
 
-      <RsvpModal
-        open={rsvpOpen}
-        onClose={() => setRsvpOpen(false)}
-        onInviteValidChange={setInviteValid}
-      />
+      <RsvpModal open={rsvpOpen} onClose={() => setRsvpOpen(false)} />
     </>
   );
 }
