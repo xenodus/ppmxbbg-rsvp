@@ -44,7 +44,7 @@ export default function RsvpModal({ open, onClose, onInviteValidChange }) {
           ×
         </button>
         <RsvpForm
-          className="rsvp-modal-form"
+          className="form-card rsvp-modal-form"
           id="rsvp-modal"
           headingId="rsvp-modal-heading"
           onInviteValidChange={onInviteValidChange}

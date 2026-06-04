@@ -99,10 +99,17 @@ html.landing-page body {
 
 .rsvp-modal-backdrop {
   z-index: 1200;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
 }
 
 .rsvp-modal-card {
-  width: min(100%, 42rem);
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border: 0;
   padding: 0;
   gap: 0;
 }
