@@ -41,13 +41,28 @@ html.landing-page body {
   line-height: 1.1;
 }
 
-.landing-hero-heading__line-one {
+.landing-hero-heading__arch {
+  display: block;
+  width: min(100%, 52rem);
+  height: auto;
+  margin: clamp(2rem, 6vw, 3.25rem) auto 0;
+  overflow: visible;
+}
+
+.landing-hero-heading__arch-text {
+  fill: #2f2f2f;
   font-family: "Font One", serif;
-  font-size: clamp(2.5rem, 10vw, 4.5rem);
-  color: #2f2f2f;
+  font-size: clamp(3rem, 9vw, 4.25rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.landing-hero-heading__amp {
+  font-size: 1.2em;
 }
 
 .landing-hero-heading__line-two {
+  margin-top: -0.5rem;
   font-family: "Font Two", serif;
   font-size: clamp(1.75rem, 7vw, 3rem);
   color: #2f2f2f;
@@ -195,7 +210,7 @@ html.landing-page body {
   }
 
   .rsvp-modal-card {
-    width: min(100%, 42rem);
+    width: min(100%, 52rem);
     height: auto;
     max-height: calc(100vh - 2rem);
     max-height: calc(100dvh - 2rem);
