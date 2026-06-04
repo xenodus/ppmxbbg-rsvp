@@ -66,15 +66,15 @@ npx playwright install chromium
 npm run screenshots
 ```
 
-Screenshots are written to `docs/screenshots/` by default.
+Screenshots are written locally to `docs/screenshots/` by default. **Do not commit screenshot PNGs** — they belong only in the PR description.
 
 Use mocked invite data when the UI depends on a valid invitation (the capture script does this automatically).
 
-**Do not include changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs.** Update mock data locally when you run the script if the API shape changed; commit only the PNGs under `docs/screenshots/`, not the script.
+**Do not include changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs.** Update mock data locally when you run the script if the API shape changed.
 
 ### Adding screenshots to the PR
 
-**Commit the images** under `docs/screenshots/` in the same PR as the frontend change. Re-run the capture script and commit updated PNGs whenever the UI changes.
+Attach desktop and mobile images **only in the PR description** (not in the repository). Re-run the capture script whenever the UI changes and refresh the PR images.
 
 Group screenshots under **Desktop** and **Mobile** headings so reviewers can compare layouts quickly.
 
@@ -87,16 +87,16 @@ Use paths that actually render in the PR body. **Do not** use GitHub branch raw 
 
 Those links return **404** for this private repository (they require auth GitHub does not apply when rendering `<img>` tags in a PR), so reviewers see broken images.
 
-**Cursor / Cloud Agent PRs (recommended):** Reference committed files with an **absolute workspace path** in the `<img>` `src`. When the PR is created or updated, those files are uploaded and the `src` is rewritten to a stable public URL:
+**Cursor / Cloud Agent PRs (recommended):** After generating PNGs locally, reference them with an **absolute workspace path** in the `<img>` `src`. When the PR is created or updated, those files are uploaded and the `src` is rewritten to a stable public URL:
 
 ```html
 <img alt="Desktop drawer open" src="/workspace/docs/screenshots/desktop-drawer.png" width="720" />
 <img alt="Mobile drawer open" src="/workspace/docs/screenshots/mobile-drawer.png" width="390" />
 ```
 
-Use the real filename under `docs/screenshots/` (for example `landing-desktop.png`). The path must match a file that exists in the branch.
+The file must exist on disk when the PR is created or updated (for example right after `npm run screenshots`). It does not need to be committed.
 
-**Manual PRs on GitHub:** Drag and drop each PNG into the PR description editor, or paste an image from the clipboard. GitHub hosts those uploads on `user-images.githubusercontent.com` and they display reliably. You can still commit the same PNGs under `docs/screenshots/` for history and local review.
+**Manual PRs on GitHub:** Drag and drop each PNG into the PR description editor, or paste an image from the clipboard. GitHub hosts those uploads on `user-images.githubusercontent.com` and they display reliably.
 
 **Avoid** pasting one-off upload URLs from an old PR into a new PR description; prefer fresh uploads or workspace paths so images stay in sync with the current UI.
 
@@ -105,7 +105,7 @@ Use the real filename under `docs/screenshots/` (for example `landing-desktop.pn
 - Do not merge API or deploy work with a stale README.
 - Prefer updating the README in the **same commit** as the code change.
 - If a change is experimental, still note it in the README or revert before merging.
-- Do not commit changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs (screenshot PNGs only).
+- Do not commit changes to `frontend/scripts/capture-screenshots.mjs` or screenshot PNGs in feature PRs.
 
 ## Checklist before opening a PR
 
