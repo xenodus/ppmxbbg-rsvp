@@ -8,6 +8,8 @@ export default function SiteNav({ coupleNames, onRsvpOpen }) {
 
   const sectionLinks = onRsvpOpen
     ? [
+        { href: "#join-us", label: "When" },
+        { href: "#where", label: "Where" },
         { href: "#getting-there", label: "Getting There" },
         { href: "#faq", label: "FAQ" },
       ]

@@ -58,7 +58,11 @@ export default function LandingApp() {
           />
         </section>
 
-        <section className="landing-section landing-section--join-us" aria-label="Join us">
+        <section
+          id="join-us"
+          className="landing-section landing-section--join-us"
+          aria-label="Join us"
+        >
           <img
             src={joinUsImg}
             alt="Join us for our wedding celebration"
@@ -69,7 +73,11 @@ export default function LandingApp() {
           />
         </section>
 
-        <section className="landing-section landing-section--where" aria-label="Where">
+        <section
+          id="where"
+          className="landing-section landing-section--where"
+          aria-label="Where"
+        >
           <img
             src={whereImg}
             alt="Wedding venue and location details"
