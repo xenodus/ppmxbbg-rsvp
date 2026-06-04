@@ -276,6 +276,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.35rem;
+  flex: 1;
 }
 
 .nav-drawer-links a {
@@ -288,6 +289,44 @@ body {
 
 .nav-drawer-links a:hover {
   color: var(--muted);
+}
+
+.nav-drawer-footer {
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+.nav-drawer-rsvp {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.nav-drawer-rsvp:hover {
+  border-color: var(--text);
+  background: var(--card);
+}
+
+.nav-drawer-rsvp:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
 }
 
 .card-title {

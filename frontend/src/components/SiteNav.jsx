@@ -95,22 +95,27 @@ export default function SiteNav({ coupleNames, onRsvpOpen }) {
 
         <h2 className="nav-drawer-title">{coupleNames}</h2>
 
-        <nav className="nav-drawer-links" aria-label="Page sections">
+        {sectionLinks.length > 0 ? (
+          <nav className="nav-drawer-links" aria-label="Page sections">
+            {sectionLinks.map((link) => (
+              <a key={link.href} href={link.href} onClick={closeMenu}>
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        ) : null}
+
+        <div className="nav-drawer-footer">
           {onRsvpOpen ? (
-            <button type="button" className="nav-drawer-link" onClick={handleRsvpClick}>
+            <button type="button" className="nav-drawer-rsvp" onClick={handleRsvpClick}>
               RSVP
             </button>
           ) : (
-            <a href="#rsvp" onClick={closeMenu}>
+            <a href="#rsvp" className="nav-drawer-rsvp" onClick={closeMenu}>
               RSVP
             </a>
           )}
-          {sectionLinks.map((link) => (
-            <a key={link.href} href={link.href} onClick={closeMenu}>
-              {link.label}
-            </a>
-          ))}
-        </nav>
+        </div>
       </aside>
     </>
   );

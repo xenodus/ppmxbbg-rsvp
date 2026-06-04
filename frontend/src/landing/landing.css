@@ -219,25 +219,6 @@ html.landing-page body {
   }
 }
 
-.nav-drawer-link {
-  appearance: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  text-align: left;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.nav-drawer-link:hover {
-  color: var(--muted);
-}
-
 @media (max-width: 640px) {
   .rsvp-modal-form {
     padding: 1.5rem 1rem 1.25rem;
