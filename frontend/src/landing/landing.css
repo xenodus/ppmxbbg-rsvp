@@ -47,6 +47,8 @@ html.landing-page body {
 .landing-getting-there-card {
   margin: 0 1rem 2rem;
   scroll-margin-top: 0;
+  background: transparent;
+  border: 0;
 }
 
 .landing-section--faq {
@@ -57,6 +59,8 @@ html.landing-page body {
 .landing-faq-card {
   margin: 0 1rem 2rem;
   scroll-margin-top: 0;
+  background: transparent;
+  border: 0;
 }
 
 .landing-sprite {
