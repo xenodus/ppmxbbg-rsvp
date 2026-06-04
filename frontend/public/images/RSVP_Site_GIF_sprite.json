@@ -1,0 +1,15 @@
+{
+  "source": "RSVP_Site_GIF.gif",
+  "sprite": "RSVP_Site_GIF_sprite.webp",
+  "frameWidth": 1080,
+  "frameHeight": 1200,
+  "frameCount": 9,
+  "columns": 9,
+  "rows": 1,
+  "layout": "horizontal",
+  "spriteWidth": 9720,
+  "spriteHeight": 1200,
+  "originalDurationMs": 4500,
+  "originalFrameDurationMs": 500,
+  "originalFps": 2
+}
