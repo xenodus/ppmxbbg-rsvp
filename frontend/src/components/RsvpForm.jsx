@@ -182,12 +182,6 @@ export default function RsvpForm({
   }, [inviteId, rsvpClosed]);
 
   const formDisabled = loading || !!error || rsvpClosed;
-  const hasSavedRsvp =
-    requireParking != null ||
-    guests.some(
-      (guest) =>
-        guest.is_attending != null || guest.attend_solemnisation != null,
-    );
   const { allDeclined, anyAttending, allAttendingAnsweredSolemnisation } =
     guestRsvpState(guests);
   const showParking = anyAttending && allAttendingAnsweredSolemnisation;
@@ -262,7 +256,6 @@ export default function RsvpForm({
           RSVP
         </h2>
         {error && <p className="banner banner-error">{error}</p>}
-        {success && <p className="banner banner-success">{success}</p>}
 
         {rsvpClosed ? (
           <p className="closed-message">{RSVP_CUTOFF.closedMessage}</p>
@@ -280,11 +273,8 @@ export default function RsvpForm({
                 disabled={formDisabled || savingGuest}
                 onRespond={setActiveGuest}
               />
+              {success && <p className="choice-saved">{success}</p>}
             </section>
-
-            {hasSavedRsvp && anyAttending && (
-              <p className="section-note">You can update your responses at any time.</p>
-            )}
 
             {allDeclined && (
               <p className="section-note">{RSVP.bigQuestion.declinedMessage}</p>

@@ -115,10 +115,17 @@ html.landing-page body {
 
 .rsvp-modal-backdrop {
   z-index: 1200;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
 }
 
 .rsvp-modal-card {
-  width: min(100%, 42rem);
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border: 0;
   padding: 0;
   gap: 0;
 }
@@ -127,6 +134,23 @@ html.landing-page body {
   border: 0;
   padding: 2rem 1.5rem 1.75rem;
   scroll-margin-top: 0;
+}
+
+@media (min-width: 641px) {
+  .rsvp-modal-backdrop {
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .rsvp-modal-card {
+    width: min(100%, 42rem);
+    height: auto;
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
+    border: 1px solid var(--border);
+    overflow-y: auto;
+  }
 }
 
 .nav-drawer-link {
