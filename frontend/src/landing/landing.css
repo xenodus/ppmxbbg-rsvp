@@ -17,6 +17,7 @@ html.landing-page body {
   margin: 0;
   padding: 0;
   scroll-margin-top: 5rem;
+  border-bottom: 10px solid #fcf9e4;
 }
 
 .landing-section--hero {
