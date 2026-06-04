@@ -74,15 +74,31 @@ Use mocked invite data when the UI depends on a valid invitation (the capture sc
 
 ### Adding screenshots to the PR
 
-**Commit the images** under `docs/screenshots/` in the same PR as the frontend change, then reference them with the branch raw URL so GitHub does not serve stale cached uploads:
-
-```html
-<img alt="Desktop drawer open" src="https://github.com/OWNER/REPO/raw/BRANCH/docs/screenshots/desktop-drawer.png" width="720" />
-```
-
-Replace `OWNER`, `REPO`, and `BRANCH` with the real values (e.g. your `cursor/...` feature branch). Re-run the capture script and commit updated PNGs whenever the UI changes.
+**Commit the images** under `docs/screenshots/` in the same PR as the frontend change. Re-run the capture script and commit updated PNGs whenever the UI changes.
 
 Group screenshots under **Desktop** and **Mobile** headings so reviewers can compare layouts quickly.
+
+#### Image links in the PR description
+
+Use paths that actually render in the PR body. **Do not** use GitHub branch raw URLs such as:
+
+- `https://github.com/OWNER/REPO/raw/BRANCH/docs/screenshots/example.png`
+- `https://raw.githubusercontent.com/OWNER/REPO/BRANCH/docs/screenshots/example.png`
+
+Those links return **404** for this private repository (they require auth GitHub does not apply when rendering `<img>` tags in a PR), so reviewers see broken images.
+
+**Cursor / Cloud Agent PRs (recommended):** Reference committed files with an **absolute workspace path** in the `<img>` `src`. When the PR is created or updated, those files are uploaded and the `src` is rewritten to a stable public URL:
+
+```html
+<img alt="Desktop drawer open" src="/workspace/docs/screenshots/desktop-drawer.png" width="720" />
+<img alt="Mobile drawer open" src="/workspace/docs/screenshots/mobile-drawer.png" width="390" />
+```
+
+Use the real filename under `docs/screenshots/` (for example `landing-desktop.png`). The path must match a file that exists in the branch.
+
+**Manual PRs on GitHub:** Drag and drop each PNG into the PR description editor, or paste an image from the clipboard. GitHub hosts those uploads on `user-images.githubusercontent.com` and they display reliably. You can still commit the same PNGs under `docs/screenshots/` for history and local review.
+
+**Avoid** pasting one-off upload URLs from an old PR into a new PR description; prefer fresh uploads or workspace paths so images stay in sync with the current UI.
 
 ## Do not skip the README
 
