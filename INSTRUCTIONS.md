@@ -66,7 +66,7 @@ npx playwright install chromium
 npm run screenshots
 ```
 
-Screenshots are written locally to `docs/screenshots/` by default. **Do not commit screenshot PNGs** — they belong only in the PR description.
+Screenshots are written locally to `docs/screenshots/` by default (that directory is gitignored). **Do not commit screenshot PNGs** — they belong only in the PR description.
 
 Use mocked invite data when the UI depends on a valid invitation (the capture script does this automatically).
 
