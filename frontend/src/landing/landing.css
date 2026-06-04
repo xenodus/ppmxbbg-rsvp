@@ -40,7 +40,13 @@ html.landing-page body {
 }
 
 .landing-section--getting-there {
+  flex-direction: column;
   background-color: #ff9800;
+}
+
+.landing-getting-there-card {
+  margin: 0 1rem 2rem;
+  scroll-margin-top: 0;
 }
 
 .landing-section--faq {

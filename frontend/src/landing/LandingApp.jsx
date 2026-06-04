@@ -1,4 +1,5 @@
 import { useState } from "react";
+import GettingThere from "../components/GettingThere.jsx";
 import RsvpModal from "../components/RsvpModal.jsx";
 import SiteNav from "../components/SiteNav.jsx";
 import { WEDDING } from "../constants.js";
@@ -109,6 +110,7 @@ export default function LandingApp() {
             loading="lazy"
             decoding="async"
           />
+          <GettingThere embedded />
         </section>
 
         <section id="faq" className="landing-section landing-section--faq" aria-label="FAQ">

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Countdown from "./components/Countdown.jsx";
 import Faq from "./components/Faq.jsx";
-import GettingThere from "./components/GettingThere.jsx";
 import RsvpForm from "./components/RsvpForm.jsx";
 import SiteNav from "./components/SiteNav.jsx";
 import { WEDDING } from "./constants.js";
@@ -38,10 +37,6 @@ export default function App() {
 
       {inviteValid && (
         <>
-          <Divider />
-
-          <GettingThere />
-
           <Divider />
 
           <Faq />

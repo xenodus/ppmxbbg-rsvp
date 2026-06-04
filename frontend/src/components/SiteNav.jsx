@@ -7,12 +7,8 @@ export default function SiteNav({ coupleNames, inviteValid, onRsvpOpen }) {
   const [scrolled, setScrolled] = useState(false);
 
   const sectionLinks = [
-    ...(inviteValid
-      ? [
-          { href: "#getting-there", label: "Getting There" },
-          { href: "#faq", label: "FAQ" },
-        ]
-      : []),
+    ...(onRsvpOpen ? [{ href: "#getting-there", label: "Getting There" }] : []),
+    ...(inviteValid ? [{ href: "#faq", label: "FAQ" }] : []),
   ];
 
   useEffect(() => {
