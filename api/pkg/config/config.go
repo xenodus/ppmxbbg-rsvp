@@ -60,11 +60,13 @@ func IsOriginAllowed(origin string) bool {
 		return true
 	}
 
-	if strings.HasPrefix(origin, "https://") &&
-		strings.Contains(origin, "ppmxbbg-rsvp-frontend") &&
-		strings.Contains(origin, "amazonaws.com") {
-		return true
-	}
+	return isS3FrontendOrigin(origin)
+}
 
-	return false
+// isS3FrontendOrigin allows REST and static-website endpoints for this project's bucket.
+func isS3FrontendOrigin(origin string) bool {
+	if !strings.Contains(origin, "ppmxbbg-rsvp-frontend") || !strings.Contains(origin, "amazonaws.com") {
+		return false
+	}
+	return strings.HasPrefix(origin, "https://") || strings.HasPrefix(origin, "http://")
 }

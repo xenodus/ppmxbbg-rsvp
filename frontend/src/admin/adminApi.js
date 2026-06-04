@@ -30,7 +30,7 @@ function networkErrorMessage(err) {
     "matches your API Gateway URL (no /prod suffix unless the gateway uses a stage path), " +
     "that /admin/* routes exist, and that Lambda FRONTEND_ORIGIN is exactly your admin " +
     "site origin (e.g. https://YOUR_ID.cloudfront.net with no trailing slash). " +
-    "CloudFront and S3 website origins are allowed automatically after the API is redeployed."
+    "S3 (http or https) and CloudFront origins are allowed automatically after the API is redeployed."
   );
 }
 

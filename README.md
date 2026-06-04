@@ -356,9 +356,15 @@ Map all routes to the same Lambda function. Route paths are without the stage na
 | `POST`, `OPTIONS` | `/admin/login` |
 | `GET`, `POST`, `PATCH`, `DELETE`, `OPTIONS` | `/admin/invites` |
 
-CORS is handled in Lambda (do not enable conflicting CORS on API Gateway). Set `FRONTEND_ORIGIN` to the exact browser origin of your deployed admin page (scheme + host, no path or trailing slash), e.g. `https://E123ABC.cloudfront.net`. `https://*.cloudfront.net` and the `ppmxbbg-rsvp-frontend` S3 bucket hosts are also allowed. Admin routes allow the `Authorization` header on responses.
+CORS is handled in Lambda (do not enable conflicting CORS on API Gateway). Set `FRONTEND_ORIGIN` to the exact browser origin of your deployed admin page (scheme + host, no path or trailing slash). Examples:
 
-If admin login shows **Cannot reach the API**, the browser usually blocked a cross-origin request: confirm `VITE_API_BASE_URL` in the Makefile matches API Gateway (no `/prod` unless your invoke URL uses it), redeploy the API after changing `FRONTEND_ORIGIN`, and match `FRONTEND_ORIGIN` to the URL in your address bar when opening `admin.html`.
+- S3 REST endpoint: `https://ppmxbbg-rsvp-frontend.s3.ap-southeast-1.amazonaws.com`
+- S3 website endpoint: `http://ppmxbbg-rsvp-frontend.s3-website-ap-southeast-1.amazonaws.com`
+- CloudFront: `https://E123ABC.cloudfront.net`
+
+`https://*.cloudfront.net` and `ppmxbbg-rsvp-frontend` S3 hosts (http or https) are also allowed automatically after the API in PR #44 is deployed. Admin routes allow the `Authorization` header on responses.
+
+If admin login shows **Cannot reach the API**, the browser usually blocked a cross-origin request: confirm `VITE_API_BASE_URL` in the Makefile matches API Gateway (no `/prod` unless your invoke URL uses it), redeploy the API after changing `FRONTEND_ORIGIN`, and match `FRONTEND_ORIGIN` to the origin shown in your browser when opening `admin.html` (S3 REST uses `https://…s3…amazonaws.com`; S3 website hosting often uses `http://…s3-website…amazonaws.com`).
 
 ### Configure deploy variables
 
