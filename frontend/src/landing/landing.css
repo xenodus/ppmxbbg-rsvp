@@ -115,9 +115,9 @@ html.landing-page body {
   z-index: 1;
   width: min(100%, 1080px);
   margin-top: -2rem;
-  aspect-ratio: 1080 / 1200;
+  aspect-ratio: 1080 / 1100;
   background-repeat: no-repeat;
-  background-size: 900% 100%;
+  background-size: 900% 109.091%;
   background-position: left bottom;
   animation: landing-sprite-play 4.5s steps(8) forwards;
 }
