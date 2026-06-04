@@ -65,8 +65,33 @@ func IsOriginAllowed(origin string) bool {
 
 // isS3FrontendOrigin allows REST and static-website endpoints for this project's bucket.
 func isS3FrontendOrigin(origin string) bool {
-	if !strings.Contains(origin, "ppmxbbg-rsvp-frontend") || !strings.Contains(origin, "amazonaws.com") {
+	if !strings.Contains(origin, "amazonaws.com") {
 		return false
 	}
-	return strings.HasPrefix(origin, "https://") || strings.HasPrefix(origin, "http://")
+	if strings.HasPrefix(origin, "https://") || strings.HasPrefix(origin, "http://") {
+		if strings.Contains(origin, "ppmxbbg-rsvp-frontend") {
+			return true
+		}
+		return isPathStyleS3Origin(origin)
+	}
+	return false
+}
+
+// isPathStyleS3Origin matches S3 REST path-style hosts (bucket name is in the URL path).
+// Example page URL: https://s3.ap-southeast-1.amazonaws.com/ppmxbbg-rsvp-frontend/admin.html
+// Browser Origin:   https://s3.ap-southeast-1.amazonaws.com
+func isPathStyleS3Origin(origin string) bool {
+	if !strings.HasPrefix(origin, "https://") {
+		return false
+	}
+	host := strings.TrimPrefix(origin, "https://")
+	if host == "s3.amazonaws.com" {
+		return true
+	}
+	if !strings.HasPrefix(host, "s3.") || !strings.HasSuffix(host, ".amazonaws.com") {
+		return false
+	}
+	// s3.<region>.amazonaws.com (four labels, no bucket prefix)
+	parts := strings.Split(host, ".")
+	return len(parts) == 4 && parts[0] == "s3" && parts[2] == "amazonaws" && parts[3] == "com"
 }
