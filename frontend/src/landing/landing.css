@@ -161,6 +161,17 @@ html.landing-page body {
 }
 
 .landing-section--rsvp img {
+  clip-path: inset(0 0 1px 1px);
+  margin-bottom: -1px;
+  margin-left: -1px;
+}
+
+.landing-section--wedding-day img {
+  clip-path: inset(0 1px 0 0);
+  margin-right: -1px;
+}
+
+.landing-section--getting-there img {
   clip-path: inset(0 0 1px 0);
   margin-bottom: -1px;
 }
