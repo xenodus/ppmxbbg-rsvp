@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 
 const SCROLL_THRESHOLD = 48;
 
-export default function SiteNav({ coupleNames, inviteValid }) {
+export default function SiteNav({ coupleNames, inviteValid, onRsvpOpen }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const links = [
-    { href: "#rsvp", label: "RSVP" },
+  const sectionLinks = [
     ...(inviteValid
       ? [
           { href: "#getting-there", label: "Getting There" },
@@ -49,6 +48,11 @@ export default function SiteNav({ coupleNames, inviteValid }) {
 
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  function handleRsvpClick() {
+    closeMenu();
+    onRsvpOpen?.();
   }
 
   return (
@@ -94,7 +98,16 @@ export default function SiteNav({ coupleNames, inviteValid }) {
         <h2 className="nav-drawer-title">{coupleNames}</h2>
 
         <nav className="nav-drawer-links" aria-label="Page sections">
-          {links.map((link) => (
+          {onRsvpOpen ? (
+            <button type="button" className="nav-drawer-link" onClick={handleRsvpClick}>
+              RSVP
+            </button>
+          ) : (
+            <a href="#rsvp" onClick={closeMenu}>
+              RSVP
+            </a>
+          )}
+          {sectionLinks.map((link) => (
             <a key={link.href} href={link.href} onClick={closeMenu}>
               {link.label}
             </a>
