@@ -489,6 +489,7 @@ CREATE TABLE guests (
 .
 ├── api/           # Go Lambda (handler, store, config)
 ├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
+│   └── public/original/  # Source PNG/GIF illustrations (section headers, couple animation)
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
