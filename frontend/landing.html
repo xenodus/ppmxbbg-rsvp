@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wedding</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .landing {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .landing-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .landing-section--hero {
+        background-color: #fcf9e4;
+      }
+
+      .landing-section--join-us {
+        background-color: #dd774a;
+      }
+
+      .landing-section--where {
+        background-color: #7a8e1f;
+      }
+
+      .landing-section--rsvp {
+        background-color: #ff9800;
+      }
+
+      .landing-section--wedding-day {
+        background-color: #dd774a;
+      }
+
+      .landing-sprite {
+        width: min(100%, 1080px);
+        aspect-ratio: 1080 / 1200;
+        background-image: url("/images/RSVP_Site_GIF_sprite.webp");
+        background-repeat: no-repeat;
+        background-size: 900% 100%;
+        animation: landing-sprite-play 4.5s steps(8) forwards;
+      }
+
+      @keyframes landing-sprite-play {
+        from {
+          background-position: 0% 0;
+        }
+        to {
+          background-position: 100% 0;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .landing-sprite {
+          animation: none;
+          background-position: 100% 0;
+        }
+      }
+
+      .landing-section img {
+        display: block;
+        width: min(100%, 1080px);
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="landing">
+      <section class="landing-section landing-section--hero" aria-label="Welcome animation">
+        <div
+          class="landing-sprite"
+          role="img"
+          aria-label="Animated wedding invitation illustration"
+        ></div>
+      </section>
+
+      <section class="landing-section landing-section--join-us" aria-label="Join us">
+        <img
+          src="/images/join-us.webp"
+          alt="Join us for our wedding celebration"
+          width="1080"
+          height="677"
+          loading="eager"
+          decoding="async"
+        />
+      </section>
+
+      <section class="landing-section landing-section--where" aria-label="Where">
+        <img
+          src="/images/where.webp"
+          alt="Wedding venue and location details"
+          width="1080"
+          height="661"
+          loading="lazy"
+          decoding="async"
+        />
+      </section>
+
+      <section class="landing-section landing-section--rsvp" aria-label="RSVP">
+        <img
+          src="/images/rsvp.webp"
+          alt="Please RSVP for our wedding"
+          width="1080"
+          height="960"
+          loading="lazy"
+          decoding="async"
+        />
+      </section>
+
+      <section class="landing-section landing-section--wedding-day" aria-label="Wedding day">
+        <img
+          src="/images/wedding-day.webp"
+          alt="Wedding day schedule and details"
+          width="1080"
+          height="1800"
+          loading="lazy"
+          decoding="async"
+        />
+      </section>
+    </main>
+  </body>
+</html>
