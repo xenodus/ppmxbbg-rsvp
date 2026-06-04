@@ -7,7 +7,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"slices"
 	"strings"
 
 	"ppmxbbg-rsvp/pkg/config"
@@ -311,8 +310,7 @@ func jsonResponse(status int, payload any, origin string) (apiResponse, error) {
 }
 
 func corsResponse(response apiResponse, origin, methods string) (apiResponse, error) {
-	allowed := config.GetAllowedOrigins()
-	if origin != "" && slices.Contains(allowed, origin) {
+	if config.IsOriginAllowed(origin) {
 		if response.Headers == nil {
 			response.Headers = map[string]string{}
 		}

@@ -336,7 +336,8 @@ Set these in the AWS Lambda console (or your IaC):
 | `DB_USER` | `rsvp_user` | MySQL user |
 | `DB_PASSWORD` | `***` | MySQL password |
 | `DB_NAME` | `rsvp` | Database name |
-| `FRONTEND_ORIGIN` | `https://d111.cloudfront.net` | CloudFront or custom domain URL for CORS |
+| `FRONTEND_ORIGIN` | `https://d111.cloudfront.net` | Primary site origin for CORS (no trailing slash) |
+| `FRONTEND_ORIGINS` | *(optional)* | Extra allowed origins, comma-separated (e.g. custom domain) |
 | `ADMIN_USERNAME` | `admin` | Admin login username |
 | `ADMIN_PASSWORD` | `***` | Admin login password |
 | `ADMIN_TOKEN_SECRET` | *(optional)* | Signs session tokens; defaults to `ADMIN_PASSWORD` if unset |
@@ -355,7 +356,9 @@ Map all routes to the same Lambda function. Route paths are without the stage na
 | `POST`, `OPTIONS` | `/admin/login` |
 | `GET`, `POST`, `PATCH`, `DELETE`, `OPTIONS` | `/admin/invites` |
 
-Set CORS allowed origin to your CloudFront URL (or custom domain). Admin routes allow the `Authorization` header (set by the Lambda response).
+CORS is handled in Lambda (do not enable conflicting CORS on API Gateway). Set `FRONTEND_ORIGIN` to the exact browser origin of your deployed admin page (scheme + host, no path or trailing slash), e.g. `https://E123ABC.cloudfront.net`. `https://*.cloudfront.net` and the `ppmxbbg-rsvp-frontend` S3 bucket hosts are also allowed. Admin routes allow the `Authorization` header on responses.
+
+If admin login shows **Cannot reach the API**, the browser usually blocked a cross-origin request: confirm `VITE_API_BASE_URL` in the Makefile matches API Gateway (no `/prod` unless your invoke URL uses it), redeploy the API after changing `FRONTEND_ORIGIN`, and match `FRONTEND_ORIGIN` to the URL in your address bar when opening `admin.html`.
 
 ### Configure deploy variables
 

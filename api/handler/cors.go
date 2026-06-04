@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"slices"
 
 	"ppmxbbg-rsvp/pkg/config"
 )
@@ -25,8 +24,7 @@ func jsonResponseWithCORS(status int, payload any, origin, methods, allowHeaders
 }
 
 func corsResponseWithHeaders(response apiResponse, origin, methods, allowHeaders string) (apiResponse, error) {
-	allowed := config.GetAllowedOrigins()
-	if origin != "" && slices.Contains(allowed, origin) {
+	if config.IsOriginAllowed(origin) {
 		if response.Headers == nil {
 			response.Headers = map[string]string{}
 		}

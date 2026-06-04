@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -135,5 +136,26 @@ func assertStatus(t *testing.T, raw []byte, want int) {
 	}
 	if envelope.StatusCode != want {
 		t.Fatalf("expected %d, got %d", want, envelope.StatusCode)
+	}
+}
+
+func assertHeader(t *testing.T, raw []byte, key, want string) {
+	t.Helper()
+
+	var envelope struct {
+		Headers map[string]string `json:"headers"`
+	}
+	if err := json.Unmarshal(raw, &envelope); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+	if envelope.Headers == nil {
+		t.Fatalf("expected header %s, response has no headers", key)
+	}
+	got := envelope.Headers[key]
+	if got == "" {
+		got = envelope.Headers[strings.ToLower(key)]
+	}
+	if got != want {
+		t.Fatalf("header %s: got %q, want %q", key, got, want)
 	}
 }

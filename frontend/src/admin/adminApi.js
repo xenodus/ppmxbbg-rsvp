@@ -25,7 +25,13 @@ function networkErrorMessage(err) {
   if (!API_BASE_URL) {
     return "Cannot reach the API. For local dev, set VITE_API_PROXY_TARGET in frontend/.env (see README).";
   }
-  return "Cannot reach the API. Check VITE_API_BASE_URL, API Gateway routes for /admin/*, and FRONTEND_ORIGIN on Lambda.";
+  return (
+    "Cannot reach the API (browser blocked the request). Check that VITE_API_BASE_URL " +
+    "matches your API Gateway URL (no /prod suffix unless the gateway uses a stage path), " +
+    "that /admin/* routes exist, and that Lambda FRONTEND_ORIGIN is exactly your admin " +
+    "site origin (e.g. https://YOUR_ID.cloudfront.net with no trailing slash). " +
+    "CloudFront and S3 website origins are allowed automatically after the API is redeployed."
+  );
 }
 
 async function request(path, options = {}) {
