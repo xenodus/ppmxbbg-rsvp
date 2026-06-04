@@ -20,7 +20,34 @@ html.landing-page body {
 }
 
 .landing-section--hero {
+  flex-direction: column;
+  gap: 0;
+  padding-top: 1.5rem;
   background-color: #fcf9e4;
+}
+
+.landing-hero-heading {
+  width: min(100%, 1080px);
+  margin: 0;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.landing-hero-heading p {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.landing-hero-heading__line-one {
+  font-family: "Font One", serif;
+  font-size: clamp(2.5rem, 10vw, 4.5rem);
+  color: #2f2f2f;
+}
+
+.landing-hero-heading__line-two {
+  font-family: "Font Two", serif;
+  font-size: clamp(1.75rem, 7vw, 3rem);
+  color: #2f2f2f;
 }
 
 .landing-section--join-us {
@@ -65,25 +92,27 @@ html.landing-page body {
 
 .landing-sprite {
   width: min(100%, 1080px);
-  aspect-ratio: 1080 / 1200;
+  margin-top: -3.5rem;
+  aspect-ratio: 1080 / 680;
   background-repeat: no-repeat;
-  background-size: 900% 100%;
+  background-size: 900% 176%;
+  background-position: left bottom;
   animation: landing-sprite-play 4.5s steps(8) forwards;
 }
 
 @keyframes landing-sprite-play {
   from {
-    background-position: 0% 0;
+    background-position: left bottom;
   }
   to {
-    background-position: 100% 0;
+    background-position: right bottom;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .landing-sprite {
     animation: none;
-    background-position: 100% 0;
+    background-position: right bottom;
   }
 }
 

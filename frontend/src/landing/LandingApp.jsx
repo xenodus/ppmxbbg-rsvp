@@ -27,6 +27,10 @@ export default function LandingApp() {
 
       <main className="landing">
         <section className="landing-section landing-section--hero" aria-label="Welcome animation">
+          <div className="landing-hero-heading">
+            <p className="landing-hero-heading__line-one">Vivian and Alvin</p>
+            <p className="landing-hero-heading__line-two">are getting married!</p>
+          </div>
           <div
             className="landing-sprite"
             style={{ backgroundImage: `url(${spriteImg})` }}
