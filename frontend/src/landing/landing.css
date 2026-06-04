@@ -20,7 +20,34 @@ html.landing-page body {
 }
 
 .landing-section--hero {
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
   background-color: #fcf9e4;
+}
+
+.landing-hero-heading {
+  width: min(100%, 1080px);
+  margin: 0;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.landing-hero-heading p {
+  margin: 0;
+  line-height: 1.1;
+}
+
+.landing-hero-heading__line-one {
+  font-family: "Font One", serif;
+  font-size: clamp(2.5rem, 10vw, 4.5rem);
+  color: #2f2f2f;
+}
+
+.landing-hero-heading__line-two {
+  font-family: "Font Two", serif;
+  font-size: clamp(1.75rem, 7vw, 3rem);
+  color: #2f2f2f;
 }
 
 .landing-section--join-us {
