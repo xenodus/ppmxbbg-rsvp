@@ -488,7 +488,7 @@ CREATE TABLE guests (
 ```text
 .
 ├── api/           # Go Lambda (handler, store, config)
-├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin)
+├── frontend/      # React + Vite SPA (`index.html` guest, `admin.html` admin, `landing.html` static scroll)
 │   └── public/
 │       ├── original/  # Source PNG/GIF illustrations (masters)
 │       └── images/    # Web-optimized copies (WebP + optimized GIF, sprite metadata)
