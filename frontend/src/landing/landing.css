@@ -50,7 +50,6 @@ html.landing-page body {
 .landing-sprite {
   width: min(100%, 1080px);
   aspect-ratio: 1080 / 1200;
-  background-image: url("/images/RSVP_Site_GIF_sprite.webp");
   background-repeat: no-repeat;
   background-size: 900% 100%;
   animation: landing-sprite-play 4.5s steps(8) forwards;

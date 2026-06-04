@@ -2,6 +2,15 @@ import { useState } from "react";
 import RsvpModal from "../components/RsvpModal.jsx";
 import SiteNav from "../components/SiteNav.jsx";
 import { WEDDING } from "../constants.js";
+import {
+  faqImg,
+  gettingThereImg,
+  joinUsImg,
+  rsvpImg,
+  spriteImg,
+  weddingDayImg,
+  whereImg,
+} from "./images.js";
 
 export default function LandingApp() {
   const [rsvpOpen, setRsvpOpen] = useState(false);
@@ -23,6 +32,7 @@ export default function LandingApp() {
         <section className="landing-section landing-section--hero" aria-label="Welcome animation">
           <div
             className="landing-sprite"
+            style={{ backgroundImage: `url(${spriteImg})` }}
             role="img"
             aria-label="Animated wedding invitation illustration"
           />
@@ -30,7 +40,7 @@ export default function LandingApp() {
 
         <section className="landing-section landing-section--join-us" aria-label="Join us">
           <img
-            src="/images/join-us.webp"
+            src={joinUsImg}
             alt="Join us for our wedding celebration"
             width="1080"
             height="677"
@@ -41,7 +51,7 @@ export default function LandingApp() {
 
         <section className="landing-section landing-section--where" aria-label="Where">
           <img
-            src="/images/where.webp"
+            src={whereImg}
             alt="Wedding venue and location details"
             width="1080"
             height="661"
@@ -62,7 +72,7 @@ export default function LandingApp() {
             aria-haspopup="dialog"
           >
             <img
-              src="/images/rsvp.webp"
+              src={rsvpImg}
               alt="Please RSVP for our wedding"
               width="1079"
               height="959"
@@ -77,7 +87,7 @@ export default function LandingApp() {
           aria-label="Wedding day"
         >
           <img
-            src="/images/wedding-day.webp"
+            src={weddingDayImg}
             alt="Wedding day schedule and details"
             width="1080"
             height="1800"
@@ -92,7 +102,7 @@ export default function LandingApp() {
           aria-label="Getting there"
         >
           <img
-            src="/images/getting-there.webp"
+            src={gettingThereImg}
             alt="Getting to the wedding venue"
             width="1080"
             height="450"
@@ -103,7 +113,7 @@ export default function LandingApp() {
 
         <section id="faq" className="landing-section landing-section--faq" aria-label="FAQ">
           <img
-            src="/images/faq.webp"
+            src={faqImg}
             alt="Wedding day frequently asked questions"
             width="1080"
             height="410"
