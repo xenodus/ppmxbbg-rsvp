@@ -20,6 +20,7 @@ html.landing-page body {
 }
 
 .landing-section--hero {
+  position: relative;
   flex-direction: column;
   gap: 0;
   padding-top: 1.5rem;
@@ -27,6 +28,8 @@ html.landing-page body {
 }
 
 .landing-hero-heading {
+  position: relative;
+  z-index: 2;
   width: min(100%, 1080px);
   margin: 0;
   padding: 0 1rem;
@@ -108,11 +111,13 @@ html.landing-page body {
 }
 
 .landing-sprite {
+  position: relative;
+  z-index: 1;
   width: min(100%, 1080px);
   margin-top: -2rem;
-  aspect-ratio: 1080 / 900;
+  aspect-ratio: 1080 / 1200;
   background-repeat: no-repeat;
-  background-size: 900% 133.333%;
+  background-size: 900% 100%;
   background-position: left bottom;
   animation: landing-sprite-play 4.5s steps(8) forwards;
 }
