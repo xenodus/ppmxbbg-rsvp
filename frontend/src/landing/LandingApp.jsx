@@ -28,7 +28,26 @@ export default function LandingApp() {
       <main className="landing">
         <section className="landing-section landing-section--hero" aria-label="Welcome animation">
           <div className="landing-hero-heading">
-            <p className="landing-hero-heading__line-one">Vivian and Alvin</p>
+            <svg
+              className="landing-hero-heading__arch"
+              viewBox="0 0 600 100"
+              aria-labelledby="landing-hero-names-title"
+              role="img"
+            >
+              <title id="landing-hero-names-title">Vivian &amp; Alvin</title>
+              <defs>
+                <path
+                  id="landing-hero-arch-path"
+                  d="M 36 78 Q 300 10 564 78"
+                  fill="none"
+                />
+              </defs>
+              <text className="landing-hero-heading__arch-text">
+                <textPath href="#landing-hero-arch-path" startOffset="50%" textAnchor="middle">
+                  Vivian <tspan className="landing-hero-heading__amp">&amp;</tspan> Alvin
+                </textPath>
+              </text>
+            </svg>
             <p className="landing-hero-heading__line-two">are getting married!</p>
           </div>
           <div
