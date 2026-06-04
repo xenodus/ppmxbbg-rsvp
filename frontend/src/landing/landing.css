@@ -1,0 +1,140 @@
+html.landing-page body {
+  margin: 0;
+  background: #fcf9e4;
+}
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.landing-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-margin-top: 5rem;
+}
+
+.landing-section--hero {
+  background-color: #fcf9e4;
+}
+
+.landing-section--join-us {
+  background-color: #dd774a;
+}
+
+.landing-section--where {
+  background-color: #7a8e1f;
+}
+
+.landing-section--rsvp {
+  background-color: #ff9800;
+}
+
+.landing-section--wedding-day {
+  background-color: #dd774a;
+}
+
+.landing-section--getting-there {
+  background-color: #ff9800;
+}
+
+.landing-section--faq {
+  background-color: #77891a;
+}
+
+.landing-sprite {
+  width: min(100%, 1080px);
+  aspect-ratio: 1080 / 1200;
+  background-image: url("/images/RSVP_Site_GIF_sprite.webp");
+  background-repeat: no-repeat;
+  background-size: 900% 100%;
+  animation: landing-sprite-play 4.5s steps(8) forwards;
+}
+
+@keyframes landing-sprite-play {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-sprite {
+    animation: none;
+    background-position: 100% 0;
+  }
+}
+
+.landing-section img {
+  display: block;
+  width: min(100%, 1080px);
+  height: auto;
+}
+
+.landing-section--rsvp img {
+  clip-path: inset(0 0 1px 0);
+  margin-bottom: -1px;
+}
+
+.landing-rsvp-cta {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.landing-rsvp-cta:focus-visible {
+  outline: 2px solid #2f2f2f;
+  outline-offset: 4px;
+}
+
+.rsvp-modal-backdrop {
+  z-index: 1200;
+}
+
+.rsvp-modal-card {
+  width: min(100%, 42rem);
+  padding: 0;
+  gap: 0;
+}
+
+.rsvp-modal-form {
+  border: 0;
+  padding: 2rem 1.5rem 1.75rem;
+  scroll-margin-top: 0;
+}
+
+.nav-drawer-link {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-drawer-link:hover {
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .rsvp-modal-form {
+    padding: 1.5rem 1rem 1.25rem;
+  }
+}
