@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "Font One";
+  src: url("/fonts/font-one.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font Two";
+  src: url("/fonts/font-two.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Font Three";
+  src: url("/fonts/font-three.woff2") format("woff2");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
