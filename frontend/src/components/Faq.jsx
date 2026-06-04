@@ -50,9 +50,9 @@ function FaqItem({ item }) {
   );
 }
 
-export default function Faq() {
+function FaqBody() {
   return (
-    <section id="faq" className="faq-card" aria-labelledby="faq-heading">
+    <>
       <h2 id="faq-heading" className="card-title">
         {FAQ.pageTitle}
       </h2>
@@ -65,6 +65,22 @@ export default function Faq() {
           ))}
         </div>
       ))}
+    </>
+  );
+}
+
+export default function Faq({ embedded = false }) {
+  if (embedded) {
+    return (
+      <div className="faq-card landing-faq-card" aria-labelledby="faq-heading">
+        <FaqBody />
+      </div>
+    );
+  }
+
+  return (
+    <section id="faq" className="faq-card" aria-labelledby="faq-heading">
+      <FaqBody />
     </section>
   );
 }

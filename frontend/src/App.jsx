@@ -1,7 +1,4 @@
-import { useState } from "react";
 import Countdown from "./components/Countdown.jsx";
-import Faq from "./components/Faq.jsx";
-import GettingThere from "./components/GettingThere.jsx";
 import RsvpForm from "./components/RsvpForm.jsx";
 import SiteNav from "./components/SiteNav.jsx";
 import { WEDDING } from "./constants.js";
@@ -17,11 +14,9 @@ function Divider() {
 }
 
 export default function App() {
-  const [inviteValid, setInviteValid] = useState(false);
-
   return (
     <div className="page">
-      <SiteNav coupleNames={WEDDING.coupleNames} inviteValid={inviteValid} />
+      <SiteNav coupleNames={WEDDING.coupleNames} />
 
       <header className="header">
         <p className="eyebrow">{WEDDING.inviteLine}</p>
@@ -33,20 +28,8 @@ export default function App() {
       <Divider />
 
       <main>
-        <RsvpForm onInviteValidChange={setInviteValid} />
+        <RsvpForm />
       </main>
-
-      {inviteValid && (
-        <>
-          <Divider />
-
-          <GettingThere />
-
-          <Divider />
-
-          <Faq />
-        </>
-      )}
 
       <Divider />
 

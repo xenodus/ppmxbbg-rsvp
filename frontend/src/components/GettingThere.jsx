@@ -42,15 +42,11 @@ function AdventureOption({ option }) {
   );
 }
 
-export default function GettingThere() {
+function GettingThereBody() {
   const { adventure, wetWeather } = GETTING_THERE;
 
   return (
-    <section
-      id="getting-there"
-      className="faq-card"
-      aria-labelledby="getting-there-heading"
-    >
+    <>
       <h2 id="getting-there-heading" className="card-title">
         {GETTING_THERE.pageTitle}
       </h2>
@@ -71,6 +67,29 @@ export default function GettingThere() {
           </p>
         ))}
       </div>
+    </>
+  );
+}
+
+export default function GettingThere({ embedded = false }) {
+  if (embedded) {
+    return (
+      <div
+        className="faq-card landing-getting-there-card"
+        aria-labelledby="getting-there-heading"
+      >
+        <GettingThereBody />
+      </div>
+    );
+  }
+
+  return (
+    <section
+      id="getting-there"
+      className="faq-card"
+      aria-labelledby="getting-there-heading"
+    >
+      <GettingThereBody />
     </section>
   );
 }

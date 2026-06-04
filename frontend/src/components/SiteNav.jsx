@@ -2,18 +2,16 @@ import { useEffect, useState } from "react";
 
 const SCROLL_THRESHOLD = 48;
 
-export default function SiteNav({ coupleNames, inviteValid, onRsvpOpen }) {
+export default function SiteNav({ coupleNames, onRsvpOpen }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const sectionLinks = [
-    ...(inviteValid
-      ? [
-          { href: "#getting-there", label: "Getting There" },
-          { href: "#faq", label: "FAQ" },
-        ]
-      : []),
-  ];
+  const sectionLinks = onRsvpOpen
+    ? [
+        { href: "#getting-there", label: "Getting There" },
+        { href: "#faq", label: "FAQ" },
+      ]
+    : [];
 
   useEffect(() => {
     function onScroll() {
