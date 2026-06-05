@@ -62,7 +62,7 @@ html.landing-page body {
   font-size: 1.2em;
 }
 
-.landing-hero-heading__line-two {
+.landing-hero-heading p.landing-hero-heading__line-two {
   margin-top: -2rem;
   font-family: "Font Two", serif;
   font-size: 1.4rem;
@@ -70,7 +70,7 @@ html.landing-page body {
 }
 
 @media (min-width: 641px) {
-  .landing-hero-heading__line-two {
+  .landing-hero-heading p.landing-hero-heading__line-two {
     font-size: clamp(2rem, 2.5vw, 2.5rem);
   }
 }
