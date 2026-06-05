@@ -2,8 +2,6 @@ const PARKING_MAP_URL = "https://maps.app.goo.gl/t6LYrW5VW9JJAzaq8";
 
 export const GETTING_THERE = {
   pageTitle: "🗺 Getting to the Wedding!",
-  intro:
-    "We can't wait to celebrate with you! To make sure you don't get lost in the gardens, here is your ultimate guide to arriving in style.",
   adventure: {
     title: "🚗 Choose Your Adventure",
     options: [

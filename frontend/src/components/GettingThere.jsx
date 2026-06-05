@@ -52,7 +52,6 @@ function GettingThereBody({ embedded = false }) {
           {GETTING_THERE.pageTitle}
         </h2>
       )}
-      <p className="card-intro">{GETTING_THERE.intro}</p>
 
       <div className="faq-section">
         <h3 className="faq-section-title">{adventure.title}</h3>
