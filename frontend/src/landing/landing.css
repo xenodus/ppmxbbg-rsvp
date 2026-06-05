@@ -206,12 +206,19 @@ html.landing-page body {
   border: 0;
   padding: 0;
   gap: 0;
+  overflow: hidden;
 }
 
-.rsvp-modal-form {
+.rsvp-modal-card .rsvp-modal-form {
+  width: 100%;
+  max-width: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   border: 0;
   padding: 2rem 1.5rem 1.75rem;
   scroll-margin-top: 0;
+  box-sizing: border-box;
 }
 
 @media (min-width: 641px) {
@@ -227,12 +234,12 @@ html.landing-page body {
     max-height: calc(100vh - 2rem);
     max-height: calc(100dvh - 2rem);
     border: 1px solid var(--border);
-    overflow-y: auto;
+    overflow: hidden;
   }
 }
 
 @media (max-width: 640px) {
-  .rsvp-modal-form {
+  .rsvp-modal-card .rsvp-modal-form {
     padding: 1.5rem 1rem 1.25rem;
   }
 }
