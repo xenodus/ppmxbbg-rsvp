@@ -15,8 +15,16 @@
 }
 
 @font-face {
+  font-family: "Balsamiq Sans";
+  src: url("/fonts/balsamiq-sans-bold.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Font Three";
-  src: url("/fonts/font-three.woff2") format("woff2");
+  src: url("/fonts/balsamiq-sans-bold.woff2") format("woff2");
   font-weight: 900;
   font-style: italic;
   font-display: swap;
