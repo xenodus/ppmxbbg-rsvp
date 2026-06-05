@@ -32,7 +32,7 @@ html.landing-page body {
   position: relative;
   z-index: 2;
   width: min(100%, 1080px);
-  margin: 0;
+  margin: 2.5rem 0 0;
   padding: 0 1rem;
   text-align: center;
 }
@@ -51,7 +51,7 @@ html.landing-page body {
 }
 
 .landing-hero-heading__arch-text {
-  fill: #2f2f2f;
+  fill: #dd774a;
   font-family: "Font One", serif;
   font-size: clamp(3rem, 9vw, 4.25rem);
   letter-spacing: 0.06em;
@@ -63,10 +63,10 @@ html.landing-page body {
 }
 
 .landing-hero-heading__line-two {
-  margin-top: -0.5rem;
+  margin-top: calc(-0.5rem - 20px);
   font-family: "Font Two", serif;
   font-size: clamp(1.75rem, 7vw, 3rem);
-  color: #2f2f2f;
+  color: #dd774a;
 }
 
 .landing-section--join-us {
@@ -161,6 +161,17 @@ html.landing-page body {
 }
 
 .landing-section--rsvp img {
+  clip-path: inset(0 0 1px 1px);
+  margin-bottom: -1px;
+  margin-left: -1px;
+}
+
+.landing-section--wedding-day img {
+  clip-path: inset(0 1px 0 0);
+  margin-right: -1px;
+}
+
+.landing-section--getting-there img {
   clip-path: inset(0 0 1px 0);
   margin-bottom: -1px;
 }
