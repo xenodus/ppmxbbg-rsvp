@@ -101,7 +101,7 @@ html.landing-page body {
   scroll-margin-top: 0;
   background: transparent;
   border: 0;
-  color: #fff;
+  color: #fcf9e4;
 }
 
 .landing-section--faq {
@@ -114,22 +114,22 @@ html.landing-page body {
   scroll-margin-top: 0;
   background: transparent;
   border: 0;
-  color: #fff;
+  color: #fcf9e4;
 }
 
 .landing-getting-there-card .faq-answer,
 .landing-faq-card .faq-answer {
-  color: #fff;
+  color: #fcf9e4;
 }
 
 .landing-getting-there-card .faq-answer a,
 .landing-faq-card .faq-answer a {
-  color: #fff;
+  color: #fcf9e4;
 }
 
 .landing-getting-there-card .faq-answer a:hover,
 .landing-faq-card .faq-answer a:hover {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(252, 249, 228, 0.85);
 }
 
 .landing-sprite {
