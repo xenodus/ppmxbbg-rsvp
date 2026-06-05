@@ -30,7 +30,7 @@ export default function LandingApp() {
           <div className="landing-hero-heading">
             <svg
               className="landing-hero-heading__arch"
-              viewBox="0 0 600 130"
+              viewBox="0 -25 600 150"
               aria-labelledby="landing-hero-names-title"
               role="img"
             >
@@ -38,7 +38,7 @@ export default function LandingApp() {
               <defs>
                 <path
                   id="landing-hero-arch-path"
-                  d="M 24 108 Q 300 -8 576 108"
+                  d="M 24 110 Q 300 -42 576 110"
                   fill="none"
                 />
               </defs>
