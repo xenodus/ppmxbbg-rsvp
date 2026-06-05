@@ -69,6 +69,12 @@ html.landing-page body {
   color: #dd774a;
 }
 
+@media (min-width: 641px) {
+  .landing-hero-heading__line-two {
+    font-size: clamp(2rem, 2.5vw, 2.5rem);
+  }
+}
+
 .landing-section--join-us {
   background-color: #dd774a;
 }
