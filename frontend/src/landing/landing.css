@@ -51,7 +51,7 @@ html.landing-page body {
 }
 
 .landing-hero-heading__arch-text {
-  fill: #2f2f2f;
+  fill: #dd774a;
   font-family: "Font One", serif;
   font-size: clamp(3rem, 9vw, 4.25rem);
   letter-spacing: 0.06em;
@@ -66,7 +66,7 @@ html.landing-page body {
   margin-top: calc(-0.5rem - 20px);
   font-family: "Font Two", serif;
   font-size: clamp(1.75rem, 7vw, 3rem);
-  color: #2f2f2f;
+  color: #dd774a;
 }
 
 .landing-section--join-us {
