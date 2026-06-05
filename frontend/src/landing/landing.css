@@ -32,7 +32,7 @@ html.landing-page body {
   position: relative;
   z-index: 2;
   width: min(100%, 1080px);
-  margin: 0;
+  margin: 2.5rem 0 0;
   padding: 0 1rem;
   text-align: center;
 }
