@@ -111,6 +111,8 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 }
 
 .landing-hero-heading .landing-hero-heading__names {
+  margin-top: 2.5rem;
+  padding: 0;
   font-family: "Font One", serif;
   font-size: 2.5rem;
   letter-spacing: 0.1rem;
