@@ -38,7 +38,7 @@ export default function LandingApp() {
               <defs>
                 <path
                   id="landing-hero-arch-path"
-                  d="M 24 110 Q 300 -42 576 110"
+                  d="M 24 110 Q 300 -28 576 110"
                   fill="none"
                 />
               </defs>
