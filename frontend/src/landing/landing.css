@@ -3,6 +3,15 @@ html.landing-page body {
   background: #fcf9e4;
 }
 
+html.landing-page #root {
+  opacity: 0;
+}
+
+html.landing-page.landing-ready #root {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
 .landing {
   display: flex;
   flex-direction: column;
