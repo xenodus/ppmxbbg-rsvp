@@ -73,9 +73,15 @@ html.landing-page.landing-ready #root {
 .landing-hero-heading .landing-hero-heading__names {
   margin: clamp(2rem, 6vw, 3.25rem) 0 0;
   font-family: "Font One", serif;
-  font-size: clamp(2.5rem, 10vw, 5rem);
+  font-size: 2.5rem;
   letter-spacing: 0.1rem;
   text-transform: uppercase;
+}
+
+@media (min-width: 641px) {
+  .landing-hero-heading .landing-hero-heading__names {
+    font-size: 5rem;
+  }
 }
 
 .landing-hero-heading .landing-hero-heading__line-two {
