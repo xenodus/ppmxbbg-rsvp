@@ -3,8 +3,9 @@ import { useLayoutEffect, useRef, useState } from "react";
 const ARCH_PATH = "M 24 110 Q 300 -28 576 110";
 const ARCH_MASK_ID = "landing-hero-arch-mask";
 const LINE_TWO = "are getting married!";
-const ARCH_WRITE_DURATION_S = 2.6;
-const CHAR_STAGGER_S = 0.07;
+const ARCH_WRITE_DURATION_S = 4.5;
+const CHAR_DRAW_DURATION_S = 0.65;
+const CHAR_STAGGER_S = 0.16;
 
 export default function LandingHeroHeading() {
   const maskPathRef = useRef(null);
@@ -18,6 +19,7 @@ export default function LandingHeroHeading() {
   return (
     <div
       className={`landing-hero-heading${pathLength ? " landing-hero-heading--ready" : ""}`}
+      style={{ "--hero-arch-duration": `${ARCH_WRITE_DURATION_S}s` }}
     >
       <svg
         className="landing-hero-heading__arch"
@@ -57,15 +59,17 @@ export default function LandingHeroHeading() {
 
       <p className="landing-hero-heading__line-two" aria-label="are getting married">
         {LINE_TWO.split("").map((char, index) => (
-          <span
-            key={`${index}-${char}`}
-            className="landing-hero-heading__char"
-            style={{
-              animationDelay: `${ARCH_WRITE_DURATION_S + index * CHAR_STAGGER_S}s`,
-            }}
-            aria-hidden="true"
-          >
-            {char === " " ? "\u00a0" : char}
+          <span key={`${index}-${char}`} className="landing-hero-heading__char-wrap">
+            <span
+              className="landing-hero-heading__char-draw"
+              style={{
+                animationDelay: `${ARCH_WRITE_DURATION_S + index * CHAR_STAGGER_S}s`,
+                animationDuration: `${CHAR_DRAW_DURATION_S}s`,
+              }}
+              aria-hidden="true"
+            >
+              {char === " " ? "\u00a0" : char}
+            </span>
           </span>
         ))}
       </p>
