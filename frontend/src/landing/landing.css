@@ -32,7 +32,7 @@ html.landing-page body {
   position: relative;
   z-index: 2;
   width: min(100%, 1080px);
-  margin: 2.5rem 0 0;
+  margin: 1rem 0 0;
   padding: 0 1rem;
   text-align: center;
 }
@@ -54,7 +54,7 @@ html.landing-page body {
   fill: #dd774a;
   font-family: "Font One", serif;
   font-size: 4rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1rem;
   text-transform: uppercase;
 }
 
@@ -71,7 +71,8 @@ html.landing-page body {
 
 @media (min-width: 641px) {
   .landing-hero-heading p.landing-hero-heading__line-two {
-    font-size: clamp(2rem, 2.5vw, 2.5rem);
+    margin-top: -3rem;
+    font-size: 3rem;
   }
 }
 
