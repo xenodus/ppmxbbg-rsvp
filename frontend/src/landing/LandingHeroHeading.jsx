@@ -1,74 +1,114 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useMemo } from "react";
+import {
+  useNamesFontSize,
+  usePrefersReducedMotion,
+  useTaglineFontSize,
+  useVaraHandwriting,
+} from "./useVaraHandwriting.js";
 
-const ARCH_PATH = "M 24 110 Q 300 -28 576 110";
-const ARCH_MASK_ID = "landing-hero-arch-mask";
+const COUPLE_NAMES = "Vivian & Alvin";
 const LINE_TWO = "are getting married!";
-const ARCH_WRITE_DURATION_S = 2.6;
-const CHAR_STAGGER_S = 0.07;
+const NAMES_WRITE_DURATION_MS = 2600;
+const TAGLINE_WRITE_DURATION_MS = 2800;
+const VARA_NAMES_FONT = "/fonts/vara/Parisienne.json";
+const VARA_TAGLINE_FONT = "/fonts/vara/SatisfySL.json";
 
 export default function LandingHeroHeading() {
-  const maskPathRef = useRef(null);
-  const [pathLength, setPathLength] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const namesFontSize = useNamesFontSize();
+  const taglineFontSize = useTaglineFontSize();
 
-  useLayoutEffect(() => {
-    const length = maskPathRef.current?.getTotalLength() ?? 0;
-    setPathLength(length);
-  }, []);
+  const namesVaraTexts = useMemo(
+    () => [
+      {
+        text: COUPLE_NAMES,
+        fontSize: namesFontSize,
+        color: "#dd774a",
+        textAlign: "center",
+        duration: NAMES_WRITE_DURATION_MS,
+        delay: 0,
+        strokeWidth: 1.2,
+      },
+    ],
+    [namesFontSize],
+  );
+
+  const taglineVaraTexts = useMemo(
+    () => [
+      {
+        text: LINE_TWO,
+        fontSize: taglineFontSize,
+        color: "#dd774a",
+        textAlign: "center",
+        duration: TAGLINE_WRITE_DURATION_MS,
+        delay: NAMES_WRITE_DURATION_MS,
+        strokeWidth: 1,
+      },
+    ],
+    [taglineFontSize],
+  );
+
+  const namesVaraOptions = useMemo(
+    () => ({
+      fontSize: namesFontSize,
+      color: "#dd774a",
+      textAlign: "center",
+      strokeWidth: 1.2,
+    }),
+    [namesFontSize],
+  );
+
+  const taglineVaraOptions = useMemo(
+    () => ({
+      fontSize: taglineFontSize,
+      color: "#dd774a",
+      textAlign: "center",
+      strokeWidth: 1,
+    }),
+    [taglineFontSize],
+  );
+
+  const namesVaraRef = useVaraHandwriting({
+    enabled: !prefersReducedMotion,
+    fontUrl: VARA_NAMES_FONT,
+    texts: namesVaraTexts,
+    options: namesVaraOptions,
+  });
+
+  const taglineVaraRef = useVaraHandwriting({
+    enabled: !prefersReducedMotion,
+    fontUrl: VARA_TAGLINE_FONT,
+    texts: taglineVaraTexts,
+    options: taglineVaraOptions,
+  });
+
+  if (prefersReducedMotion) {
+    return (
+      <div className="landing-hero-heading">
+        <p className="landing-hero-heading__names" aria-label={COUPLE_NAMES}>
+          {COUPLE_NAMES}
+        </p>
+        <p className="landing-hero-heading__line-two" aria-label="are getting married">
+          {LINE_TWO}
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={`landing-hero-heading${pathLength ? " landing-hero-heading--ready" : ""}`}
-    >
-      <svg
-        className="landing-hero-heading__arch"
-        viewBox="0 -25 600 150"
-        aria-labelledby="landing-hero-names-title"
+    <div className="landing-hero-heading">
+      <div
+        ref={namesVaraRef}
+        className="landing-hero-heading__names landing-hero-heading__names--vara"
         role="img"
-      >
-        <title id="landing-hero-names-title">Vivian &amp; Alvin</title>
-        <defs>
-          <path id="landing-hero-arch-path" d={ARCH_PATH} fill="none" />
-          <mask id={ARCH_MASK_ID}>
-            <path
-              ref={maskPathRef}
-              className="landing-hero-heading__arch-mask-path"
-              d={ARCH_PATH}
-              fill="none"
-              stroke="white"
-              strokeWidth="130"
-              strokeLinecap="round"
-              style={
-                pathLength
-                  ? { "--arch-path-length": `${pathLength}px` }
-                  : undefined
-              }
-            />
-          </mask>
-        </defs>
-        <text
-          className="landing-hero-heading__arch-text"
-          mask={`url(#${ARCH_MASK_ID})`}
-        >
-          <textPath href="#landing-hero-arch-path" startOffset="50%" textAnchor="middle">
-            Vivian <tspan className="landing-hero-heading__amp">&amp;</tspan> Alvin
-          </textPath>
-        </text>
-      </svg>
-
-      <p className="landing-hero-heading__line-two" aria-label="are getting married">
-        {LINE_TWO.split("").map((char, index) => (
-          <span
-            key={`${index}-${char}`}
-            className="landing-hero-heading__char"
-            style={{
-              animationDelay: `${ARCH_WRITE_DURATION_S + index * CHAR_STAGGER_S}s`,
-            }}
-            aria-hidden="true"
-          >
-            {char === " " ? "\u00a0" : char}
-          </span>
-        ))}
-      </p>
+        aria-label={COUPLE_NAMES}
+      />
+      <div
+        ref={taglineVaraRef}
+        className="landing-hero-heading__line-two landing-hero-heading__line-two--vara"
+        role="img"
+        aria-label="are getting married"
+      />
     </div>
   );
 }
