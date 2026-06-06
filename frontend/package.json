@@ -12,8 +12,7 @@
   "dependencies": {
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "typed.js": "^2.1.0"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.4.1",
