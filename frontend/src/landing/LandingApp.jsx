@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Faq from "../components/Faq.jsx";
 import GettingThere from "../components/GettingThere.jsx";
+import LandingHeroHeading from "./LandingHeroHeading.jsx";
 import RsvpModal from "../components/RsvpModal.jsx";
 import SiteNav from "../components/SiteNav.jsx";
 import { WEDDING } from "../constants.js";
@@ -27,29 +28,7 @@ export default function LandingApp() {
 
       <main className="landing">
         <section className="landing-section landing-section--hero" aria-label="Welcome animation">
-          <div className="landing-hero-heading">
-            <svg
-              className="landing-hero-heading__arch"
-              viewBox="0 -25 600 150"
-              aria-labelledby="landing-hero-names-title"
-              role="img"
-            >
-              <title id="landing-hero-names-title">Vivian &amp; Alvin</title>
-              <defs>
-                <path
-                  id="landing-hero-arch-path"
-                  d="M 24 110 Q 300 -28 576 110"
-                  fill="none"
-                />
-              </defs>
-              <text className="landing-hero-heading__arch-text">
-                <textPath href="#landing-hero-arch-path" startOffset="50%" textAnchor="middle">
-                  Vivian <tspan className="landing-hero-heading__amp">&amp;</tspan> Alvin
-                </textPath>
-              </text>
-            </svg>
-            <p className="landing-hero-heading__line-two">are getting married!</p>
-          </div>
+          <LandingHeroHeading />
           <div
             className="landing-sprite"
             style={{ backgroundImage: `url(${spriteImg})` }}
