@@ -98,7 +98,7 @@ html.landing-page.landing-ready .landing-getting-there-card :is(
     .getting-there-route-title,
     .getting-there-route-label
   ) {
-  animation: landing-text-reveal 1.2s ease forwards;
+  animation: landing-text-reveal 1.7s ease forwards;
 }
 
 html.landing-page.landing-ready .landing-hero-heading__line-two {
