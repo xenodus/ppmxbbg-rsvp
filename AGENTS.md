@@ -5,8 +5,8 @@ Before planning or editing code in this repository, read and follow [INSTRUCTION
 ## Non-negotiable
 
 - **README**: Update [README.md](./README.md) in the same change when API, deployment, database schema, local dev, or project layout changes (details in INSTRUCTIONS.md).
-- **Frontend PRs**: Any change under `frontend/` must include desktop and mobile screenshots in the PR description only (not committed to the repo). See INSTRUCTIONS.md for image links. Do not commit changes to `frontend/scripts/capture-screenshots.mjs` or screenshot PNGs in feature PRs.
-- **Before opening a PR**: Complete the checklist in INSTRUCTIONS.md (README sections, deploy config, examples, screenshots).
+- **Frontend PRs**: Do not generate screenshots by default. For visible UI changes, ask the user whether desktop and mobile screenshots are wanted in the PR description (not committed to the repo). See INSTRUCTIONS.md for when and how to capture them. Do not commit changes to `frontend/scripts/capture-screenshots.mjs` or screenshot PNGs in feature PRs.
+- **Before opening a PR**: Complete the checklist in INSTRUCTIONS.md (README sections, deploy config, examples, screenshots when requested).
 
 ## Where to look
 
