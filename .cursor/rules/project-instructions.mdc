@@ -8,11 +8,11 @@ Follow [INSTRUCTIONS.md](../../INSTRUCTIONS.md) for every task in this repositor
 ## Requirements
 
 - **README**: Keep [README.md](../../README.md) in sync with code in the same change when you touch API endpoints, deployment/Makefile flow, database schema, local dev, or project layout (see INSTRUCTIONS.md for section mapping).
-- **Frontend PRs**: Changes under `frontend/` require desktop (~1280px) and mobile (~390px) screenshots in the PR description only (do not commit PNGs; see INSTRUCTIONS.md for image links).
-- **PR checklist**: Before opening a PR, verify the checklist at the end of INSTRUCTIONS.md (README API/Deployment, Makefile deploy variables, examples, screenshots).
+- **Frontend PRs**: Do not generate screenshots by default. For visible UI changes, ask whether desktop (~1280px) and mobile (~390px) screenshots are wanted in the PR description only (do not commit PNGs; see INSTRUCTIONS.md).
+- **PR checklist**: Before opening a PR, verify the checklist at the end of INSTRUCTIONS.md (README API/Deployment, Makefile deploy variables, examples, screenshots when requested).
 
 ## Do not
 
 - Merge API or deploy work with a stale README.
-- Open frontend PRs without screenshots when UI changed.
+- Auto-run screenshot capture or attach PR images without asking when the UI changed visibly.
 - Include changes to `frontend/scripts/capture-screenshots.mjs` in feature PRs.

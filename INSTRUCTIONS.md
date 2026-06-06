@@ -41,9 +41,14 @@ Update the **Deployment** section when you change:
 | Project structure | Project layout |
 | Wedding copy / frontend constants | Mention in Project layout or Local development |
 
-## Frontend pull requests need screenshots
+## Frontend PR screenshots (when needed)
 
-**Any PR that changes `frontend/` must include mobile and desktop screenshots in the PR description.**
+**Do not generate screenshots by default.** For changes under `frontend/`, decide whether reviewers need visual proof of the UI:
+
+- **Ask the user** when the change is likely visible (layout, styling, copy shown in the UI, new components, interaction changes).
+- **Skip screenshots** for non-visual work (refactors, API client logic, types, build config) unless the user asks for them.
+
+When screenshots are needed, include mobile and desktop images in the PR description.
 
 ### What to capture
 
@@ -54,9 +59,9 @@ At minimum, attach images that show the affected UI on:
 
 For navigation or scroll behaviour, include both the default state and any scrolled/expanded/open states (for example, the floating menu before scroll, after scroll, and with the drawer open).
 
-### How to generate screenshots
+### How to generate screenshots (only when requested)
 
-From the repo root:
+Run the capture script only after the user confirms screenshots are wanted, or when the task explicitly requires visual review. From the repo root:
 
 ```bash
 cd frontend
@@ -113,4 +118,4 @@ The file must exist on disk when the PR is created or updated (for example right
 - [ ] README Deployment section matches current Makefile and env vars
 - [ ] Makefile deploy variables updated if deploy config changed
 - [ ] Examples in README tested or verified against the code
-- [ ] Frontend changes include desktop and mobile screenshots in the PR description
+- [ ] For visible frontend UI changes, asked the user whether PR screenshots are needed; if yes, added desktop and mobile images to the PR description
