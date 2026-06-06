@@ -74,7 +74,8 @@ html.landing-page.landing-ready #root {
 .landing-hero-heading__arch-mask-path {
   stroke-dasharray: var(--arch-path-length);
   stroke-dashoffset: var(--arch-path-length);
-  animation: landing-hero-write-arch 2.6s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+  animation: landing-hero-write-arch var(--hero-arch-duration, 4.5s)
+    cubic-bezier(0.42, 0, 0.58, 1) forwards;
 }
 
 @keyframes landing-hero-write-arch {
@@ -83,17 +84,19 @@ html.landing-page.landing-ready #root {
   }
 }
 
-.landing-hero-heading__char {
+.landing-hero-heading__char-wrap {
   display: inline-block;
-  opacity: 0;
-  transform: translateY(0.12em);
-  animation: landing-hero-char-write 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-@keyframes landing-hero-char-write {
+.landing-hero-heading__char-draw {
+  display: inline-block;
+  clip-path: inset(0 100% 0 0);
+  animation: landing-hero-char-draw 0.65s cubic-bezier(0.33, 0, 0.2, 1) forwards;
+}
+
+@keyframes landing-hero-char-draw {
   to {
-    opacity: 1;
-    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
   }
 }
 
@@ -204,10 +207,9 @@ html.landing-page.landing-ready #root {
     stroke-dashoffset: 0;
   }
 
-  .landing-hero-heading__char {
+  .landing-hero-heading__char-draw {
     animation: none;
-    opacity: 1;
-    transform: none;
+    clip-path: inset(0 0 0 0);
   }
 }
 
