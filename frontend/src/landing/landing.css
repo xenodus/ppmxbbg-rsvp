@@ -47,22 +47,72 @@ html.landing-page.landing-ready #root {
 }
 
 .landing-hero-heading p {
-  position: relative;
   margin: 0;
   line-height: 1.1;
 }
 
-.landing-hero-heading__reserve {
-  visibility: hidden;
-  pointer-events: none;
-  user-select: none;
+@keyframes landing-text-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0% 0 0);
+  }
 }
 
-.landing-hero-heading__typed {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
+html.landing-page .landing-hero-heading p,
+html.landing-page .landing-faq-card :is(
+    .faq-section-title,
+    .faq-question,
+    .faq-answer,
+    .faq-list li,
+    .getting-there-route-title,
+    .getting-there-route-label
+  ),
+html.landing-page .landing-getting-there-card :is(
+    .faq-section-title,
+    .faq-question,
+    .faq-answer,
+    .faq-list li,
+    .getting-there-route-title,
+    .getting-there-route-label
+  ),
+html.landing-page .nav-fab-label,
+html.landing-page .nav-drawer-title,
+html.landing-page .nav-drawer-links a,
+html.landing-page .nav-drawer-rsvp,
+html.landing-page .nav-drawer-close {
+  clip-path: inset(0 100% 0 0);
+}
+
+html.landing-page.landing-ready .landing-hero-heading p,
+html.landing-page.landing-ready .landing-faq-card :is(
+    .faq-section-title,
+    .faq-question,
+    .faq-answer,
+    .faq-list li,
+    .getting-there-route-title,
+    .getting-there-route-label
+  ),
+html.landing-page.landing-ready .landing-getting-there-card :is(
+    .faq-section-title,
+    .faq-question,
+    .faq-answer,
+    .faq-list li,
+    .getting-there-route-title,
+    .getting-there-route-label
+  ),
+html.landing-page.landing-ready .nav-fab-label,
+html.landing-page.landing-ready .nav-drawer-title,
+html.landing-page.landing-ready .nav-drawer-links a,
+html.landing-page.landing-ready .nav-drawer-rsvp,
+html.landing-page.landing-ready .nav-drawer-close {
+  animation: landing-text-reveal 0.7s ease forwards;
+}
+
+html.landing-page.landing-ready .landing-hero-heading__line-two {
+  animation-delay: 0.15s;
 }
 
 .landing-hero-heading .landing-hero-heading__names,
@@ -180,6 +230,31 @@ html.landing-page.landing-ready #root {
     background-position: right bottom;
   }
 
+  html.landing-page .landing-hero-heading p,
+  html.landing-page .landing-faq-card :is(
+      .faq-section-title,
+      .faq-question,
+      .faq-answer,
+      .faq-list li,
+      .getting-there-route-title,
+      .getting-there-route-label
+    ),
+  html.landing-page .landing-getting-there-card :is(
+      .faq-section-title,
+      .faq-question,
+      .faq-answer,
+      .faq-list li,
+      .getting-there-route-title,
+      .getting-there-route-label
+    ),
+  html.landing-page .nav-fab-label,
+  html.landing-page .nav-drawer-title,
+  html.landing-page .nav-drawer-links a,
+  html.landing-page .nav-drawer-rsvp,
+  html.landing-page .nav-drawer-close {
+    animation: none;
+    clip-path: inset(0 0% 0 0);
+  }
 }
 
 .landing-section img {
