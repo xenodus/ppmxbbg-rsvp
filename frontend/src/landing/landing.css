@@ -47,8 +47,22 @@ html.landing-page.landing-ready #root {
 }
 
 .landing-hero-heading p {
+  position: relative;
   margin: 0;
   line-height: 1.1;
+}
+
+.landing-hero-heading__reserve {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.landing-hero-heading__typed {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
 }
 
 .landing-hero-heading .landing-hero-heading__names,
@@ -59,9 +73,15 @@ html.landing-page.landing-ready #root {
 .landing-hero-heading .landing-hero-heading__names {
   margin: clamp(2rem, 6vw, 3.25rem) 0 0;
   font-family: "Font One", serif;
-  font-size: clamp(2rem, 8vw, 4rem);
+  font-size: 2.5rem;
   letter-spacing: 0.1rem;
   text-transform: uppercase;
+}
+
+@media (min-width: 641px) {
+  .landing-hero-heading .landing-hero-heading__names {
+    font-size: 5rem;
+  }
 }
 
 .landing-hero-heading .landing-hero-heading__line-two {

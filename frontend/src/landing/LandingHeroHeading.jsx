@@ -14,10 +14,28 @@ export default function LandingHeroHeading() {
   return (
     <div className="landing-hero-heading">
       <p className="landing-hero-heading__names" aria-label={COUPLE_NAMES}>
-        {prefersReducedMotion ? COUPLE_NAMES : <span ref={namesRef} aria-hidden="true" />}
+        {prefersReducedMotion ? (
+          COUPLE_NAMES
+        ) : (
+          <>
+            <span className="landing-hero-heading__reserve" aria-hidden="true">
+              {COUPLE_NAMES}
+            </span>
+            <span ref={namesRef} className="landing-hero-heading__typed" aria-hidden="true" />
+          </>
+        )}
       </p>
       <p className="landing-hero-heading__line-two" aria-label="are getting married">
-        {prefersReducedMotion ? LINE_TWO : <span ref={taglineRef} aria-hidden="true" />}
+        {prefersReducedMotion ? (
+          LINE_TWO
+        ) : (
+          <>
+            <span className="landing-hero-heading__reserve" aria-hidden="true">
+              {LINE_TWO}
+            </span>
+            <span ref={taglineRef} className="landing-hero-heading__typed" aria-hidden="true" />
+          </>
+        )}
       </p>
     </div>
   );
