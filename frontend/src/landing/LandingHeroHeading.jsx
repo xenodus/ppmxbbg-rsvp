@@ -10,7 +10,7 @@ const COUPLE_NAMES = "Vivian & Alvin";
 const LINE_TWO = "are getting married!";
 const NAMES_WRITE_DURATION_MS = 2600;
 const TAGLINE_WRITE_DURATION_MS = 2800;
-const VARA_NAMES_FONT = "/fonts/vara/PacificoSLO.json";
+const VARA_NAMES_FONT = "/fonts/vara/Parisienne.json";
 const VARA_TAGLINE_FONT = "/fonts/vara/SatisfySL.json";
 
 export default function LandingHeroHeading() {
