@@ -41,7 +41,7 @@ html.landing-page.landing-ready #root {
   position: relative;
   z-index: 2;
   width: min(100%, 1080px);
-  margin: 1rem 0 0;
+  margin: 0;
   padding: 0 1rem;
   text-align: center;
 }
@@ -77,12 +77,7 @@ html.landing-page .landing-getting-there-card :is(
     .faq-list li,
     .getting-there-route-title,
     .getting-there-route-label
-  ),
-html.landing-page .nav-fab-label,
-html.landing-page .nav-drawer-title,
-html.landing-page .nav-drawer-links a,
-html.landing-page .nav-drawer-rsvp,
-html.landing-page .nav-drawer-close {
+  ) {
   clip-path: inset(0 100% 0 0);
 }
 
@@ -102,13 +97,8 @@ html.landing-page.landing-ready .landing-getting-there-card :is(
     .faq-list li,
     .getting-there-route-title,
     .getting-there-route-label
-  ),
-html.landing-page.landing-ready .nav-fab-label,
-html.landing-page.landing-ready .nav-drawer-title,
-html.landing-page.landing-ready .nav-drawer-links a,
-html.landing-page.landing-ready .nav-drawer-rsvp,
-html.landing-page.landing-ready .nav-drawer-close {
-  animation: landing-text-reveal 0.7s ease forwards;
+  ) {
+  animation: landing-text-reveal 1.2s ease forwards;
 }
 
 html.landing-page.landing-ready .landing-hero-heading__line-two {
@@ -246,12 +236,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
       .faq-list li,
       .getting-there-route-title,
       .getting-there-route-label
-    ),
-  html.landing-page .nav-fab-label,
-  html.landing-page .nav-drawer-title,
-  html.landing-page .nav-drawer-links a,
-  html.landing-page .nav-drawer-rsvp,
-  html.landing-page .nav-drawer-close {
+    ) {
     animation: none;
     clip-path: inset(0 0% 0 0);
   }
