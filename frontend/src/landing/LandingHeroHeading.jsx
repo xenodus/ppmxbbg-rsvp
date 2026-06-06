@@ -2,10 +2,9 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 const ARCH_PATH = "M 24 110 Q 300 -28 576 110";
 const ARCH_MASK_ID = "landing-hero-arch-mask";
-const LINE_TWO = "are getting married!";
-const ARCH_WRITE_DURATION_S = 4.5;
-const CHAR_DRAW_DURATION_S = 0.65;
-const CHAR_STAGGER_S = 0.16;
+const LINE_TWO = "are getting married";
+const ARCH_WRITE_DURATION_S = 2.6;
+const CHAR_STAGGER_S = 0.07;
 
 export default function LandingHeroHeading() {
   const maskPathRef = useRef(null);
@@ -19,7 +18,6 @@ export default function LandingHeroHeading() {
   return (
     <div
       className={`landing-hero-heading${pathLength ? " landing-hero-heading--ready" : ""}`}
-      style={{ "--hero-arch-duration": `${ARCH_WRITE_DURATION_S}s` }}
     >
       <svg
         className="landing-hero-heading__arch"
@@ -27,7 +25,7 @@ export default function LandingHeroHeading() {
         aria-labelledby="landing-hero-names-title"
         role="img"
       >
-        <title id="landing-hero-names-title">Vivian &amp; Alvin</title>
+        <title id="landing-hero-names-title">Mark &amp; Bianca</title>
         <defs>
           <path id="landing-hero-arch-path" d={ARCH_PATH} fill="none" />
           <mask id={ARCH_MASK_ID}>
@@ -52,24 +50,22 @@ export default function LandingHeroHeading() {
           mask={`url(#${ARCH_MASK_ID})`}
         >
           <textPath href="#landing-hero-arch-path" startOffset="50%" textAnchor="middle">
-            Vivian <tspan className="landing-hero-heading__amp">&amp;</tspan> Alvin
+            Mark <tspan className="landing-hero-heading__amp">&amp;</tspan> Bianca
           </textPath>
         </text>
       </svg>
 
       <p className="landing-hero-heading__line-two" aria-label="are getting married">
         {LINE_TWO.split("").map((char, index) => (
-          <span key={`${index}-${char}`} className="landing-hero-heading__char-wrap">
-            <span
-              className="landing-hero-heading__char-draw"
-              style={{
-                animationDelay: `${ARCH_WRITE_DURATION_S + index * CHAR_STAGGER_S}s`,
-                animationDuration: `${CHAR_DRAW_DURATION_S}s`,
-              }}
-              aria-hidden="true"
-            >
-              {char === " " ? "\u00a0" : char}
-            </span>
+          <span
+            key={`${index}-${char}`}
+            className="landing-hero-heading__char"
+            style={{
+              animationDelay: `${ARCH_WRITE_DURATION_S + index * CHAR_STAGGER_S}s`,
+            }}
+            aria-hidden="true"
+          >
+            {char === " " ? "\u00a0" : char}
           </span>
         ))}
       </p>
