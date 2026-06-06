@@ -51,66 +51,46 @@ html.landing-page.landing-ready #root {
   line-height: 1.1;
 }
 
-.landing-hero-heading__arch {
-  display: block;
+.landing-hero-heading__names--vara,
+.landing-hero-heading__line-two--vara {
   width: min(100%, 52rem);
-  height: auto;
-  margin: clamp(2rem, 6vw, 3.25rem) auto 0;
+  margin-inline: auto;
+}
+
+.landing-hero-heading__names--vara {
+  margin-top: clamp(2rem, 6vw, 3.25rem);
+}
+
+.landing-hero-heading__names--vara svg,
+.landing-hero-heading__line-two--vara svg {
+  display: block;
   overflow: visible;
 }
 
-.landing-hero-heading__arch-text {
-  fill: #dd774a;
+.landing-hero-heading .landing-hero-heading__names,
+.landing-hero-heading .landing-hero-heading__line-two {
+  color: #dd774a;
+}
+
+.landing-hero-heading p.landing-hero-heading__names {
+  margin: clamp(2rem, 6vw, 3.25rem) 0 0;
   font-family: "Font One", serif;
-  font-size: 4rem;
+  font-size: clamp(2rem, 8vw, 4rem);
   letter-spacing: 0.1rem;
   text-transform: uppercase;
 }
 
-.landing-hero-heading:not(.landing-hero-heading--ready) .landing-hero-heading__arch-text {
-  visibility: hidden;
-}
-
-.landing-hero-heading__arch-mask-path {
-  stroke-dasharray: var(--arch-path-length);
-  stroke-dashoffset: var(--arch-path-length);
-  animation: landing-hero-write-arch 2.6s cubic-bezier(0.45, 0, 0.2, 1) forwards;
-}
-
-@keyframes landing-hero-write-arch {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.landing-hero-heading__char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(0.12em);
-  animation: landing-hero-char-write 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-@keyframes landing-hero-char-write {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.landing-hero-heading__amp {
-  font-size: 1.2em;
+.landing-hero-heading .landing-hero-heading__line-two {
+  margin-top: 0.25rem;
 }
 
 .landing-hero-heading p.landing-hero-heading__line-two {
-  margin-top: -2rem;
   font-family: "Font Two", serif;
   font-size: 1.4rem;
-  color: #dd774a;
 }
 
 @media (min-width: 641px) {
   .landing-hero-heading p.landing-hero-heading__line-two {
-    margin-top: -3rem;
     font-size: 3rem;
   }
 }
@@ -199,16 +179,6 @@ html.landing-page.landing-ready #root {
     background-position: right bottom;
   }
 
-  .landing-hero-heading__arch-mask-path {
-    animation: none;
-    stroke-dashoffset: 0;
-  }
-
-  .landing-hero-heading__char {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
 }
 
 .landing-section img {
