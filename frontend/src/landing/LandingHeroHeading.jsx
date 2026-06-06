@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 const ARCH_PATH = "M 24 110 Q 300 -28 576 110";
 const ARCH_MASK_ID = "landing-hero-arch-mask";
-const LINE_TWO = "are getting married";
+const LINE_TWO = "are getting married!";
 const ARCH_WRITE_DURATION_S = 2.6;
 const CHAR_STAGGER_S = 0.07;
 
@@ -25,7 +25,7 @@ export default function LandingHeroHeading() {
         aria-labelledby="landing-hero-names-title"
         role="img"
       >
-        <title id="landing-hero-names-title">Mark &amp; Bianca</title>
+        <title id="landing-hero-names-title">Vivian &amp; Alvin</title>
         <defs>
           <path id="landing-hero-arch-path" d={ARCH_PATH} fill="none" />
           <mask id={ARCH_MASK_ID}>
@@ -50,7 +50,7 @@ export default function LandingHeroHeading() {
           mask={`url(#${ARCH_MASK_ID})`}
         >
           <textPath href="#landing-hero-arch-path" startOffset="50%" textAnchor="middle">
-            Mark <tspan className="landing-hero-heading__amp">&amp;</tspan> Bianca
+            Vivian <tspan className="landing-hero-heading__amp">&amp;</tspan> Alvin
           </textPath>
         </text>
       </svg>
