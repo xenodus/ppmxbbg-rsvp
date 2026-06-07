@@ -10,6 +10,7 @@ export default function SiteNav({ coupleNames, onRsvpOpen }) {
     ? [
         { href: "#join-us", label: "When" },
         { href: "#where", label: "Where" },
+        { href: "#what", label: "What" },
         { href: "#getting-there", label: "Getting There" },
         { href: "#faq", label: "FAQ" },
       ]

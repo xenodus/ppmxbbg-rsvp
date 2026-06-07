@@ -90,6 +90,7 @@ export default function LandingApp() {
         </section>
 
         <section
+          id="what"
           className="landing-section landing-section--wedding-day"
           aria-label="Wedding day"
         >
