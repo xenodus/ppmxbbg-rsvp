@@ -1,5 +1,6 @@
 import joinUsImg from "../../public/images/join-us.webp";
-import whereImg from "../../public/images/where.webp";
+import whereBgImg from "../../public/images/RSVP_Venue_Picture_BG.webp";
+import whereForegroundImg from "../../public/images/RSVP_Venue_Us_Foreground.webp";
 import rsvpImg from "../../public/images/rsvp.webp";
 import weddingDayImg from "../../public/images/wedding-day.webp";
 import gettingThereImg from "../../public/images/getting-there.webp";
@@ -8,7 +9,8 @@ import spriteImg from "../../public/images/RSVP_Site_GIF_sprite.webp";
 
 export {
   joinUsImg,
-  whereImg,
+  whereBgImg,
+  whereForegroundImg,
   rsvpImg,
   weddingDayImg,
   gettingThereImg,
