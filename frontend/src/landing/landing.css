@@ -169,7 +169,6 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 .landing-where__overlay {
   position: absolute;
   inset: 0;
-  background-color: #7a8e1f;
   opacity: 0.45;
 }
 
