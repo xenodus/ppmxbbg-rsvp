@@ -142,7 +142,44 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 }
 
 .landing-section--where {
+  display: block;
   background-color: #7a8e1f;
+}
+
+.landing-where {
+  position: relative;
+  width: 100%;
+}
+
+.landing-where__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.landing-where__bg img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.landing-where__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: #7a8e1f;
+  opacity: 0.45;
+}
+
+.landing-where__foreground {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(100%, 1080px);
+  height: auto;
+  margin: 0 auto;
 }
 
 .landing-section--rsvp {
@@ -155,7 +192,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 
 .landing-section--getting-there {
   flex-direction: column;
-  background-color: #ff9800;
+  background-color: #4060b2;
 }
 
 .landing-getting-there-card {

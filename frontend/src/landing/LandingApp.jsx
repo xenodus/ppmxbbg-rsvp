@@ -12,7 +12,8 @@ import {
   rsvpImg,
   spriteImg,
   weddingDayImg,
-  whereImg,
+  whereBgImg,
+  whereForegroundImg,
 } from "./images.js";
 
 export default function LandingApp() {
@@ -57,14 +58,28 @@ export default function LandingApp() {
           className="landing-section landing-section--where"
           aria-label="Where"
         >
-          <img
-            src={whereImg}
-            alt="Wedding venue and location details"
-            width="1080"
-            height="661"
-            loading="lazy"
-            decoding="async"
-          />
+          <div className="landing-where">
+            <div className="landing-where__bg" aria-hidden="true">
+              <img
+                src={whereBgImg}
+                alt=""
+                width="1080"
+                height="661"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="landing-where__overlay" />
+            </div>
+            <img
+              className="landing-where__foreground"
+              src={whereForegroundImg}
+              alt="Wedding venue and location details"
+              width="1080"
+              height="661"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
         </section>
 
         <section
@@ -81,8 +96,8 @@ export default function LandingApp() {
             <img
               src={rsvpImg}
               alt="Please RSVP for our wedding"
-              width="1079"
-              height="959"
+              width="1080"
+              height="960"
               loading="lazy"
               decoding="async"
             />
