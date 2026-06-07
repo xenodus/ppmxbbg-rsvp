@@ -236,6 +236,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   z-index: 1;
   width: min(100%, 1080px);
   margin-top: -2rem;
+  margin-bottom: 2.5rem;
   aspect-ratio: 1080 / 1100;
   background-repeat: no-repeat;
   background-size: 900% 109.091%;
