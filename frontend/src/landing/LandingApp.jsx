@@ -96,8 +96,8 @@ export default function LandingApp() {
             <img
               src={rsvpImg}
               alt="Please RSVP for our wedding"
-              width="1079"
-              height="959"
+              width="1080"
+              height="960"
               loading="lazy"
               decoding="async"
             />
