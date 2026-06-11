@@ -95,6 +95,7 @@
   border: 2px solid var(--rsvp-accent);
   border-radius: 0.7rem;
   font-weight: 400;
+  min-height: 7.5rem;
 }
 
 .rsvp-popup-backdrop .guest-name-value {
@@ -103,11 +104,6 @@
   font-weight: 400;
   line-height: 1.4;
   color: var(--text);
-}
-
-.rsvp-modal-backdrop .textarea,
-.rsvp-popup-backdrop .textarea {
-  min-height: 7.5rem;
 }
 
 .rsvp-modal-backdrop .textarea::placeholder,
