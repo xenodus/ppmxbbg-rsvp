@@ -206,6 +206,10 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   background-color: #77891a;
 }
 
+.landing-section--lots-of-love {
+  background-color: #fcf9e4;
+}
+
 .landing-faq-card {
   margin: 0 1rem 2rem;
   scroll-margin-top: 0;
