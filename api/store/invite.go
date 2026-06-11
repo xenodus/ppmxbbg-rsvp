@@ -183,24 +183,21 @@ func SaveInvite(ctx context.Context, update InviteUpdate) error {
 		return errors.New("require_parking is required")
 	}
 
-	result, err := conn.ExecContext(ctx, `
+	var exists int
+	err = conn.QueryRowContext(ctx, `SELECT 1 FROM invites WHERE id = ?`, update.ID).Scan(&exists)
+	if errors.Is(err, sql.ErrNoRows) {
+		return ErrInviteNotFound
+	}
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.ExecContext(ctx, `
 		UPDATE invites
 		SET require_parking = ?
 		WHERE id = ?
 	`, *update.RequireParking, update.ID)
-	if err != nil {
-		return err
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return ErrInviteNotFound
-	}
-
-	return nil
+	return err
 }
 
 func SaveGuest(ctx context.Context, update GuestUpdate) error {

@@ -189,6 +189,12 @@ export default function RsvpForm({
   const inviteChoicesDisabled = formDisabled || savingInvite;
 
   async function handleInviteChoice(value) {
+    if (value === requireParking) {
+      setError("");
+      setParkingSavedMessage(RESPONSE_SAVED_MESSAGE);
+      return;
+    }
+
     const previousParking = requireParking;
     setRequireParking(value);
     setError("");
