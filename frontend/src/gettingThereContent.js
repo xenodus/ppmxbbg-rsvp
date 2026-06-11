@@ -45,7 +45,7 @@ export const GETTING_THERE = {
             title:
               "Route 1: Via Gardens by the Bay MRT Station (Thomson-East Coast Line - TE22)",
             steps: [
-              "Take Exit 1,",
+              "Take Exit 1.",
               "Follow the signs toward Gardens by the Bay.",
               "Cross the road and turn right into the drop-off point.",
               "Look out for the Hortus signage at the drop-off point. Hop right onto the complimentary Hortus buggy! (Service starts at 11:00 AM, runs every 8–12 minutes).",
@@ -63,6 +63,12 @@ export const GETTING_THERE = {
           },
         ],
       },
+    ],
+    buggyNotes: [
+      "Timing: The buggy service starts from 11:00 AM.",
+      "Frequency: The buggy arrives every 8 to 12 minutes, so we appreciate your patience while waiting.",
+      "The Return Trip: You can absolutely catch a ride on the buggy back to the pick-up point after the wedding.",
+      "Rain Check: In the event of heavy rain, the buggy will unfortunately be grounded. If the skies open up, please refer to our Wet Weather Plan below for instructions on how to safely arrive and leave the venue!",
     ],
   },
   wetWeather: {

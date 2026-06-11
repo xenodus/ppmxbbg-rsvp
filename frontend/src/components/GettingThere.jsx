@@ -31,11 +31,11 @@ function AdventureOption({ option }) {
         <div key={route.title} className="getting-there-route">
           <h5 className="getting-there-route-title">{route.title}</h5>
           <p className="faq-detail-label getting-there-route-label">The Route:</p>
-          <ol className="faq-list getting-there-steps">
+          <ul className="faq-list getting-there-steps">
             {route.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
-          </ol>
+          </ul>
         </div>
       ))}
     </article>
@@ -58,6 +58,13 @@ function GettingThereBody({ embedded = false }) {
         {adventure.options.map((option) => (
           <AdventureOption key={option.title} option={option} />
         ))}
+        {adventure.buggyNotes && (
+          <ul className="faq-list getting-there-buggy-notes">
+            {adventure.buggyNotes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="faq-section">

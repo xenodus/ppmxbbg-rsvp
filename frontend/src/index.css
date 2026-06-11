@@ -365,8 +365,8 @@ body {
   font-size: 0.9rem;
 }
 
-.getting-there-steps {
-  list-style: decimal;
+.getting-there-buggy-notes {
+  margin-top: 1rem;
 }
 
 .faq-section + .faq-section {
