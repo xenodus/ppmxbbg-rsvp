@@ -290,7 +290,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 }
 
 .landing-section--rsvp img {
-  clip-path: inset(0 0 1px 1px);
+  clip-path: inset(0 0 1px 5px);
   margin-bottom: -1px;
   margin-left: -1px;
 }
