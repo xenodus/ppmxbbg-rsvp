@@ -38,24 +38,6 @@
 
 .modal-backdrop.guest-respond-backdrop {
   z-index: 1300;
-  align-items: stretch;
-  justify-content: stretch;
-  padding: 0;
-  overflow: hidden;
-}
-
-.modal-card.guest-respond-card {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  min-height: 100dvh;
-  border: 0;
-  padding: 0;
-  gap: 0;
-  box-shadow: none;
 }
 
 .guest-respond-header {
@@ -247,16 +229,52 @@
 }
 
 @media (min-width: 641px) {
-  .rsvp-popup-card:not(.guest-respond-card) {
+  .rsvp-popup-card {
     width: min(100%, 28rem);
     max-height: calc(100dvh - 2rem);
     border: 0;
     box-shadow: 0 12px 40px rgba(47, 47, 47, 0.12);
   }
 
+  .modal-backdrop.guest-respond-backdrop {
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .modal-card.guest-respond-card {
+    position: relative;
+    inset: auto;
+    width: min(100%, 28rem);
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 2rem);
+  }
 }
 
 @media (max-width: 640px) {
+  .modal-backdrop.guest-respond-backdrop {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .modal-card.guest-respond-card {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    min-height: 100dvh;
+    border: 0;
+    padding: 0;
+    gap: 0;
+    box-shadow: none;
+  }
+
   .guest-respond-header {
     padding: 1.25rem 1.25rem 0.25rem;
   }
