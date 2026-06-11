@@ -41,6 +41,8 @@ func TestIsOriginAllowed(t *testing.T) {
 	}{
 		{"https://wedding.example.com", true},
 		{"https://wedding.example.com/", true},
+		{"https://alvinandvivian.rsvp", true},
+		{"https://www.alvinandvivian.rsvp", true},
 		{"https://d123.cloudfront.net", true},
 		{"https://ppmxbbg-rsvp-frontend.s3.ap-southeast-1.amazonaws.com", true},
 		{"https://s3.ap-southeast-1.amazonaws.com", true},

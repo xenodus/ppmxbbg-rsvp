@@ -10,6 +10,12 @@ const (
 	EnvStaging = "staging"
 )
 
+// productionSiteOrigins are always allowed for CORS (custom wedding domain).
+var productionSiteOrigins = []string{
+	"https://alvinandvivian.rsvp",
+	"https://www.alvinandvivian.rsvp",
+}
+
 // NormalizeOrigin trims space and removes a trailing slash from a browser Origin value.
 func NormalizeOrigin(origin string) string {
 	origin = strings.TrimSpace(origin)
@@ -51,6 +57,12 @@ func IsOriginAllowed(origin string) bool {
 	}
 
 	for _, allowed := range GetAllowedOrigins() {
+		if origin == allowed {
+			return true
+		}
+	}
+
+	for _, allowed := range productionSiteOrigins {
 		if origin == allowed {
 			return true
 		}
