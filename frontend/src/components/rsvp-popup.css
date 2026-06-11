@@ -2,6 +2,44 @@
 .rsvp-popup-backdrop {
   --rsvp-accent: #dd774a;
   --rsvp-option-bg: #ececec;
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
+.rsvp-modal-backdrop :is(
+    button,
+    input,
+    textarea,
+    select,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label,
+    li
+  ),
+.rsvp-popup-backdrop :is(
+    button,
+    input,
+    textarea,
+    select,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label,
+    li
+  ) {
+  font-family: var(--font-sans);
+  font-style: normal;
 }
 
 .rsvp-popup-backdrop {
@@ -18,9 +56,7 @@
 .rsvp-popup-backdrop .modal-title,
 .rsvp-popup-backdrop .field-label {
   color: var(--rsvp-accent);
-  font-family: "Font One", var(--font-sans);
-  font-weight: 900;
-  font-style: italic;
+  font-weight: 700;
   font-size: 1.05rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -91,10 +127,8 @@
   border: 0;
   border-radius: 0.7rem;
   color: var(--rsvp-accent);
-  font-family: "Font One", var(--font-sans);
   font-size: 0.95rem;
-  font-weight: 900;
-  font-style: italic;
+  font-weight: 700;
   letter-spacing: 0;
   line-height: 1.35;
   padding: 1rem 1.1rem;
@@ -124,10 +158,8 @@
   border: 2px solid var(--rsvp-accent);
   border-radius: 999px;
   color: var(--rsvp-accent);
-  font-family: "Font One", var(--font-sans);
   font-size: 0.78rem;
-  font-style: italic;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.04em;
 }
 
@@ -147,10 +179,8 @@
   border-radius: 0.7rem;
   background: var(--rsvp-accent);
   color: #fff;
-  font-family: "Font One", var(--font-sans);
   font-size: 1.05rem;
-  font-style: italic;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
