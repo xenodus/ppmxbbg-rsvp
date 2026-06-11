@@ -78,11 +78,15 @@ function guestResponseUnchanged(guest, payload) {
     if (guest.attend_solemnisation !== payload.attend_solemnisation) {
       return false;
     }
+
+    const savedDietary = (guest.dietary_restriction || "").trim();
+    const nextDietary = (payload.dietary_restriction || "").trim();
+    if (savedDietary !== nextDietary) {
+      return false;
+    }
   }
 
-  const savedDietary = (guest.dietary_restriction || "").trim();
-  const nextDietary = (payload.dietary_restriction || "").trim();
-  return savedDietary === nextDietary;
+  return true;
 }
 
 function guestSaveSuccessMessage(guestList) {
@@ -240,7 +244,8 @@ export default function RsvpForm({
           ? {
               ...guest,
               is_attending: payload.is_attending,
-              dietary_restriction: payload.dietary_restriction,
+              dietary_restriction:
+                payload.is_attending === true ? payload.dietary_restriction : "",
               attend_solemnisation:
                 payload.is_attending === true ? payload.attend_solemnisation : null,
             }
