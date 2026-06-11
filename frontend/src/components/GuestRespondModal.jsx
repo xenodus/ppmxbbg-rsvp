@@ -22,6 +22,7 @@ export default function GuestRespondModal({
     setAttendance(value);
     if (value === false) {
       setAttendSolemnisation(null);
+      setDietaryRestriction("");
     }
   }
 
@@ -43,7 +44,8 @@ export default function GuestRespondModal({
       const payload = {
         id: guest.id,
         is_attending: attendance,
-        dietary_restriction: dietaryRestriction.trim(),
+        dietary_restriction:
+          attendance === true ? dietaryRestriction.trim() : "",
       };
       if (attendance === true) {
         payload.attend_solemnisation = attendSolemnisation;
@@ -143,19 +145,21 @@ export default function GuestRespondModal({
             </div>
           )}
 
-          <div className="modal-block">
-            <label className="field-label" htmlFor="modal-dietary">
-              DIETARY RESTRICTIONS
-            </label>
-            <textarea
-              id="modal-dietary"
-              className="textarea"
-              placeholder="Please let us know of any dietary needs, allergies, or preferences..."
-              value={dietaryRestriction}
-              onChange={(event) => setDietaryRestriction(event.target.value)}
-              rows={4}
-            />
-          </div>
+          {attendance === true && (
+            <div className="modal-block">
+              <label className="field-label" htmlFor="modal-dietary">
+                DIETARY RESTRICTIONS
+              </label>
+              <textarea
+                id="modal-dietary"
+                className="textarea"
+                placeholder="Please let us know of any dietary needs, allergies, or preferences..."
+                value={dietaryRestriction}
+                onChange={(event) => setDietaryRestriction(event.target.value)}
+                rows={4}
+              />
+            </div>
+          )}
 
           <button type="submit" className="submit-btn" disabled={submitting}>
             {submitting ? "SAVING..." : "SAVE RESPONSE"}
