@@ -71,7 +71,7 @@ export default function GuestRespondModal({
         </button>
 
         <header className="guest-respond-header">
-          <h2 id="respond-title" className="guest-respond-couple-names">
+          <h2 id="respond-title" className="nav-drawer-title guest-respond-couple-names">
             {WEDDING.coupleNames}
           </h2>
           <p className="guest-respond-date">1st November 2026</p>
