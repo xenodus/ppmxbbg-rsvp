@@ -73,18 +73,18 @@ export default function GuestRespondModal({
 
         <RsvpPopupWeddingHeader headingId="respond-title" />
 
-        <div className="modal-block">
-          <span className="field-label" id="modal-guest-name-label">
-            Name
-          </span>
-          <p id="modal-guest-name" className="guest-name-value" aria-labelledby="modal-guest-name-label">
-            {guest.name}
-          </p>
-        </div>
-
-        {error && <p className="banner banner-error">{error}</p>}
-
         <form className="modal-form" onSubmit={handleSubmit} noValidate>
+          <div className="modal-block">
+            <span className="field-label" id="modal-guest-name-label">
+              Name
+            </span>
+            <p id="modal-guest-name" className="guest-name-value" aria-labelledby="modal-guest-name-label">
+              {guest.name}
+            </p>
+          </div>
+
+          {error && <p className="banner banner-error">{error}</p>}
+
           <div className="modal-block">
             <span className="field-label" id="modal-attendance-label">
               WILL THEY BE ATTENDING?
