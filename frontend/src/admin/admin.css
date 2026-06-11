@@ -1,5 +1,10 @@
 @import "../index.css";
 
+body.admin-app,
+body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
+  font-family: var(--font-sans);
+}
+
 .admin-page {
   min-height: 100vh;
   max-width: 42rem;
@@ -18,7 +23,6 @@
 
 .admin-page h1,
 .admin-page h2 {
-  font-family: var(--font-serif);
   font-weight: 400;
   margin: 0 0 1.25rem;
 }
