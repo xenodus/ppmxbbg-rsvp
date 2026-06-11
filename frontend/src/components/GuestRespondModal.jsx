@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { RSVP } from "../constants.js";
+import RsvpPopupWeddingHeader from "./RsvpPopupWeddingHeader.jsx";
+import "./rsvp-popup.css";
 
 export default function GuestRespondModal({
   guest,
@@ -53,9 +55,13 @@ export default function GuestRespondModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="presentation">
+    <div
+      className="modal-backdrop rsvp-popup-backdrop guest-respond-backdrop"
+      onClick={onClose}
+      role="presentation"
+    >
       <div
-        className="modal-card"
+        className="modal-card rsvp-popup-card guest-respond-card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="respond-title"
@@ -65,17 +71,15 @@ export default function GuestRespondModal({
           ×
         </button>
 
-        <h2 id="respond-title" className="modal-title">
-          Guest Response
-        </h2>
+        <RsvpPopupWeddingHeader headingId="respond-title" />
 
         <div className="modal-block">
-          <label className="field-label" htmlFor="modal-guest-name">
-            FULL NAME
-          </label>
-          <div id="modal-guest-name" className="name-display">
+          <span className="field-label" id="modal-guest-name-label">
+            Name
+          </span>
+          <p id="modal-guest-name" className="guest-name-value" aria-labelledby="modal-guest-name-label">
             {guest.name}
-          </div>
+          </p>
         </div>
 
         {error && <p className="banner banner-error">{error}</p>}

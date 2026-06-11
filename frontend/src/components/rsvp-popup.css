@@ -1,0 +1,300 @@
+.rsvp-modal-backdrop,
+.rsvp-popup-backdrop {
+  --rsvp-accent: #dd774a;
+  --rsvp-option-bg: #ececec;
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
+.rsvp-modal-backdrop :is(
+    button,
+    input,
+    textarea,
+    select,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    span,
+    label,
+    li
+  ),
+.rsvp-popup-backdrop :is(button, input, textarea, select, p, span, label, li) {
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
+.rsvp-popup-backdrop :is(h1, h2, h3, h4, h5, h6):not(.rsvp-popup-couple-names) {
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
+.rsvp-modal-backdrop :is(h1, h2, h3, h4, h5, h6):not(.rsvp-popup-couple-names) {
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
+.rsvp-popup-backdrop {
+  background: rgba(227, 215, 215, 0.92);
+}
+
+.modal-backdrop.guest-respond-backdrop {
+  z-index: 1300;
+}
+
+.rsvp-popup-header {
+  padding: 1.5rem 1.75rem 0.25rem;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.rsvp-modal-backdrop .rsvp-popup-couple-names,
+.rsvp-popup-backdrop .rsvp-popup-couple-names {
+  margin: 0;
+  font-family: "Font Two", serif;
+  font-size: clamp(1.75rem, 7vw, 2.25rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1.15;
+  color: var(--text);
+  text-align: center;
+  text-transform: none;
+}
+
+.rsvp-popup-date {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text);
+  text-align: center;
+}
+
+.rsvp-modal-backdrop .card-title,
+.rsvp-modal-backdrop .section-heading,
+.rsvp-modal-backdrop .field-label,
+.rsvp-popup-backdrop .modal-title,
+.rsvp-popup-backdrop .field-label {
+  color: var(--rsvp-accent);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.rsvp-modal-backdrop .card-title,
+.rsvp-popup-backdrop .modal-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.2rem;
+  text-align: left;
+}
+
+.rsvp-modal-backdrop .section-heading {
+  margin: 0 0 0.65rem;
+  text-align: left;
+}
+
+.rsvp-modal-backdrop .section-question,
+.rsvp-modal-backdrop .section-note,
+.rsvp-popup-backdrop .section-question,
+.rsvp-popup-backdrop .section-note {
+  text-align: left;
+  color: var(--text);
+  font-style: normal;
+}
+
+.rsvp-modal-backdrop .field-label,
+.rsvp-popup-backdrop .field-label {
+  margin-top: 0;
+}
+
+.rsvp-modal-backdrop .textarea,
+.rsvp-popup-backdrop .textarea {
+  background: #fff;
+  color: var(--text);
+  border: 2px solid var(--rsvp-accent);
+  border-radius: 0.7rem;
+  font-weight: 400;
+  min-height: 7.5rem;
+}
+
+.rsvp-popup-backdrop .guest-name-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.rsvp-modal-backdrop .textarea::placeholder,
+.rsvp-popup-backdrop .textarea::placeholder {
+  color: #b8b0b0;
+}
+
+.rsvp-modal-backdrop .attendance-options,
+.rsvp-popup-backdrop .attendance-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0;
+}
+
+.rsvp-modal-backdrop .choice-btn,
+.rsvp-popup-backdrop .choice-btn {
+  background: var(--rsvp-option-bg);
+  border: 0;
+  border-radius: 0.7rem;
+  color: var(--rsvp-accent);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.35;
+  padding: 1rem 1.1rem;
+  text-align: center;
+  text-transform: none;
+}
+
+.rsvp-modal-backdrop .choice-btn:hover:not(:disabled),
+.rsvp-popup-backdrop .choice-btn:hover:not(:disabled) {
+  background: #ff8955;
+  color: #fff;
+}
+
+.rsvp-modal-backdrop .choice-btn.is-selected,
+.rsvp-popup-backdrop .choice-btn.is-selected {
+  background: var(--rsvp-accent);
+  border-color: var(--rsvp-accent);
+  color: #fff;
+}
+
+.rsvp-modal-backdrop .guest-row {
+  border: 2px solid var(--rsvp-accent);
+  border-radius: 0.7rem;
+  padding: 0.95rem 1rem;
+}
+
+.rsvp-modal-backdrop .respond-btn {
+  border: 2px solid var(--rsvp-accent);
+  border-radius: 999px;
+  color: var(--rsvp-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.rsvp-modal-backdrop .respond-btn:hover:not(:disabled) {
+  background: var(--rsvp-accent);
+  border-color: var(--rsvp-accent);
+  color: #fff;
+}
+
+.rsvp-popup-backdrop .submit-btn {
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.35rem;
+  padding: 1rem 1.25rem;
+  border: 0;
+  border-radius: 0.7rem;
+  background: var(--rsvp-accent);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.rsvp-popup-backdrop .submit-btn:hover:not(:disabled) {
+  background: #c9683f;
+  border-color: transparent;
+  color: #fff;
+}
+
+.rsvp-popup-card {
+  display: flex;
+  flex-direction: column;
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
+}
+
+.rsvp-popup-card .modal-block {
+  gap: 0.55rem;
+}
+
+.rsvp-modal-card > :not(.modal-close):not(.rsvp-modal-form):not(.rsvp-popup-header),
+.rsvp-popup-card > :not(.modal-close):not(.modal-form):not(.rsvp-popup-header) {
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
+}
+
+.rsvp-popup-card .modal-form {
+  padding: 0.75rem 1.75rem 2rem;
+}
+
+@media (min-width: 641px) {
+  .rsvp-popup-card {
+    width: min(100%, 28rem);
+    max-height: calc(100dvh - 2rem);
+    border: 0;
+    box-shadow: 0 12px 40px rgba(47, 47, 47, 0.12);
+  }
+
+  .modal-backdrop.guest-respond-backdrop {
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .modal-card.guest-respond-card {
+    position: relative;
+    inset: auto;
+    width: min(100%, 28rem);
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 2rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-backdrop.guest-respond-backdrop {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .modal-card.guest-respond-card {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    min-height: 100dvh;
+    border: 0;
+    padding: 0;
+    gap: 0;
+    box-shadow: none;
+  }
+
+  .rsvp-popup-header {
+    padding: 1.25rem 1.25rem 0.25rem;
+  }
+
+  .rsvp-modal-card > :not(.modal-close):not(.rsvp-modal-form):not(.rsvp-popup-header),
+  .rsvp-popup-card > :not(.modal-close):not(.modal-form):not(.rsvp-popup-header) {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .rsvp-popup-card .modal-form {
+    padding: 0.75rem 1.25rem 1.75rem;
+  }
+}
