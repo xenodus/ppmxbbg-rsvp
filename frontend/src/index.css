@@ -365,10 +365,6 @@ body {
   font-size: 0.9rem;
 }
 
-.getting-there-buggy-notes {
-  margin-top: 1rem;
-}
-
 .faq-section + .faq-section {
   margin-top: var(--section-gap);
 }

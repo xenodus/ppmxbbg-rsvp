@@ -58,13 +58,6 @@ function GettingThereBody({ embedded = false }) {
         {adventure.options.map((option) => (
           <AdventureOption key={option.title} option={option} />
         ))}
-        {adventure.buggyNotes && (
-          <ul className="faq-list getting-there-buggy-notes">
-            {adventure.buggyNotes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        )}
       </div>
 
       <div className="faq-section">

@@ -64,12 +64,6 @@ export const GETTING_THERE = {
         ],
       },
     ],
-    buggyNotes: [
-      "Timing: The buggy service starts from 11:00 AM.",
-      "Frequency: The buggy arrives every 8 to 12 minutes, so we appreciate your patience while waiting.",
-      "The Return Trip: You can absolutely catch a ride on the buggy back to the pick-up point after the wedding.",
-      "Rain Check: In the event of heavy rain, the buggy will unfortunately be grounded. If the skies open up, please refer to our Wet Weather Plan below for instructions on how to safely arrive and leave the venue!",
-    ],
   },
   wetWeather: {
     title: '🌧 ⛈ The "Oh No, It\'s Raining!" Plan (Wet Weather)',
