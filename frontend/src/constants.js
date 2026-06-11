@@ -21,7 +21,7 @@ export const RSVP = {
     number: "2",
     title: "The Solemnisation",
     question:
-      "Will you be joining us for the solemnisation, or heading straight for the food?",
+      "Will you be joining us for the solemnisation?",
     note: "Because our ceremony space is cozy, we're prioritizing seating for our family and elders. But we'd love to know your plans!",
     yes: "Yes! I'd love to witness the \"I do's.\"",
     no: "Skipping the ceremony, but absolutely ready for lunch!",

@@ -76,7 +76,7 @@ export default function GuestRespondModal({
 
         <div className="modal-block">
           <span className="field-label" id="modal-guest-name-label">
-            FULL NAME
+            Name
           </span>
           <p id="modal-guest-name" className="guest-name-value" aria-labelledby="modal-guest-name-label">
             {guest.name}
