@@ -1,7 +1,8 @@
 .PHONY: test api-test frontend-dev frontend-build frontend-update cloudfront-invalidate \
 	check-vite-api-url docker-build docker-tag docker-push aws-login \
 	lambda-update lambda-wait deploy-api deploy-frontend deploy \
-	print-aws-deploy-role-arn print-aws-region print-site-domain
+	print-aws-deploy-role-arn print-aws-deploy-role-name print-aws-account-id \
+	print-cloudfront-distribution-id print-aws-region print-site-domain
 
 # Deploy settings (also used by GitHub Actions).
 AWS_REGION ?= ap-southeast-1
@@ -103,6 +104,15 @@ deploy: deploy-api deploy-frontend
 
 print-aws-deploy-role-arn:
 	@echo $(AWS_DEPLOY_ROLE_ARN)
+
+print-aws-deploy-role-name:
+	@echo $(AWS_DEPLOY_ROLE_NAME)
+
+print-aws-account-id:
+	@echo $(AWS_ACCOUNT_ID)
+
+print-cloudfront-distribution-id:
+	@echo $(CLOUDFRONT_DISTRIBUTION_ID)
 
 print-aws-region:
 	@echo $(AWS_REGION)

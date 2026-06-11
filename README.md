@@ -372,7 +372,24 @@ If admin login shows **Cannot reach the API**, the browser usually blocked a cro
 
 Set your AWS account id, API Gateway URL, and site domain in the **Makefile** (defaults near the top of the file). The canonical wedding site URL is `https://alvinandvivian.rsvp` (`SITE_DOMAIN`).
 
-`CLOUDFRONT_DISTRIBUTION_ID` is optional: `make deploy-frontend` auto-discovers the distribution that aliases `SITE_DOMAIN` (or fronts `S3_BUCKET`) and invalidates `/*` after every S3 sync. Set it explicitly in the Makefile only if auto-discovery fails. The GitHub Actions deploy role needs `cloudfront:ListDistributions` and `cloudfront:CreateInvalidation`.
+`CLOUDFRONT_DISTRIBUTION_ID` is optional: `make deploy-frontend` auto-discovers the distribution that aliases `SITE_DOMAIN` (or fronts `S3_BUCKET`) and invalidates `/*` after every S3 sync. Set it explicitly in the Makefile only if auto-discovery fails.
+
+### GitHub Actions deploy role (IAM)
+
+Merges to `master` deploy via OIDC as `github-actions-ppmxbbg-rsvp-deploy` (see `.github/workflows/deploy-on-merge.yml`). That role must allow everything `make deploy` uses, including CloudFront cache invalidation after the S3 sync.
+
+If deploy fails with `AccessDenied` on `cloudfront:CreateInvalidation`, attach the CloudFront inline policy (values match the Makefile):
+
+```bash
+./deploy/attach-cloudfront-policy.sh
+```
+
+Or in the IAM console, add an inline policy to role `github-actions-ppmxbbg-rsvp-deploy` using `deploy/github-actions-cloudfront-policy.json`. It grants:
+
+- `cloudfront:ListDistributions` on `*` (for auto-discovery when `CLOUDFRONT_DISTRIBUTION_ID` is empty)
+- `cloudfront:CreateInvalidation` on distribution `E3LI9C0QOF801H`
+
+After updating IAM, re-run the failed workflow or run `make cloudfront-invalidate` locally with credentials that assume the same role.
 
 ### Custom domain (`alvinandvivian.rsvp`)
 
@@ -421,6 +438,16 @@ open "https://alvinandvivian.rsvp/?id=YOUR_INVITE_ID"
 # Admin UI
 open "https://alvinandvivian.rsvp/admin.html"
 ```
+
+### Troubleshooting: `AccessDenied` on `cloudfront:CreateInvalidation`
+
+GitHub Actions (or local deploy) fails during `make cloudfront-invalidate` with:
+
+```text
+User: arn:aws:sts::…:assumed-role/github-actions-ppmxbbg-rsvp-deploy/… is not authorized to perform: cloudfront:CreateInvalidation
+```
+
+The S3 sync may still succeed, but the deploy exits with an error and CloudFront can keep serving a stale `index.html`. Fix IAM as described in [GitHub Actions deploy role (IAM)](#github-actions-deploy-role-iam), then invalidate manually if needed: `make cloudfront-invalidate`.
 
 ### Troubleshooting: 403 on `/assets/*` after deploy
 
@@ -539,6 +566,7 @@ CREATE TABLE guests (
 │   └── public/
 │       ├── original/  # Source PNG/GIF illustrations (masters)
 │       └── images/    # Web-optimized copies (WebP + optimized GIF, sprite metadata)
+├── deploy/        # IAM policy JSON and scripts for the GitHub Actions deploy role
 ├── Dockerfile     # Lambda container image
 ├── Makefile       # Build and deploy commands
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes

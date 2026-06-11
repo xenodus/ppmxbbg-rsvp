@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudFrontListDistributions",
+      "Effect": "Allow",
+      "Action": "cloudfront:ListDistributions",
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudFrontInvalidateFrontend",
+      "Effect": "Allow",
+      "Action": "cloudfront:CreateInvalidation",
+      "Resource": "arn:aws:cloudfront::206363131200:distribution/E3LI9C0QOF801H"
+    }
+  ]
+}
