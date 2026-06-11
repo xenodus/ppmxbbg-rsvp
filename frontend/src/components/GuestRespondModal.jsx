@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RSVP } from "../constants.js";
+import RsvpPopupHeader from "./RsvpPopupHeader.jsx";
 
 export default function GuestRespondModal({
   guest,
@@ -53,17 +54,19 @@ export default function GuestRespondModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="presentation">
+    <div
+      className="modal-backdrop rsvp-popup-backdrop guest-respond-backdrop"
+      onClick={onClose}
+      role="presentation"
+    >
       <div
-        className="modal-card"
+        className="modal-card rsvp-popup-card guest-respond-card"
         role="dialog"
         aria-modal="true"
         aria-labelledby="respond-title"
         onClick={(event) => event.stopPropagation()}
       >
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
-          ×
-        </button>
+        <RsvpPopupHeader onBack={onClose} />
 
         <h2 id="respond-title" className="modal-title">
           Guest Response

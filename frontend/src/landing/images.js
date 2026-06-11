@@ -7,6 +7,7 @@ import gettingThereImg from "../../public/images/RSVP_Getting_There_Blue.webp";
 import faqImg from "../../public/images/faq.webp";
 import lotsOfLoveImg from "../../public/images/lots-of-love.webp";
 import spriteImg from "../../public/images/RSVP_Site_GIF_sprite.webp";
+import rsvpPopupIcon from "../../public/images/rsvp-popup-icon.png";
 
 export {
   joinUsImg,
@@ -18,4 +19,5 @@ export {
   faqImg,
   lotsOfLoveImg,
   spriteImg,
+  rsvpPopupIcon,
 };

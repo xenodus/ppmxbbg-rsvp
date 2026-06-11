@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import RsvpForm from "./RsvpForm.jsx";
+import RsvpPopupHeader from "./RsvpPopupHeader.jsx";
 
 export default function RsvpModal({ open, onClose, onInviteValidChange }) {
   useEffect(() => {
@@ -40,9 +41,7 @@ export default function RsvpModal({ open, onClose, onInviteValidChange }) {
         aria-labelledby="rsvp-modal-heading"
         onClick={(event) => event.stopPropagation()}
       >
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Close RSVP">
-          ×
-        </button>
+        <RsvpPopupHeader onBack={onClose} />
         <RsvpForm
           className="form-card rsvp-modal-form"
           id="rsvp-modal"

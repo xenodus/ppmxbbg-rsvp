@@ -325,6 +325,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   align-items: stretch;
   justify-content: stretch;
   padding: 0;
+  background: rgba(227, 215, 215, 0.92);
 }
 
 .rsvp-modal-card {
@@ -336,6 +337,9 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   padding: 0;
   gap: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
 }
 
 .rsvp-modal-card .rsvp-modal-form {
@@ -345,7 +349,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   min-height: 0;
   overflow-y: auto;
   border: 0;
-  padding: 2rem 1.5rem 1.75rem;
+  padding: 0.75rem 1.75rem 2rem;
   scroll-margin-top: 0;
   box-sizing: border-box;
 }
@@ -359,24 +363,28 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 }
 
 @media (min-width: 641px) {
-  .rsvp-modal-backdrop {
+  .rsvp-modal-backdrop,
+  .rsvp-popup-backdrop {
     align-items: center;
     justify-content: center;
     padding: 1rem;
   }
 
-  .rsvp-modal-card {
-    width: min(100%, 52rem);
+  .rsvp-modal-card,
+  .rsvp-popup-card {
+    width: min(100%, 28rem);
     height: auto;
     max-height: calc(100vh - 2rem);
     max-height: calc(100dvh - 2rem);
-    border: 1px solid var(--border);
+    border: 0;
+    border-radius: 0;
     overflow: hidden;
+    box-shadow: 0 12px 40px rgba(47, 47, 47, 0.12);
   }
 }
 
 @media (max-width: 640px) {
   .rsvp-modal-card .rsvp-modal-form {
-    padding: 1.5rem 1rem 1.25rem;
+    padding: 0.75rem 1.25rem 1.75rem;
   }
 }
