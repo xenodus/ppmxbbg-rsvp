@@ -370,7 +370,9 @@ If admin login shows **Cannot reach the API**, the browser usually blocked a cro
 
 ### Configure deploy variables
 
-Set your AWS account id, API Gateway URL, CloudFront distribution id, and site domain in the **Makefile** (defaults near the top of the file). The canonical wedding site URL is `https://alvinandvivian.rsvp` (`SITE_DOMAIN`).
+Set your AWS account id, API Gateway URL, and site domain in the **Makefile** (defaults near the top of the file). The canonical wedding site URL is `https://alvinandvivian.rsvp` (`SITE_DOMAIN`).
+
+`CLOUDFRONT_DISTRIBUTION_ID` is optional: `make deploy-frontend` auto-discovers the distribution that aliases `SITE_DOMAIN` (or fronts `S3_BUCKET`) and invalidates `/*` after every S3 sync. Set it explicitly in the Makefile only if auto-discovery fails. The GitHub Actions deploy role needs `cloudfront:ListDistributions` and `cloudfront:CreateInvalidation`.
 
 ### Custom domain (`alvinandvivian.rsvp`)
 
@@ -418,6 +420,18 @@ open "https://alvinandvivian.rsvp/?id=YOUR_INVITE_ID"
 
 # Admin UI
 open "https://alvinandvivian.rsvp/admin.html"
+```
+
+### Troubleshooting: 403 on `/assets/*` after deploy
+
+Vite builds fingerprinted files under `/assets/` (for example `main-*.js`). `make deploy-frontend` syncs new files to S3 and deletes old hashes. If CloudFront still serves a cached `index.html` that references deleted assets, the browser shows **403 Forbidden** on JS/CSS until the cache refreshes.
+
+**Fix:** run `make cloudfront-invalidate` (or redeploy with `make deploy-frontend`, which invalidates automatically). Confirm S3 and CloudFront agree:
+
+```bash
+# Live site (CloudFront) and S3 should reference the same hashed assets
+curl -s "$(make -s print-site-domain)/" | grep assets/main
+curl -s "https://ppmxbbg-rsvp-frontend.s3.ap-southeast-1.amazonaws.com/index.html" | grep assets/main
 ```
 
 ### Invitation links

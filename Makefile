@@ -1,5 +1,5 @@
-.PHONY: test api-test frontend-dev frontend-build frontend-update check-vite-api-url \
-	docker-build docker-tag docker-push aws-login \
+.PHONY: test api-test frontend-dev frontend-build frontend-update cloudfront-invalidate \
+	check-vite-api-url docker-build docker-tag docker-push aws-login \
 	lambda-update lambda-wait deploy-api deploy-frontend deploy \
 	print-aws-deploy-role-arn print-aws-region print-site-domain
 
@@ -39,11 +39,31 @@ frontend-build: check-vite-api-url
 
 frontend-update: frontend-build
 	aws s3 sync frontend/dist s3://$(S3_BUCKET) --delete --region $(AWS_REGION)
-ifneq ($(CLOUDFRONT_DISTRIBUTION_ID),)
+	$(MAKE) cloudfront-invalidate
+
+# Invalidate CloudFront after every frontend deploy so index.html and hashed
+# /assets/* files stay in sync. CLOUDFRONT_DISTRIBUTION_ID is optional: when
+# empty, resolve the distribution by SITE_DOMAIN alias, then S3_BUCKET origin.
+cloudfront-invalidate:
+	@DIST_ID="$(CLOUDFRONT_DISTRIBUTION_ID)"; \
+	if [ -z "$$DIST_ID" ]; then \
+	  DIST_ID=$$(aws cloudfront list-distributions \
+	    --query "DistributionList.Items[?Aliases.Items[?@=='$(SITE_DOMAIN)']].Id | [0]" \
+	    --output text); \
+	fi; \
+	if [ -z "$$DIST_ID" ] || [ "$$DIST_ID" = "None" ]; then \
+	  DIST_ID=$$(aws cloudfront list-distributions \
+	    --query "DistributionList.Items[?contains(join('', Origins.Items[*].DomainName), '$(S3_BUCKET)')].Id | [0]" \
+	    --output text); \
+	fi; \
+	if [ -z "$$DIST_ID" ] || [ "$$DIST_ID" = "None" ]; then \
+	  echo "error: Could not resolve CloudFront distribution for $(SITE_DOMAIN) / $(S3_BUCKET). Set CLOUDFRONT_DISTRIBUTION_ID in the Makefile or grant cloudfront:ListDistributions to the deploy role." >&2; \
+	  exit 1; \
+	fi; \
+	echo "Invalidating CloudFront distribution $$DIST_ID (/*)"; \
 	aws cloudfront create-invalidation \
-		--distribution-id $(CLOUDFRONT_DISTRIBUTION_ID) \
-		--paths "/*"
-endif
+	  --distribution-id "$$DIST_ID" \
+	  --paths "/*"
 
 docker-build:
 	docker buildx build \
