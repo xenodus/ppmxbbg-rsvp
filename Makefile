@@ -1,7 +1,7 @@
 .PHONY: test api-test frontend-dev frontend-build frontend-update check-vite-api-url \
 	docker-build docker-tag docker-push aws-login \
 	lambda-update lambda-wait deploy-api deploy-frontend deploy \
-	print-aws-deploy-role-arn print-aws-region
+	print-aws-deploy-role-arn print-aws-region print-site-domain
 
 # Deploy settings (also used by GitHub Actions).
 AWS_REGION ?= ap-southeast-1
@@ -12,6 +12,7 @@ ECR_REGISTRY ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 ECR_REPO ?= $(ECR_REGISTRY)/$(ECR_REPO_NAME)
 LAMBDA_FUNCTION ?= ppmxbbg-rsvp-api
 S3_BUCKET ?= ppmxbbg-rsvp-frontend
+SITE_DOMAIN ?= alvinandvivian.rsvp
 CLOUDFRONT_DISTRIBUTION_ID ?=
 VITE_API_BASE_URL ?= https://s0vujknrw1.execute-api.ap-southeast-1.amazonaws.com
 AWS_DEPLOY_ROLE_NAME ?= github-actions-ppmxbbg-rsvp-deploy
@@ -85,3 +86,6 @@ print-aws-deploy-role-arn:
 
 print-aws-region:
 	@echo $(AWS_REGION)
+
+print-site-domain:
+	@echo https://$(SITE_DOMAIN)

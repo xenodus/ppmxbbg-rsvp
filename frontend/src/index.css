@@ -266,7 +266,7 @@ body {
 
 .nav-drawer-title {
   margin: 0 2rem 2.5rem 0;
-  font-family: var(--font-serif);
+  font-family: "Font Two", serif;
   font-size: clamp(1.75rem, 7vw, 2.25rem);
   font-weight: 400;
   line-height: 1.15;
@@ -358,15 +358,13 @@ body {
   font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.45;
+  text-decoration: underline;
 }
 
 .getting-there-route-label {
   margin: 0 0 0.35rem;
   font-size: 0.9rem;
-}
-
-.getting-there-steps {
-  list-style: decimal;
+  text-decoration: underline;
 }
 
 .faq-section + .faq-section {
@@ -418,9 +416,22 @@ body {
 
 .faq-list {
   margin: 0.65rem 0 0;
-  padding-left: 1.25rem;
+  padding-left: 0;
   line-height: 1.55;
   font-size: 0.9rem;
+  list-style: none;
+}
+
+.faq-list li {
+  position: relative;
+  margin-left: 10px;
+  padding-left: 1.1em;
+}
+
+.faq-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
 }
 
 .faq-list li + li {

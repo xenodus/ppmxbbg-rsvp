@@ -336,8 +336,8 @@ Set these in the AWS Lambda console (or your IaC):
 | `DB_USER` | `rsvp_user` | MySQL user |
 | `DB_PASSWORD` | `***` | MySQL password |
 | `DB_NAME` | `rsvp` | Database name |
-| `FRONTEND_ORIGIN` | `https://d111.cloudfront.net` | Primary site origin for CORS (no trailing slash) |
-| `FRONTEND_ORIGINS` | *(optional)* | Extra allowed origins, comma-separated (e.g. custom domain) |
+| `FRONTEND_ORIGIN` | `https://alvinandvivian.rsvp` | Primary site origin for CORS (no trailing slash) |
+| `FRONTEND_ORIGINS` | *(optional)* | Extra allowed origins, comma-separated (e.g. CloudFront URL during migration) |
 | `ADMIN_USERNAME` | `admin` | Admin login username |
 | `ADMIN_PASSWORD` | `***` | Admin login password |
 | `ADMIN_TOKEN_SECRET` | *(optional)* | Signs session tokens; defaults to `ADMIN_PASSWORD` if unset |
@@ -362,14 +362,37 @@ CORS is handled in Lambda (do not enable conflicting CORS on API Gateway). Set `
 - S3 REST (path-style): `https://s3.ap-southeast-1.amazonaws.com` (when opening `…/ppmxbbg-rsvp-frontend/admin.html`)
 - S3 website endpoint: `http://ppmxbbg-rsvp-frontend.s3-website-ap-southeast-1.amazonaws.com`
 - CloudFront: `https://E123ABC.cloudfront.net`
+- Custom domain: `https://alvinandvivian.rsvp`
 
-`https://*.cloudfront.net` and `ppmxbbg-rsvp-frontend` S3 hosts (http or https) are also allowed automatically after the API in PR #44 is deployed. Admin routes allow the `Authorization` header on responses.
+`https://alvinandvivian.rsvp`, `https://www.alvinandvivian.rsvp`, `https://*.cloudfront.net`, and `ppmxbbg-rsvp-frontend` S3 hosts (http or https) are also allowed automatically. Admin routes allow the `Authorization` header on responses.
 
 If admin login shows **Cannot reach the API**, the browser usually blocked a cross-origin request: confirm `VITE_API_BASE_URL` in the Makefile matches API Gateway (no `/prod` unless your invoke URL uses it), redeploy the API after changing `FRONTEND_ORIGIN`, and match `FRONTEND_ORIGIN` to the origin shown in your browser when opening `admin.html` (virtual-hosted S3: `https://ppmxbbg-rsvp-frontend.s3…amazonaws.com`; path-style S3: `https://s3.ap-southeast-1.amazonaws.com` with no bucket in the origin; S3 website hosting often uses `http://…s3-website…amazonaws.com`).
 
 ### Configure deploy variables
 
-Set your AWS account id, API Gateway URL, and CloudFront distribution id in the **Makefile** (defaults near the top of the file).
+Set your AWS account id, API Gateway URL, CloudFront distribution id, and site domain in the **Makefile** (defaults near the top of the file). The canonical wedding site URL is `https://alvinandvivian.rsvp` (`SITE_DOMAIN`).
+
+### Custom domain (`alvinandvivian.rsvp`)
+
+The frontend is served from S3 through CloudFront. S3 website endpoints do not support HTTPS, so attach the custom domain to **CloudFront**, not directly to the S3 website endpoint.
+
+1. **ACM certificate (us-east-1)** — In **N. Virginia** (`us-east-1`), request a public certificate for `alvinandvivian.rsvp` (and `www.alvinandvivian.rsvp` if you want both). Validate via DNS at your `.rsvp` registrar.
+2. **CloudFront alternate domain** — Edit the distribution that fronts `ppmxbbg-rsvp-frontend`:
+   - **Alternate domain name (CNAME):** `alvinandvivian.rsvp` (add `www.alvinandvivian.rsvp` if needed)
+   - **Custom SSL certificate:** select the ACM cert from step 1
+   - **Viewer protocol policy:** Redirect HTTP to HTTPS
+   - **Default root object:** `index.html`
+3. **DNS** — At your domain registrar (or Route 53 hosted zone), point the domain to CloudFront:
+   - **Apex (`alvinandvivian.rsvp`):** alias/A record to the CloudFront distribution (Route 53 alias, or your registrar’s apex ALIAS/CNAME flattening)
+   - **`www` (optional):** CNAME to `d1234abcd.cloudfront.net`, or redirect `www` → apex in CloudFront/S3
+4. **Lambda CORS** — Set `FRONTEND_ORIGIN` to `https://alvinandvivian.rsvp` (no trailing slash). The API already allows this origin in code; updating the env var makes it the primary reflected origin for admin login.
+5. **Deploy** — `make deploy-frontend` syncs to S3 and invalidates CloudFront. Test:
+   ```bash
+   open "https://alvinandvivian.rsvp/?id=YOUR_INVITE_ID"
+   open "https://alvinandvivian.rsvp/admin.html"
+   ```
+
+During migration you can keep the CloudFront `*.cloudfront.net` URL working and add it to `FRONTEND_ORIGINS` until DNS is cut over.
 
 ### Deploy commands
 
@@ -391,10 +414,10 @@ make deploy
 curl "https://YOUR_API_URL/guest?id=YOUR_INVITE_ID"
 
 # Frontend
-open "https://YOUR_CLOUDFRONT_URL/?id=YOUR_INVITE_ID"
+open "https://alvinandvivian.rsvp/?id=YOUR_INVITE_ID"
 
 # Admin UI
-open "https://YOUR_CLOUDFRONT_URL/admin.html"
+open "https://alvinandvivian.rsvp/admin.html"
 ```
 
 ### Invitation links
@@ -402,7 +425,7 @@ open "https://YOUR_CLOUDFRONT_URL/admin.html"
 Share links in this form:
 
 ```
-https://YOUR_CLOUDFRONT_URL/?id=1234567890123456789
+https://alvinandvivian.rsvp/?id=1234567890123456789
 ```
 
 ---

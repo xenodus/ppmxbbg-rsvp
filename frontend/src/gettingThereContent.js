@@ -45,7 +45,7 @@ export const GETTING_THERE = {
             title:
               "Route 1: Via Gardens by the Bay MRT Station (Thomson-East Coast Line - TE22)",
             steps: [
-              "Take Exit 1,",
+              "Take Exit 1.",
               "Follow the signs toward Gardens by the Bay.",
               "Cross the road and turn right into the drop-off point.",
               "Look out for the Hortus signage at the drop-off point. Hop right onto the complimentary Hortus buggy! (Service starts at 11:00 AM, runs every 8–12 minutes).",
