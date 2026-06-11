@@ -97,6 +97,7 @@ export default function RsvpForm({
   className = "form-card",
   id = "rsvp",
   headingId = "rsvp-heading",
+  showTitle = true,
   onInviteValidChange,
 }) {
   const inviteId = useMemo(() => getInviteId(), []);
@@ -252,9 +253,11 @@ export default function RsvpForm({
   return (
     <>
       <div id={id} className={className} aria-labelledby={headingId}>
-        <h2 id={headingId} className="card-title">
-          RSVP
-        </h2>
+        {showTitle && (
+          <h2 id={headingId} className="card-title">
+            RSVP
+          </h2>
+        )}
         {error && <p className="banner banner-error">{error}</p>}
 
         {rsvpClosed ? (
