@@ -418,9 +418,21 @@ body {
 
 .faq-list {
   margin: 0.65rem 0 0;
-  padding-left: 1.25rem;
+  padding-left: 0;
   line-height: 1.55;
   font-size: 0.9rem;
+  list-style: none;
+}
+
+.faq-list li {
+  position: relative;
+  padding-left: 1.1em;
+}
+
+.faq-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
 }
 
 .faq-list li + li {
