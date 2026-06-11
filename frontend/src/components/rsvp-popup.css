@@ -12,40 +12,6 @@
   z-index: 1300;
 }
 
-.rsvp-popup-header {
-  flex-shrink: 0;
-  padding: 1.35rem 1.5rem 0;
-}
-
-.rsvp-popup-back {
-  display: block;
-  margin: 0 auto;
-  padding: 0.55rem 2.35rem;
-  border: 2px solid var(--rsvp-accent);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--rsvp-accent);
-  font-family: "Font One", var(--font-sans);
-  font-size: 1rem;
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.rsvp-popup-back:focus-visible {
-  outline: 2px solid var(--rsvp-accent);
-  outline-offset: 3px;
-}
-
-.rsvp-popup-icon {
-  display: block;
-  width: 4.75rem;
-  height: auto;
-  margin: 1.1rem auto 0.35rem;
-}
-
 .rsvp-modal-backdrop .card-title,
 .rsvp-modal-backdrop .section-heading,
 .rsvp-modal-backdrop .field-label,
@@ -205,7 +171,7 @@
   gap: 0.55rem;
 }
 
-.rsvp-popup-card > :not(.rsvp-popup-header):not(.modal-form) {
+.rsvp-popup-card > :not(.modal-close):not(.modal-form) {
   padding-left: 1.75rem;
   padding-right: 1.75rem;
 }
@@ -224,11 +190,7 @@
 }
 
 @media (max-width: 640px) {
-  .rsvp-popup-header {
-    padding: 1.1rem 1.25rem 0;
-  }
-
-  .rsvp-popup-card > :not(.rsvp-popup-header):not(.modal-form) {
+  .rsvp-popup-card > :not(.modal-close):not(.modal-form) {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }

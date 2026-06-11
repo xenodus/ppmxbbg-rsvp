@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { RSVP } from "../constants.js";
-import RsvpPopupHeader from "./RsvpPopupHeader.jsx";
+import "./rsvp-popup.css";
 
 export default function GuestRespondModal({
   guest,
@@ -66,7 +66,9 @@ export default function GuestRespondModal({
         aria-labelledby="respond-title"
         onClick={(event) => event.stopPropagation()}
       >
-        <RsvpPopupHeader onBack={onClose} />
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
 
         <h2 id="respond-title" className="modal-title">
           Guest Response
