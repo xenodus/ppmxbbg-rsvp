@@ -706,11 +706,11 @@ form {
 }
 
 .status-pending {
-  color: var(--muted);
+  color: #ff0000;
 }
 
 .status-attending {
-  color: var(--success);
+  color: #0b9638;
 }
 
 .status-declined {
