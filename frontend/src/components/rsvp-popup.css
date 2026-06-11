@@ -136,11 +136,6 @@
   text-transform: none;
 }
 
-.rsvp-modal-backdrop .choice-btn:hover:not(:disabled),
-.rsvp-popup-backdrop .choice-btn:hover:not(:disabled) {
-  background: #e2e2e2;
-}
-
 .rsvp-modal-backdrop .choice-btn.is-selected,
 .rsvp-popup-backdrop .choice-btn.is-selected {
   background: var(--rsvp-accent);
