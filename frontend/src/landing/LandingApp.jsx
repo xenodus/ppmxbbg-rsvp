@@ -9,6 +9,7 @@ import {
   faqImg,
   gettingThereImg,
   joinUsImg,
+  lotsOfLoveImg,
   rsvpImg,
   spriteImg,
   weddingDayImg,
@@ -114,6 +115,21 @@ export default function LandingApp() {
             alt="Wedding day schedule and details"
             width="1080"
             height="1800"
+            loading="lazy"
+            decoding="async"
+          />
+        </section>
+
+        <section
+          id="lots-of-love"
+          className="landing-section landing-section--lots-of-love"
+          aria-label="Lots of love"
+        >
+          <img
+            src={lotsOfLoveImg}
+            alt="Lots of love, Alvin and Vivian"
+            width="1080"
+            height="1400"
             loading="lazy"
             decoding="async"
           />
