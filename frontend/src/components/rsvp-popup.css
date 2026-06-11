@@ -139,6 +139,7 @@
 .rsvp-modal-backdrop .choice-btn:hover:not(:disabled),
 .rsvp-popup-backdrop .choice-btn:hover:not(:disabled) {
   background: #dd774acf;
+  color: #fff;
 }
 
 .rsvp-modal-backdrop .choice-btn.is-selected,
