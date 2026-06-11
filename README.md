@@ -378,16 +378,15 @@ Set your AWS account id, API Gateway URL, and site domain in the **Makefile** (d
 
 Merges to `master` deploy via OIDC as `github-actions-ppmxbbg-rsvp-deploy` (see `.github/workflows/deploy-on-merge.yml`). That role must allow everything `make deploy` uses, including CloudFront cache invalidation after the S3 sync.
 
-If deploy fails with `AccessDenied` on `cloudfront:CreateInvalidation`, attach the CloudFront inline policy (values match the Makefile):
+The full inline policy for this role is in `deploy/github-actions-deploy-policy.json` (ECR, Lambda, S3, and CloudFront). The CloudFront `Resource` must match `CLOUDFRONT_DISTRIBUTION_ID` in the Makefile (`E3LI9C0QOF801H`); a placeholder such as `E1234567890ABC` causes `AccessDenied` on `CreateInvalidation`.
+
+To attach only the CloudFront statements (if the rest of the policy is already correct):
 
 ```bash
 ./deploy/attach-cloudfront-policy.sh
 ```
 
-Or in the IAM console, add an inline policy to role `github-actions-ppmxbbg-rsvp-deploy` using `deploy/github-actions-cloudfront-policy.json`. It grants:
-
-- `cloudfront:ListDistributions` on `*` (for auto-discovery when `CLOUDFRONT_DISTRIBUTION_ID` is empty)
-- `cloudfront:CreateInvalidation` on distribution `E3LI9C0QOF801H`
+Or replace the role’s inline policy in the IAM console with `deploy/github-actions-deploy-policy.json`.
 
 After updating IAM, re-run the failed workflow or run `make cloudfront-invalidate` locally with credentials that assume the same role.
 
