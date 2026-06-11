@@ -350,6 +350,14 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   box-sizing: border-box;
 }
 
+.rsvp-modal-card,
+.rsvp-modal-card .card-title,
+.rsvp-modal-card .section-heading,
+.rsvp-modal-card .modal-title,
+.rsvp-modal-card .section-title {
+  font-family: var(--font-sans);
+}
+
 @media (min-width: 641px) {
   .rsvp-modal-backdrop {
     align-items: center;
