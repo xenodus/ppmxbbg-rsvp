@@ -365,14 +365,14 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 
 @media (min-width: 641px) {
   .rsvp-modal-backdrop,
-  .rsvp-popup-backdrop {
+  .rsvp-popup-backdrop:not(.guest-respond-backdrop) {
     align-items: center;
     justify-content: center;
     padding: 1rem;
   }
 
   .rsvp-modal-card,
-  .rsvp-popup-card {
+  .rsvp-popup-card:not(.guest-respond-card) {
     width: min(100%, 28rem);
     height: auto;
     max-height: calc(100vh - 2rem);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { RSVP } from "../constants.js";
+import { RSVP, WEDDING } from "../constants.js";
 import "./rsvp-popup.css";
 
 export default function GuestRespondModal({
@@ -70,9 +70,12 @@ export default function GuestRespondModal({
           ×
         </button>
 
-        <h2 id="respond-title" className="modal-title">
-          Guest Response
-        </h2>
+        <header className="guest-respond-header">
+          <h2 id="respond-title" className="guest-respond-couple-names">
+            {WEDDING.coupleNames}
+          </h2>
+          <p className="guest-respond-date">1st November 2026</p>
+        </header>
 
         <div className="modal-block">
           <span className="field-label" id="modal-guest-name-label">
