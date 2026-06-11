@@ -75,12 +75,12 @@ export default function GuestRespondModal({
         </h2>
 
         <div className="modal-block">
-          <label className="field-label" htmlFor="modal-guest-name">
+          <span className="field-label" id="modal-guest-name-label">
             FULL NAME
-          </label>
-          <div id="modal-guest-name" className="name-display">
+          </span>
+          <p id="modal-guest-name" className="guest-name-value" aria-labelledby="modal-guest-name-label">
             {guest.name}
-          </div>
+          </p>
         </div>
 
         {error && <p className="banner banner-error">{error}</p>}

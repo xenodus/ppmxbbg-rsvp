@@ -88,9 +88,7 @@
   margin-top: 0;
 }
 
-.rsvp-modal-backdrop .name-display,
 .rsvp-modal-backdrop .textarea,
-.rsvp-popup-backdrop .name-display,
 .rsvp-popup-backdrop .textarea {
   background: #fff;
   color: var(--text);
@@ -99,8 +97,12 @@
   font-weight: 400;
 }
 
-.rsvp-modal-backdrop .name-display {
-  min-height: 3.1rem;
+.rsvp-popup-backdrop .guest-name-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text);
 }
 
 .rsvp-modal-backdrop .textarea,
