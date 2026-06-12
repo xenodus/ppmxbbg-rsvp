@@ -60,7 +60,39 @@ html.landing-page.landing-ready #root {
   }
 }
 
-html.landing-page .landing-hero-heading p,
+@keyframes landing-hero-name-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-10deg);
+  }
+
+  55% {
+    opacity: 1;
+    transform: scale(1.18) rotate(4deg);
+  }
+
+  75% {
+    transform: scale(0.94) rotate(-2deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+html.landing-page .landing-hero-heading__name-pop {
+  display: inline-block;
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: center center;
+}
+
+html.landing-page.landing-ready .landing-hero-heading__name-pop {
+  animation: landing-hero-name-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+html.landing-page .landing-hero-heading__line-two,
 html.landing-page .landing-faq-card :is(
     .faq-section-title,
     .faq-question,
@@ -80,7 +112,7 @@ html.landing-page .landing-getting-there-card :is(
   clip-path: inset(0 100% 0 0);
 }
 
-html.landing-page.landing-ready .landing-hero-heading p,
+html.landing-page.landing-ready .landing-hero-heading__line-two,
 html.landing-page.landing-ready .landing-faq-card :is(
     .faq-section-title,
     .faq-question,
@@ -101,7 +133,7 @@ html.landing-page.landing-ready .landing-getting-there-card :is(
 }
 
 html.landing-page.landing-ready .landing-hero-heading__line-two {
-  animation-delay: 0.15s;
+  animation-delay: 0.55s;
 }
 
 .landing-hero-heading .landing-hero-heading__names,
@@ -261,7 +293,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
     background-position: right bottom;
   }
 
-  html.landing-page .landing-hero-heading p,
+  html.landing-page .landing-hero-heading__line-two,
   html.landing-page .landing-faq-card :is(
       .faq-section-title,
       .faq-question,
@@ -280,6 +312,12 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
     ) {
     animation: none;
     clip-path: inset(0 0% 0 0);
+  }
+
+  html.landing-page .landing-hero-heading__name-pop {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
