@@ -10,7 +10,13 @@ import {
   setStoredToken,
 } from "./adminApi.js";
 import { downloadInvitesCsv } from "./exportCsv.js";
-import { buildInviteMessage } from "./inviteMessage.js";
+import {
+  buildInviteMessage,
+  clearStoredInviteMessageTemplate,
+  DEFAULT_INVITE_MESSAGE_TEMPLATE,
+  getStoredInviteMessageTemplate,
+  setStoredInviteMessageTemplate,
+} from "./inviteMessage.js";
 import { generateQrCodeDataUrl } from "./qrCode.js";
 
 function guestSiteOrigin() {
@@ -163,7 +169,61 @@ function InviteQrCode({ url }) {
   );
 }
 
-function InviteRow({ invite, onRefresh }) {
+function MessageTemplateEditor({ template, onSave, onClose }) {
+  const [draft, setDraft] = useState(template);
+
+  useEffect(() => {
+    setDraft(template);
+  }, [template]);
+
+  function handleSave(event) {
+    event.preventDefault();
+    onSave(draft);
+  }
+
+  function handleReset() {
+    if (
+      window.confirm(
+        "Reset the message template to the default? Your custom text will be discarded.",
+      )
+    ) {
+      onSave(DEFAULT_INVITE_MESSAGE_TEMPLATE, { reset: true });
+      setDraft(DEFAULT_INVITE_MESSAGE_TEMPLATE);
+    }
+  }
+
+  return (
+    <section className="form-card admin-message-template">
+      <h2>Edit message template</h2>
+      <p className="admin-muted">
+        Used by every <strong>Copy message</strong> button. Placeholders:{" "}
+        <code>[Names]</code> (guest names), <code>[Link]</code> (RSVP link).
+      </p>
+      <form onSubmit={handleSave}>
+        <textarea
+          className="admin-textarea admin-message-template-input"
+          rows={16}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          spellCheck
+        />
+        <div className="admin-message-template-actions">
+          <button type="submit" className="primary-btn">
+            Save template
+          </button>
+          <button type="button" className="secondary-btn" onClick={handleReset}>
+            Reset to default
+          </button>
+          <button type="button" className="secondary-btn" onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+function InviteRow({ invite, messageTemplate, onRefresh }) {
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -197,6 +257,7 @@ function InviteRow({ invite, onRefresh }) {
       const message = buildInviteMessage({
         guestNames: guestNameList,
         link: inviteLink(invite.id),
+        template: messageTemplate,
       });
       await copyToClipboard(message);
       setMessageCopied(true);
@@ -317,6 +378,8 @@ export default function AdminApp() {
   const [guestNames, setGuestNames] = useState("");
   const [guestSearch, setGuestSearch] = useState("");
   const [creating, setCreating] = useState(false);
+  const [messageTemplate, setMessageTemplate] = useState(getStoredInviteMessageTemplate);
+  const [editingMessageTemplate, setEditingMessageTemplate] = useState(false);
 
   const loadInvites = useCallback(async () => {
     setLoading(true);
@@ -395,6 +458,16 @@ export default function AdminApp() {
     setInvites([]);
   }
 
+  function handleSaveMessageTemplate(template, { reset = false } = {}) {
+    if (reset) {
+      clearStoredInviteMessageTemplate();
+    } else {
+      setStoredInviteMessageTemplate(template);
+    }
+    setMessageTemplate(template);
+    setEditingMessageTemplate(false);
+  }
+
   if (!authed) {
     return (
       <div className="admin-page">
@@ -417,6 +490,13 @@ export default function AdminApp() {
           <button
             type="button"
             className="secondary-btn"
+            onClick={() => setEditingMessageTemplate((open) => !open)}
+          >
+            {editingMessageTemplate ? "Close editor" : "Edit message"}
+          </button>
+          <button
+            type="button"
+            className="secondary-btn"
             disabled={loading || invites.length === 0}
             onClick={() => downloadInvitesCsv(invites)}
           >
@@ -429,6 +509,14 @@ export default function AdminApp() {
       </header>
 
       {pageError ? <p className="banner banner-error">{pageError}</p> : null}
+
+      {editingMessageTemplate ? (
+        <MessageTemplateEditor
+          template={messageTemplate}
+          onSave={handleSaveMessageTemplate}
+          onClose={() => setEditingMessageTemplate(false)}
+        />
+      ) : null}
 
       <section className="form-card admin-create">
         <h2>Create invite</h2>
@@ -472,7 +560,12 @@ export default function AdminApp() {
         ) : null}
         <div className="admin-invite-list">
           {filteredInvites.map((invite) => (
-            <InviteRow key={invite.id} invite={invite} onRefresh={loadInvites} />
+            <InviteRow
+              key={invite.id}
+              invite={invite}
+              messageTemplate={messageTemplate}
+              onRefresh={loadInvites}
+            />
           ))}
         </div>
       </section>

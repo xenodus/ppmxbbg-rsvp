@@ -93,8 +93,29 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
 }
 
 .admin-create,
-.admin-list-section {
+.admin-list-section,
+.admin-message-template {
   margin-bottom: 2rem;
+}
+
+.admin-message-template-input {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.admin-message-template-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-message-template code {
+  font-size: 0.85em;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  background: var(--bg);
+  border: 1px solid var(--border);
 }
 
 .admin-list-section:last-child {
