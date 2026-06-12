@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { fetchInvite, saveGuest, saveInvite } from "../api.js";
+import FadeAwayMessage from "./FadeAwayMessage.jsx";
 import GuestList from "./GuestList.jsx";
 import GuestRespondModal from "./GuestRespondModal.jsx";
 import { RSVP, RSVP_CUTOFF } from "../constants.js";
@@ -22,6 +23,8 @@ function ChoiceSection({
   noLabel,
   disabled,
   savedMessage,
+  savedMessageKey,
+  onSavedMessageDismiss,
   onSelectYes,
   onSelectNo,
 }) {
@@ -50,7 +53,11 @@ function ChoiceSection({
           {noLabel}
         </button>
       </div>
-      {savedMessage && <p className="choice-saved">{savedMessage}</p>}
+      <FadeAwayMessage
+        message={savedMessage}
+        messageKey={savedMessageKey}
+        onDismiss={onSavedMessageDismiss}
+      />
     </section>
   );
 }
@@ -115,6 +122,8 @@ export default function RsvpForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [parkingSavedMessage, setParkingSavedMessage] = useState("");
+  const [parkingSavedMessageKey, setParkingSavedMessageKey] = useState(0);
+  const [successMessageKey, setSuccessMessageKey] = useState(0);
   const [inviteValid, setInviteValid] = useState(false);
   const rsvpClosed = now.getTime() >= RSVP_CUTOFF_MS;
 
@@ -192,10 +201,20 @@ export default function RsvpForm({
   const showParking = anyAttending && allAttendingAnsweredSolemnisation;
   const inviteChoicesDisabled = formDisabled || savingInvite;
 
+  function showParkingSavedMessage() {
+    setParkingSavedMessage(RESPONSE_SAVED_MESSAGE);
+    setParkingSavedMessageKey(Date.now());
+  }
+
+  function showSuccessMessage(message) {
+    setSuccess(message);
+    setSuccessMessageKey(Date.now());
+  }
+
   async function handleInviteChoice(value) {
     if (value === requireParking) {
       setError("");
-      setParkingSavedMessage(RESPONSE_SAVED_MESSAGE);
+      showParkingSavedMessage();
       return;
     }
 
@@ -214,10 +233,11 @@ export default function RsvpForm({
       if (updated.require_parking !== undefined && updated.require_parking !== null) {
         setRequireParking(updated.require_parking);
       }
-      setParkingSavedMessage(RESPONSE_SAVED_MESSAGE);
+      showParkingSavedMessage();
     } catch (err) {
       setRequireParking(previousParking);
       setParkingSavedMessage("");
+      setParkingSavedMessageKey(0);
       setError(err.message);
     } finally {
       setSavingInvite(false);
@@ -231,7 +251,7 @@ export default function RsvpForm({
     const existing = guests.find((guest) => guest.id === payload.id);
     if (guestResponseUnchanged(existing, payload)) {
       setActiveGuest(null);
-      setSuccess(guestSaveSuccessMessage(guests));
+      showSuccessMessage(guestSaveSuccessMessage(guests));
       return;
     }
 
@@ -253,7 +273,7 @@ export default function RsvpForm({
       );
       setGuests(updatedGuests);
       setActiveGuest(null);
-      setSuccess(guestSaveSuccessMessage(updatedGuests));
+      showSuccessMessage(guestSaveSuccessMessage(updatedGuests));
     } catch (err) {
       throw err;
     } finally {
@@ -287,7 +307,11 @@ export default function RsvpForm({
                 disabled={formDisabled || savingGuest}
                 onRespond={setActiveGuest}
               />
-              {success && <p className="choice-saved">{success}</p>}
+              <FadeAwayMessage
+                message={success}
+                messageKey={successMessageKey}
+                onDismiss={() => setSuccess("")}
+              />
             </section>
 
             {allDeclined && (
@@ -304,6 +328,11 @@ export default function RsvpForm({
                 noLabel={RSVP.parking.no}
                 disabled={inviteChoicesDisabled}
                 savedMessage={parkingSavedMessage}
+                savedMessageKey={parkingSavedMessageKey}
+                onSavedMessageDismiss={() => {
+                  setParkingSavedMessage("");
+                  setParkingSavedMessageKey(0);
+                }}
                 onSelectYes={() => handleInviteChoice(true)}
                 onSelectNo={() => handleInviteChoice(false)}
               />

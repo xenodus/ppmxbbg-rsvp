@@ -636,6 +636,12 @@ form {
   line-height: 1.5;
   font-size: 0.85rem;
   color: var(--success);
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.choice-saved--fading {
+  opacity: 0;
 }
 
 .choice-btn {
