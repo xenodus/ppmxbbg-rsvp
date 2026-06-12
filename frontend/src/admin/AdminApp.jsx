@@ -10,6 +10,7 @@ import {
   setStoredToken,
 } from "./adminApi.js";
 import { downloadInvitesCsv } from "./exportCsv.js";
+import { buildInviteMessage } from "./inviteMessage.js";
 import { generateQrCodeDataUrl } from "./qrCode.js";
 
 function guestSiteOrigin() {
@@ -166,7 +167,9 @@ function InviteRow({ invite, onRefresh }) {
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [messageCopied, setMessageCopied] = useState(false);
   const summary = inviteSummary(invite);
+  const guestNameList = (invite.guests || []).map((g) => g.name);
 
   useEffect(() => {
     if (!linkCopied) return undefined;
@@ -174,10 +177,29 @@ function InviteRow({ invite, onRefresh }) {
     return () => window.clearTimeout(timer);
   }, [linkCopied]);
 
+  useEffect(() => {
+    if (!messageCopied) return undefined;
+    const timer = window.setTimeout(() => setMessageCopied(false), 2000);
+    return () => window.clearTimeout(timer);
+  }, [messageCopied]);
+
   async function handleCopyLink() {
     try {
       await copyToClipboard(inviteLink(invite.id));
       setLinkCopied(true);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function handleCopyMessage() {
+    try {
+      const message = buildInviteMessage({
+        guestNames: guestNameList,
+        link: inviteLink(invite.id),
+      });
+      await copyToClipboard(message);
+      setMessageCopied(true);
     } catch (err) {
       alert(err.message);
     }
@@ -212,6 +234,14 @@ function InviteRow({ invite, onRefresh }) {
           onClick={handleCopyLink}
         >
           {linkCopied ? "Copied!" : "Copy link"}
+        </button>
+        <button
+          type="button"
+          className={messageCopied ? "secondary-btn admin-copy-done" : "secondary-btn"}
+          disabled={busy || guestNameList.length === 0}
+          onClick={handleCopyMessage}
+        >
+          {messageCopied ? "Copied!" : "Copy message"}
         </button>
         <button
           type="button"
