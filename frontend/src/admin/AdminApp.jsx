@@ -71,6 +71,21 @@ function filterInvitesByGuestName(invites, query) {
   return invites.filter((invite) => inviteMatchesGuestSearch(invite, query));
 }
 
+function countGuestsInInvites(inviteList) {
+  return inviteList.reduce((sum, invite) => sum + (invite.guests?.length ?? 0), 0);
+}
+
+function formatInviteListHeading(invites, filteredInvites, searchActive) {
+  const inviteCount = filteredInvites.length;
+  const guestCount = countGuestsInInvites(filteredInvites);
+  if (searchActive) {
+    const totalInvites = invites.length;
+    const totalGuests = countGuestsInInvites(invites);
+    return ` (${inviteCount} of ${totalInvites} invites · ${guestCount} of ${totalGuests} guests)`;
+  }
+  return ` (${inviteCount} invites · ${guestCount} guests)`;
+}
+
 function LoginForm({ onSuccess, error, loading }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -405,9 +420,7 @@ export default function AdminApp() {
       <section className="admin-list-section">
         <h2>
           All invites
-          {searchActive
-            ? ` (${filteredInvites.length} of ${invites.length})`
-            : ` (${invites.length})`}
+          {formatInviteListHeading(invites, filteredInvites, searchActive)}
         </h2>
         <div className="field-group">
           <label className="field-label" htmlFor="guest-search">
