@@ -40,7 +40,7 @@ html.landing-page.landing-ready #root {
 .landing-hero-heading {
   position: relative;
   z-index: 2;
-  width: min(100%, 1080px);
+  width: min(100%, 920px);
   margin: 0;
   padding: 0 1rem;
   text-align: center;
@@ -207,7 +207,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   position: relative;
   z-index: 1;
   display: block;
-  width: min(100%, 1080px);
+  width: min(100%, 920px);
   height: auto;
   margin: 0 auto;
 }
@@ -268,7 +268,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 .landing-sprite {
   position: relative;
   z-index: 1;
-  width: min(100%, 1080px);
+  width: min(100%, 920px);
   margin-top: -2rem;
   margin-bottom: 2.5rem;
   aspect-ratio: 1080 / 1100;
@@ -323,7 +323,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 
 .landing-section img {
   display: block;
-  width: min(100%, 1080px);
+  width: min(100%, 920px);
   height: auto;
 }
 
