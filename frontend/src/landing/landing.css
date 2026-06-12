@@ -320,6 +320,20 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   outline-offset: 4px;
 }
 
+.landing-footer {
+  width: 100%;
+  padding: 1.5rem 1rem 2rem;
+  text-align: center;
+  background-color: #fcf9e4;
+}
+
+.landing-footer p {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: #8a8a8a;
+}
+
 .rsvp-modal-backdrop {
   z-index: 1200;
   align-items: stretch;

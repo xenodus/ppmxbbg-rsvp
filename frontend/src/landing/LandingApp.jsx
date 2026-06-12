@@ -164,6 +164,10 @@ export default function LandingApp() {
         </section>
       </main>
 
+      <footer className="landing-footer">
+        <p>© alvinandvivian.rsvp 2026</p>
+      </footer>
+
       <RsvpModal open={rsvpOpen} onClose={() => setRsvpOpen(false)} />
     </>
   );
