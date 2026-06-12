@@ -287,6 +287,12 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   }
 }
 
+@media (min-width: 641px) {
+  .landing-sprite {
+    margin-top: -5rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-sprite {
     animation: none;
