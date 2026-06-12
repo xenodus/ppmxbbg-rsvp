@@ -269,7 +269,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   position: relative;
   z-index: 1;
   width: min(100%, 960px);
-  margin-top: -5rem;
+  margin-top: -2rem;
   margin-bottom: 2.5rem;
   aspect-ratio: 1080 / 1100;
   background-repeat: no-repeat;
@@ -284,6 +284,12 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   }
   to {
     background-position: right bottom;
+  }
+}
+
+@media (min-width: 641px) {
+  .landing-sprite {
+    margin-top: -5rem;
   }
 }
 
