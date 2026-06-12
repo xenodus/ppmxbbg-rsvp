@@ -269,7 +269,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   position: relative;
   z-index: 1;
   width: min(100%, 960px);
-  margin-top: -2rem;
+  margin-top: -5rem;
   margin-bottom: 2.5rem;
   aspect-ratio: 1080 / 1100;
   background-repeat: no-repeat;
