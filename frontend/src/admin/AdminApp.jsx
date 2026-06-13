@@ -93,6 +93,14 @@ function formatInviteListHeading(invites, filteredInvites, searchActive) {
   return ` (${inviteCount} invites · ${guestCount} guests)`;
 }
 
+function AdminFooter() {
+  return (
+    <footer className="admin-footer">
+      <p>© 2026 alvinandvivian.rsvp</p>
+    </footer>
+  );
+}
+
 function LoginForm({ onSuccess, error, loading }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -638,89 +646,88 @@ export default function AdminApp() {
     setEditingMessageTemplate(false);
   }
 
-  if (!authed) {
-    return (
-      <div className="admin-page">
-        <LoginForm onSuccess={handleLogin} error={loginError} loading={loading} />
-      </div>
-    );
-  }
-
   const filteredInvites = filterInvitesByGuestName(invites, guestSearch);
   const searchActive = guestSearch.trim().length > 0;
 
   return (
     <div className="admin-page">
-      <AdminHeader
-        editingMessageTemplate={editingMessageTemplate}
-        onToggleMessageTemplate={() => setEditingMessageTemplate((open) => !open)}
-        loading={loading}
-        invites={invites}
-        onDownloadCsv={() => downloadInvitesCsv(invites)}
-        onLogout={handleLogout}
-      />
-
-      {pageError ? <p className="banner banner-error">{pageError}</p> : null}
-
-      {editingMessageTemplate ? (
-        <MessageTemplateEditor
-          template={messageTemplate}
-          onSave={handleSaveMessageTemplate}
-          onClose={() => setEditingMessageTemplate(false)}
-        />
-      ) : null}
-
-      <section className="form-card admin-create">
-        <h2>Create invite</h2>
-        <p className="admin-muted">One guest name per line. The invite link is copied after create.</p>
-        <form onSubmit={handleCreate}>
-          <textarea
-            className="admin-textarea"
-            rows={4}
-            placeholder={"Jane Doe\nJohn Doe"}
-            value={guestNames}
-            onChange={(e) => setGuestNames(e.target.value)}
+      {!authed ? (
+        <LoginForm onSuccess={handleLogin} error={loginError} loading={loading} />
+      ) : (
+        <>
+          <AdminHeader
+            editingMessageTemplate={editingMessageTemplate}
+            onToggleMessageTemplate={() => setEditingMessageTemplate((open) => !open)}
+            loading={loading}
+            invites={invites}
+            onDownloadCsv={() => downloadInvitesCsv(invites)}
+            onLogout={handleLogout}
           />
-          <button type="submit" className="primary-btn" disabled={creating}>
-            {creating ? "Creating…" : "Create invite"}
-          </button>
-        </form>
-      </section>
 
-      <section className="admin-list-section">
-        <h2>
-          All invites
-          {formatInviteListHeading(invites, filteredInvites, searchActive)}
-        </h2>
-        <div className="field-group">
-          <label className="field-label" htmlFor="guest-search">
-            Search by guest name
-          </label>
-          <input
-            id="guest-search"
-            type="search"
-            className="admin-input"
-            placeholder="e.g. Jane"
-            value={guestSearch}
-            onChange={(e) => setGuestSearch(e.target.value)}
-            autoComplete="off"
-          />
-        </div>
-        {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
-        {!loading && invites.length > 0 && searchActive && filteredInvites.length === 0 ? (
-          <p className="admin-muted">No invites match that guest name.</p>
-        ) : null}
-        <div className="admin-invite-list">
-          {filteredInvites.map((invite) => (
-            <InviteRow
-              key={invite.id}
-              invite={invite}
-              messageTemplate={messageTemplate}
-              onRefresh={loadInvites}
+          {pageError ? <p className="banner banner-error">{pageError}</p> : null}
+
+          {editingMessageTemplate ? (
+            <MessageTemplateEditor
+              template={messageTemplate}
+              onSave={handleSaveMessageTemplate}
+              onClose={() => setEditingMessageTemplate(false)}
             />
-          ))}
-        </div>
-      </section>
+          ) : null}
+
+          <section className="form-card admin-create">
+            <h2>Create invite</h2>
+            <p className="admin-muted">One guest name per line. The invite link is copied after create.</p>
+            <form onSubmit={handleCreate}>
+              <textarea
+                className="admin-textarea"
+                rows={4}
+                placeholder={"Jane Doe\nJohn Doe"}
+                value={guestNames}
+                onChange={(e) => setGuestNames(e.target.value)}
+              />
+              <button type="submit" className="primary-btn" disabled={creating}>
+                {creating ? "Creating…" : "Create invite"}
+              </button>
+            </form>
+          </section>
+
+          <section className="admin-list-section">
+            <h2>
+              All invites
+              {formatInviteListHeading(invites, filteredInvites, searchActive)}
+            </h2>
+            <div className="field-group">
+              <label className="field-label" htmlFor="guest-search">
+                Search by guest name
+              </label>
+              <input
+                id="guest-search"
+                type="search"
+                className="admin-input"
+                placeholder="e.g. Jane"
+                value={guestSearch}
+                onChange={(e) => setGuestSearch(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+            {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
+            {!loading && invites.length > 0 && searchActive && filteredInvites.length === 0 ? (
+              <p className="admin-muted">No invites match that guest name.</p>
+            ) : null}
+            <div className="admin-invite-list">
+              {filteredInvites.map((invite) => (
+                <InviteRow
+                  key={invite.id}
+                  invite={invite}
+                  messageTemplate={messageTemplate}
+                  onRefresh={loadInvites}
+                />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+      <AdminFooter />
     </div>
   );
 }
