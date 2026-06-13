@@ -40,7 +40,7 @@ export const RSVP_CUTOFF = {
   /** RSVP closes at midnight in Singapore (Asia/Singapore). */
   dateTime: "2026-09-11T00:00:00+08:00",
   closedMessage:
-    "Sorry! We have officially closed our RSVPs. Please give Alvin or Vivian a shout directly if you have any urgent updates or questions!",
+    "RSVP has closed. Please contact Alvin or Vivian for any changes.",
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";

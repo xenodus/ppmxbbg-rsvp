@@ -8,8 +8,10 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"ppmxbbg-rsvp/pkg/config"
+	"ppmxbbg-rsvp/pkg/rsvpcutoff"
 	"ppmxbbg-rsvp/store"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -198,6 +200,10 @@ func handleGetInvite(ctx context.Context, params map[string]string, origin strin
 }
 
 func handlePost(ctx context.Context, body string, origin string) (apiResponse, error) {
+	if rsvpcutoff.Closed(time.Now()) {
+		return jsonResponse(http.StatusForbidden, errorResponse{Error: "rsvp has closed"}, origin)
+	}
+
 	var probe struct {
 		DeclineAll     *bool `json:"decline_all"`
 		RequireParking *bool `json:"require_parking"`

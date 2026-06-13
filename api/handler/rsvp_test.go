@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
+
+	"ppmxbbg-rsvp/pkg/rsvpcutoff"
 )
 
 func TestStripAPIStage(t *testing.T) {
@@ -70,6 +73,34 @@ func TestRSVPInvalidMethodV2(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	assertStatus(t, resp, http.StatusMethodNotAllowed)
+}
+
+func TestRSVPPostAfterCutoff(t *testing.T) {
+	prev := rsvpcutoff.Cutoff
+	rsvpcutoff.Cutoff = time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	t.Cleanup(func() {
+		rsvpcutoff.Cutoff = prev
+	})
+
+	raw := mustJSON(map[string]any{
+		"httpMethod": "POST",
+		"path":       "/guest",
+		"body":       `{"id":1,"is_attending":true,"attend_solemnisation":true}`,
+	})
+
+	resp, err := RSVP(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertStatus(t, resp, http.StatusForbidden)
+
+	var body map[string]string
+	if err := json.Unmarshal(bodyFromResponse(resp), &body); err != nil {
+		t.Fatalf("failed to decode body: %v", err)
+	}
+	if body["error"] != "rsvp has closed" {
+		t.Fatalf("expected rsvp has closed, got %q", body["error"])
+	}
 }
 
 func TestRSVPPostGuestInvalidBody(t *testing.T) {
