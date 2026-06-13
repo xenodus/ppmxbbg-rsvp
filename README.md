@@ -382,7 +382,7 @@ cd frontend && npm install && npm run dev
 
 Open `http://localhost:5173/?id=YOUR_INVITE_ID`.
 
-Admin UI: `http://localhost:5173/admin.html` (set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `api/.env` when running the API locally).
+Admin UI: `http://localhost:5173/admin.html` — see [Admin UI](#admin-ui) (set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `api/.env` when running the API locally).
 
 To proxy API calls through Vite during dev, set `VITE_API_PROXY_TARGET` in `frontend/.env` to your API Gateway URL and leave `VITE_API_BASE_URL` empty. The dev server proxies `/guest` and `/admin` to that target.
 
@@ -391,6 +391,43 @@ To proxy API calls through Vite during dev, set `VITE_API_PROXY_TARGET` in `fron
 ```bash
 make test
 ```
+
+---
+
+## Admin UI
+
+Password-protected admin app at **`/admin.html`** on the deployed site (e.g. `https://alvinandvivian.rsvp/admin.html`) or locally at `http://localhost:5173/admin.html`. It uses the admin API (`POST /admin/login`, `/admin/invites`) documented above.
+
+Sign in with `ADMIN_USERNAME` and `ADMIN_PASSWORD` (Lambda env vars, or `api/.env` when running the API locally). The session token is stored in `sessionStorage` for the browser tab.
+
+### What you can do
+
+| Area | Actions |
+|------|---------|
+| **Create invite** | Enter guest names (one per line); the server assigns a snowflake id and the RSVP link is copied to the clipboard after create |
+| **Invite list** | Search by guest name; see counts of invites and guests |
+| **Per invite** | QR code for the RSVP link, **Copy link**, **Copy message** (uses the template below), **Mark sent** / **Mark unsent**, **Delete**, **Responses** (expand RSVP table) |
+| **Message template** | **Edit message** — customize the WhatsApp/SMS-style invite text stored in `localStorage`; placeholders `[Names]` and `[Link]` are replaced per invite |
+| **Export** | **Download CSV** — one row per guest with invite id, sent/parking flags, attendance, solemnisation, dietary needs, and timestamps |
+| **Session** | **Sign out** clears the stored token |
+
+Expanded **Responses** shows attending, solemnisation, dietary, and last-updated per guest. Summary lines show responded/attending counts plus sent and parking status.
+
+### Screenshots
+
+Captured with mocked invite data (`npm run screenshots` in `frontend/`; see [Project layout](#project-layout)). Production data will differ.
+
+**Desktop (1280px)**
+
+| Invite list | Responses expanded |
+|-------------|-------------------|
+| ![Admin desktop — invite list](docs/readme/admin/admin-desktop.png) | ![Admin desktop — responses](docs/readme/admin/admin-desktop-responses.png) |
+
+**Mobile (~390px)**
+
+| Invite list | Responses expanded |
+|-------------|-------------------|
+| ![Admin mobile — invite list](docs/readme/admin/admin-mobile.png) | ![Admin mobile — responses](docs/readme/admin/admin-mobile-responses.png) |
 
 ---
 
@@ -454,6 +491,8 @@ CREATE TABLE guests (
 ```text
 .
 ├── api/           # Go Lambda (handler, store, config)
+├── docs/
+│   └── readme/    # Images committed for README (admin UI screenshots)
 ├── frontend/      # React + Vite SPA (`index.html` landing + RSVP popup, `admin.html` admin)
 │   └── public/
 │       ├── original/  # Source PNG/GIF illustrations (masters)
@@ -462,5 +501,14 @@ CREATE TABLE guests (
 ├── Makefile       # Build and deploy commands
 └── INSTRUCTIONS.md  # Repo rules — keep README in sync with API/deploy changes
 ```
+
+Regenerate UI screenshots locally (written to gitignored `docs/screenshots/` by default):
+
+```bash
+cd frontend
+npm ci && npm run build && npx playwright install chromium && npm run screenshots
+```
+
+Copy updated admin images into `docs/readme/admin/` when refreshing the README screenshots.
 
 Wedding copy (couple names, date, venue) is in `frontend/src/constants.js`.
