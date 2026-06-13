@@ -236,6 +236,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 .landing-section--faq {
   flex-direction: column;
   background-color: #77891a;
+  border-bottom: 0;
 }
 
 .landing-section--lots-of-love {
