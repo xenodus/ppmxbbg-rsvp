@@ -271,7 +271,7 @@ function AdminHeader({
         {scrolled ? (
           <button
             type="button"
-            className={`admin-header-menu-btn secondary-btn${menuOpen ? " is-hidden" : ""}`}
+            className={`admin-header-menu-btn${menuOpen ? " is-hidden" : ""}`}
             aria-expanded={menuOpen}
             aria-controls="admin-actions-drawer"
             onClick={() => setMenuOpen(true)}
@@ -298,7 +298,7 @@ function AdminHeader({
 
           <aside
             id="admin-actions-drawer"
-            className={`nav-drawer${menuOpen ? " is-open" : ""}`}
+            className={`nav-drawer admin-nav-drawer${menuOpen ? " is-open" : ""}`}
             aria-hidden={!menuOpen}
           >
             <button
