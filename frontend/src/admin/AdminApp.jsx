@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   clearSession,
   createInvite,
@@ -181,7 +181,6 @@ function AdminHeader({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
 
   useEffect(() => {
     function onScroll() {
@@ -204,23 +203,19 @@ function AdminHeader({
       return undefined;
     }
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     function onKeyDown(event) {
       if (event.key === "Escape") {
         setMenuOpen(false);
       }
     }
 
-    function onPointerDown(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-    }
-
     window.addEventListener("keydown", onKeyDown);
-    document.addEventListener("pointerdown", onPointerDown);
     return () => {
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointerdown", onPointerDown);
     };
   }, [menuOpen]);
 
@@ -267,19 +262,19 @@ function AdminHeader({
   );
 
   return (
-    <header className={`admin-header${scrolled ? " is-compact" : ""}`}>
-      <div className="admin-header-title">
-        <h1>Invites &amp; responses</h1>
-        <p className="admin-muted">Manage invitations and view RSVP data.</p>
-      </div>
-      {scrolled ? (
-        <div className="admin-header-menu" ref={menuRef}>
+    <>
+      <header className={`admin-header${scrolled ? " is-compact" : ""}`}>
+        <div className="admin-header-title">
+          <h1>Invites &amp; responses</h1>
+          <p className="admin-muted">Manage invitations and view RSVP data.</p>
+        </div>
+        {scrolled ? (
           <button
             type="button"
-            className="admin-header-menu-btn secondary-btn"
+            className={`admin-header-menu-btn secondary-btn${menuOpen ? " is-hidden" : ""}`}
             aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            onClick={() => setMenuOpen((open) => !open)}
+            aria-controls="admin-actions-drawer"
+            onClick={() => setMenuOpen(true)}
           >
             <span className="admin-header-menu-icon" aria-hidden="true">
               <span />
@@ -288,16 +283,59 @@ function AdminHeader({
             </span>
             <span>Actions</span>
           </button>
-          {menuOpen ? (
-            <div className="admin-header-dropdown" role="menu">
-              {actionButtons}
-            </div>
-          ) : null}
-        </div>
-      ) : (
-        <div className="admin-header-actions">{actionButtons}</div>
-      )}
-    </header>
+        ) : (
+          <div className="admin-header-actions">{actionButtons}</div>
+        )}
+      </header>
+
+      {scrolled ? (
+        <>
+          <div
+            className={`nav-overlay${menuOpen ? " is-visible" : ""}`}
+            aria-hidden={!menuOpen}
+            onClick={closeMenu}
+          />
+
+          <aside
+            id="admin-actions-drawer"
+            className={`nav-drawer${menuOpen ? " is-open" : ""}`}
+            aria-hidden={!menuOpen}
+          >
+            <button
+              type="button"
+              className="nav-drawer-close"
+              aria-label="Close menu"
+              onClick={closeMenu}
+            >
+              ×
+            </button>
+
+            <h2 className="nav-drawer-title admin-drawer-title">Invites &amp; responses</h2>
+
+            <nav className="admin-drawer-actions" aria-label="Admin actions">
+              <button
+                type="button"
+                className="admin-drawer-action"
+                onClick={handleToggleMessageTemplate}
+              >
+                {editingMessageTemplate ? "Close editor" : "Edit message"}
+              </button>
+              <button
+                type="button"
+                className="admin-drawer-action"
+                disabled={loading || invites.length === 0}
+                onClick={handleDownloadCsv}
+              >
+                Download CSV
+              </button>
+              <button type="button" className="admin-drawer-action" onClick={handleLogout}>
+                Sign out
+              </button>
+            </nav>
+          </aside>
+        </>
+      ) : null}
+    </>
   );
 }
 
