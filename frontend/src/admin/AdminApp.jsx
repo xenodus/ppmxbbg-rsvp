@@ -177,6 +177,176 @@ function InviteQrCode({ url }) {
   );
 }
 
+const ADMIN_HEADER_SCROLL_THRESHOLD = 48;
+
+function AdminHeader({
+  editingMessageTemplate,
+  onToggleMessageTemplate,
+  loading,
+  invites,
+  onDownloadCsv,
+  onLogout,
+}) {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > ADMIN_HEADER_SCROLL_THRESHOLD);
+    }
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!scrolled) {
+      setMenuOpen(false);
+    }
+  }, [scrolled]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
+  function closeMenu() {
+    setMenuOpen(false);
+  }
+
+  function handleToggleMessageTemplate() {
+    closeMenu();
+    onToggleMessageTemplate();
+  }
+
+  function handleDownloadCsv() {
+    closeMenu();
+    onDownloadCsv();
+  }
+
+  function handleLogout() {
+    closeMenu();
+    onLogout();
+  }
+
+  const actionButtons = (
+    <>
+      <button
+        type="button"
+        className="secondary-btn"
+        onClick={handleToggleMessageTemplate}
+      >
+        {editingMessageTemplate ? "Close editor" : "Edit message"}
+      </button>
+      <button
+        type="button"
+        className="secondary-btn"
+        disabled={loading || invites.length === 0}
+        onClick={handleDownloadCsv}
+      >
+        Download CSV
+      </button>
+      <button type="button" className="secondary-btn" onClick={handleLogout}>
+        Sign out
+      </button>
+    </>
+  );
+
+  return (
+    <>
+      <header className={`admin-header${scrolled ? " is-compact" : ""}`}>
+        <div className="admin-header-title">
+          <h1>Invites &amp; responses</h1>
+          <p className="admin-muted">Manage invitations and view RSVP data.</p>
+        </div>
+        {scrolled ? (
+          <button
+            type="button"
+            className={`admin-header-menu-btn${menuOpen ? " is-hidden" : ""}`}
+            aria-expanded={menuOpen}
+            aria-controls="admin-actions-drawer"
+            onClick={() => setMenuOpen(true)}
+          >
+            <span className="admin-header-menu-icon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+            <span>Actions</span>
+          </button>
+        ) : (
+          <div className="admin-header-actions">{actionButtons}</div>
+        )}
+      </header>
+
+      {scrolled ? (
+        <>
+          <div
+            className={`nav-overlay${menuOpen ? " is-visible" : ""}`}
+            aria-hidden={!menuOpen}
+            onClick={closeMenu}
+          />
+
+          <aside
+            id="admin-actions-drawer"
+            className={`nav-drawer admin-nav-drawer${menuOpen ? " is-open" : ""}`}
+            aria-hidden={!menuOpen}
+          >
+            <button
+              type="button"
+              className="nav-drawer-close"
+              aria-label="Close menu"
+              onClick={closeMenu}
+            >
+              ×
+            </button>
+
+            <h2 className="nav-drawer-title admin-drawer-title">Invites &amp; responses</h2>
+
+            <nav className="admin-drawer-actions" aria-label="Admin actions">
+              <button
+                type="button"
+                className="admin-drawer-action"
+                onClick={handleToggleMessageTemplate}
+              >
+                {editingMessageTemplate ? "Close editor" : "Edit message"}
+              </button>
+              <button
+                type="button"
+                className="admin-drawer-action"
+                disabled={loading || invites.length === 0}
+                onClick={handleDownloadCsv}
+              >
+                Download CSV
+              </button>
+              <button type="button" className="admin-drawer-action" onClick={handleLogout}>
+                Sign out
+              </button>
+            </nav>
+          </aside>
+        </>
+      ) : null}
+    </>
+  );
+}
+
 function MessageTemplateEditor({ template, onSave, onClose }) {
   const [draft, setDraft] = useState(template);
 
@@ -485,32 +655,14 @@ export default function AdminApp() {
         <LoginForm onSuccess={handleLogin} error={loginError} loading={loading} />
       ) : (
         <>
-          <header className="admin-header">
-            <div>
-              <h1>Invites &amp; responses</h1>
-              <p className="admin-muted">Manage invitations and view RSVP data.</p>
-            </div>
-            <div className="admin-header-actions">
-              <button
-                type="button"
-                className="secondary-btn"
-                onClick={() => setEditingMessageTemplate((open) => !open)}
-              >
-                {editingMessageTemplate ? "Close editor" : "Edit message"}
-              </button>
-              <button
-                type="button"
-                className="secondary-btn"
-                disabled={loading || invites.length === 0}
-                onClick={() => downloadInvitesCsv(invites)}
-              >
-                Download CSV
-              </button>
-              <button type="button" className="secondary-btn" onClick={handleLogout}>
-                Sign out
-              </button>
-            </div>
-          </header>
+          <AdminHeader
+            editingMessageTemplate={editingMessageTemplate}
+            onToggleMessageTemplate={() => setEditingMessageTemplate((open) => !open)}
+            loading={loading}
+            invites={invites}
+            onDownloadCsv={() => downloadInvitesCsv(invites)}
+            onLogout={handleLogout}
+          />
 
           {pageError ? <p className="banner banner-error">{pageError}</p> : null}
 
