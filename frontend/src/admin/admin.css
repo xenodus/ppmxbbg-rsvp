@@ -10,6 +10,22 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   max-width: 42rem;
   margin: 0 auto;
   padding: 2rem 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-footer {
+  width: 100%;
+  margin-top: auto;
+  padding: 0.5rem 0 0;
+  text-align: center;
+}
+
+.admin-footer p {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
 
 .admin-page .form-card {
