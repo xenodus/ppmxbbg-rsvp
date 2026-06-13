@@ -287,7 +287,7 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   }
 }
 
-@media (min-width: 641px) {
+@media (min-width: 1280px) {
   .landing-sprite {
     margin-top: -5rem;
   }
@@ -443,6 +443,10 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
 }
 
 @media (max-width: 640px) {
+  .landing-sprite {
+    margin-top: -2rem;
+  }
+
   .modal-backdrop.guest-respond-backdrop {
     align-items: stretch;
     justify-content: stretch;
