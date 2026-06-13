@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   clearSession,
   createInvite,
@@ -177,7 +177,8 @@ function InviteQrCode({ url }) {
   );
 }
 
-const ADMIN_HEADER_SCROLL_THRESHOLD = 48;
+const ADMIN_HEADER_SCROLL_DOWN_THRESHOLD = 48;
+const ADMIN_HEADER_SCROLL_UP_THRESHOLD = 12;
 
 function AdminHeader({
   editingMessageTemplate,
@@ -187,12 +188,33 @@ function AdminHeader({
   onDownloadCsv,
   onLogout,
 }) {
+  const headerRef = useRef(null);
+  const scrolledRef = useRef(false);
   const [scrolled, setScrolled] = useState(false);
+  const [spacerHeight, setSpacerHeight] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > ADMIN_HEADER_SCROLL_THRESHOLD);
+      const scrollY = window.scrollY;
+      const wasScrolled = scrolledRef.current;
+      let nextScrolled = wasScrolled;
+
+      if (!wasScrolled && scrollY > ADMIN_HEADER_SCROLL_DOWN_THRESHOLD) {
+        nextScrolled = true;
+        const height = headerRef.current?.offsetHeight ?? 0;
+        if (height > 0) {
+          setSpacerHeight(height);
+        }
+      } else if (wasScrolled && scrollY < ADMIN_HEADER_SCROLL_UP_THRESHOLD) {
+        nextScrolled = false;
+        setSpacerHeight(0);
+      }
+
+      if (nextScrolled !== wasScrolled) {
+        scrolledRef.current = nextScrolled;
+        setScrolled(nextScrolled);
+      }
     }
 
     onScroll();
@@ -271,7 +293,17 @@ function AdminHeader({
 
   return (
     <>
-      <header className={`admin-header${scrolled ? " is-compact" : ""}`}>
+      {spacerHeight > 0 ? (
+        <div
+          className="admin-header-spacer"
+          style={{ height: spacerHeight }}
+          aria-hidden="true"
+        />
+      ) : null}
+      <header
+        ref={headerRef}
+        className={`admin-header${scrolled ? " is-compact" : ""}`}
+      >
         <div className="admin-header-title">
           <h1>Invites &amp; responses</h1>
           <p className="admin-muted">Manage invitations and view RSVP data.</p>

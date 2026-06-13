@@ -87,15 +87,21 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   gap: 1rem;
   margin-bottom: 2rem;
   background: var(--bg);
-  transition:
-    padding 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
+}
+
+.admin-header-spacer {
+  flex-shrink: 0;
 }
 
 .admin-header.is-compact {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(42rem, calc(100% - 2.5rem));
   align-items: center;
-  margin-left: -1.25rem;
-  margin-right: -1.25rem;
+  margin: 0 0 2rem;
   padding: 0.75rem 1.25rem;
   box-shadow: 0 1px 0 var(--border);
 }
