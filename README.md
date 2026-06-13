@@ -99,6 +99,8 @@ Save RSVP data. The handler routes by request body:
 - Body contains `require_parking` → **invite update**
 - Otherwise → **guest update**
 
+RSVP submissions are rejected with **403** at or after **11 September 2026 00:00** (Asia/Singapore). `GET /guest` remains available so guests can still open their invite link.
+
 #### Decline all guests
 
 **Request body**
@@ -147,6 +149,7 @@ curl -X POST "https://YOUR_API_URL/guest" \
 
 | Status | Body | Cause |
 |--------|------|-------|
+| `403` | `{"error":"rsvp has closed"}` | RSVP cutoff passed (11 Sep 2026 00:00 Asia/Singapore) |
 | `400` | `{"error":"id is required"}` | Missing invite id |
 | `400` | `{"error":"require_parking is required"}` | Missing parking field |
 | `404` | `{"error":"invite not found"}` | Invite id not in database |
@@ -193,6 +196,7 @@ curl -X POST "https://YOUR_API_URL/guest" \
 
 | Status | Body | Cause |
 |--------|------|-------|
+| `403` | `{"error":"rsvp has closed"}` | RSVP cutoff passed (11 Sep 2026 00:00 Asia/Singapore) |
 | `400` | `{"error":"id is required"}` | Missing guest id |
 | `400` | `{"error":"is_attending is required"}` | Missing attendance choice |
 | `400` | `{"error":"attend_solemnisation is required when attending"}` | Attending guest missing solemnisation choice |
