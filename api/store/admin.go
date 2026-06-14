@@ -244,6 +244,27 @@ func UpdateGuestName(ctx context.Context, patch AdminGuestPatch) (*Guest, error)
 		return nil, err
 	}
 
+	var inviteID string
+	err = conn.QueryRowContext(ctx, `SELECT invite_id FROM guests WHERE id = ?`, patch.ID).Scan(&inviteID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, ErrGuestNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	var responded int
+	err = conn.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM guests
+		WHERE invite_id = ? AND is_attending IS NOT NULL
+	`, inviteID).Scan(&responded)
+	if err != nil {
+		return nil, err
+	}
+	if responded > 0 {
+		return nil, ErrInviteHasResponses
+	}
+
 	result, err := conn.ExecContext(ctx, `UPDATE guests SET name = ? WHERE id = ?`, name, patch.ID)
 	if err != nil {
 		return nil, err

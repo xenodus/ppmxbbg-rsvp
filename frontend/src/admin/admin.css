@@ -343,6 +343,11 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   -webkit-overflow-scrolling: touch;
 }
 
+.admin-names-locked-note {
+  margin: 0 0 0.65rem;
+  font-size: 0.85rem;
+}
+
 .admin-table {
   width: 100%;
   min-width: 32rem;

@@ -60,6 +60,10 @@ function guestResponded(guest) {
   return guest.is_attending !== undefined && guest.is_attending !== null;
 }
 
+function inviteHasResponses(invite) {
+  return (invite.guests || []).some(guestResponded);
+}
+
 function inviteSummary(invite) {
   const guests = invite.guests || [];
   const responded = guests.filter(guestResponded).length;
@@ -434,7 +438,7 @@ function MessageTemplateEditor({ template, onSave, onClose }) {
   );
 }
 
-function EditableGuestName({ guest, disabled, onSaved }) {
+function EditableGuestName({ guest, disabled, canEdit, onSaved }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(guest.name);
   const [saving, setSaving] = useState(false);
@@ -470,6 +474,10 @@ function EditableGuestName({ guest, disabled, onSaved }) {
   function handleCancel() {
     setDraft(guest.name);
     setEditing(false);
+  }
+
+  if (!canEdit) {
+    return <span>{guest.name}</span>;
   }
 
   if (!editing) {
@@ -534,6 +542,7 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [messageCopied, setMessageCopied] = useState(false);
   const summary = inviteSummary(invite);
+  const namesLocked = inviteHasResponses(invite);
   const guestNameList = (invite.guests || []).map((g) => g.name);
 
   useEffect(() => {
@@ -646,6 +655,11 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
       </p>
       {expanded ? (
         <div className="admin-table-wrap">
+          {namesLocked ? (
+            <p className="admin-muted admin-names-locked-note">
+              Guest names cannot be edited after someone has responded.
+            </p>
+          ) : null}
           <table className="admin-table">
             <thead>
               <tr>
@@ -663,6 +677,7 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
                     <EditableGuestName
                       guest={guest}
                       disabled={busy}
+                      canEdit={!namesLocked}
                       onSaved={onRefresh}
                     />
                   </td>

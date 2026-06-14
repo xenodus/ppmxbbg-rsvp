@@ -184,6 +184,9 @@ func handleAdminPatchGuest(ctx context.Context, body, origin string) (apiRespons
 	if errors.Is(err, store.ErrGuestNotFound) {
 		return jsonResponseWithCORS(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin, adminCORSMethods, adminCORSHeaders)
 	}
+	if errors.Is(err, store.ErrInviteHasResponses) {
+		return jsonResponseWithCORS(http.StatusConflict, errorResponse{Error: err.Error()}, origin, adminCORSMethods, adminCORSHeaders)
+	}
 	if err != nil {
 		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: err.Error()}, origin, adminCORSMethods, adminCORSHeaders)
 	}

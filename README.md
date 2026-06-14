@@ -301,7 +301,7 @@ Update invite metadata. Only `is_sent` is supported today.
 
 ### PATCH /admin/guests
 
-Update a guest's name. RSVP fields are not changed by this endpoint.
+Update a guest's name. RSVP fields are not changed by this endpoint. Rejected with **409 Conflict** once any guest on the same invite has submitted an RSVP (`is_attending` is set).
 
 **Request body**
 
@@ -320,6 +320,8 @@ Update a guest's name. RSVP fields are not changed by this endpoint.
 **200 OK** — updated guest object.
 
 **404 Not Found** — `{"error":"guest not found"}`.
+
+**409 Conflict** — `{"error":"guest names cannot be changed after an RSVP response"}`.
 
 **Example**
 
@@ -442,12 +444,12 @@ Sign in with `ADMIN_USERNAME` and `ADMIN_PASSWORD` (Lambda env vars, or `api/.en
 | **Create invite** | Enter guest names (one per line); the server assigns a snowflake id and the RSVP link is copied to the clipboard after create |
 | **Invite list** | Search by guest name; see counts of invites and guests |
 | **Per invite** | QR code for the RSVP link, **Copy link**, **Copy message** (uses the template below), **Mark sent** / **Mark unsent**, **Delete**, **Responses** (expand RSVP table) |
-| **Guest names** | In **Responses**, use **Edit** next to a guest name to rename them |
+| **Guest names** | In **Responses**, use **Edit** next to a guest name to rename them (disabled once any guest on that invite has responded) |
 | **Message template** | **Edit message** — customize the WhatsApp/SMS-style invite text stored in `localStorage`; placeholders `[Names]` and `[Link]` are replaced per invite |
 | **Export** | **Download CSV** — one row per guest with invite id, sent/parking flags, attendance, solemnisation, dietary needs, and timestamps |
 | **Session** | **Sign out** clears the stored token |
 
-Expanded **Responses** shows attending, solemnisation, dietary, and last-updated per guest. Guest names can be edited inline from this table. Summary lines show responded/attending counts plus sent and parking status.
+Expanded **Responses** shows attending, solemnisation, dietary, and last-updated per guest. Guest names can be edited inline from this table until any guest on the invite has responded. Summary lines show responded/attending counts plus sent and parking status.
 
 ### Screenshots
 
