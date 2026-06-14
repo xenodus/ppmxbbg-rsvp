@@ -343,6 +343,11 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   -webkit-overflow-scrolling: touch;
 }
 
+.admin-names-locked-note {
+  margin: 0 0 0.65rem;
+  font-size: 0.85rem;
+}
+
 .admin-table {
   width: 100%;
   min-width: 32rem;
@@ -355,6 +360,47 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   text-align: left;
   padding: 0.45rem 0.5rem;
   border-bottom: 1px solid var(--border);
+}
+
+.admin-guest-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-guest-name-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 10rem;
+}
+
+.admin-guest-name-input {
+  width: 100%;
+  min-width: 8rem;
+}
+
+.admin-guest-name-edit-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.admin-inline-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.admin-inline-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .admin-danger {

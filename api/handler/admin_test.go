@@ -90,6 +90,60 @@ func TestAdminLoginWithStagePrefix(t *testing.T) {
 	assertStatus(t, resp, http.StatusOK)
 }
 
+func TestAdminGuestsUnauthorized(t *testing.T) {
+	t.Setenv("ADMIN_USERNAME", "admin")
+	t.Setenv("ADMIN_PASSWORD", "secret")
+
+	raw := mustJSON(map[string]any{
+		"httpMethod": "PATCH",
+		"path":       "/admin/guests",
+		"body":       `{"id":1,"name":"Jane"}`,
+	})
+
+	resp, err := RSVP(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertStatus(t, resp, http.StatusUnauthorized)
+}
+
+func TestAdminPatchGuestInvalidBody(t *testing.T) {
+	t.Setenv("ADMIN_USERNAME", "admin")
+	t.Setenv("ADMIN_PASSWORD", "secret")
+	t.Setenv("ADMIN_TOKEN_SECRET", "signing")
+
+	loginRaw := mustJSON(map[string]any{
+		"httpMethod": "POST",
+		"path":       "/admin/login",
+		"body":       `{"username":"admin","password":"secret"}`,
+	})
+	loginResp, err := RSVP(context.Background(), loginRaw)
+	if err != nil {
+		t.Fatalf("login error: %v", err)
+	}
+	assertStatus(t, loginResp, http.StatusOK)
+
+	var loginBody map[string]string
+	if err := json.Unmarshal(bodyFromResponse(loginResp), &loginBody); err != nil {
+		t.Fatalf("decode login body: %v", err)
+	}
+
+	raw := mustJSON(map[string]any{
+		"httpMethod": "PATCH",
+		"path":       "/admin/guests",
+		"headers": map[string]string{
+			"Authorization": "Bearer " + loginBody["token"],
+		},
+		"body": `{"id":1}`,
+	})
+
+	resp, err := RSVP(context.Background(), raw)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertStatus(t, resp, http.StatusBadRequest)
+}
+
 func TestAdminOptionsV2(t *testing.T) {
 	raw := mustJSON(map[string]any{
 		"version":  "2.0",

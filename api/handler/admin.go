@@ -36,7 +36,7 @@ type createInviteResponse struct {
 }
 
 func isAdminPath(path string) bool {
-	return path == "/admin/login" || path == "/admin/invites"
+	return path == "/admin/login" || path == "/admin/invites" || path == "/admin/guests"
 }
 
 func dispatchAdmin(ctx context.Context, in inboundRequest) (apiResponse, error) {
@@ -71,6 +71,14 @@ func dispatchAdmin(ctx context.Context, in inboundRequest) (apiResponse, error) 
 				return adminUnauthorized(in.Origin, err)
 			}
 			return handleAdminDeleteInvite(ctx, in.Query, in.Origin)
+		}
+	case "/admin/guests":
+		switch in.Method {
+		case http.MethodPatch:
+			if err := requireAdmin(in.Headers); err != nil {
+				return adminUnauthorized(in.Origin, err)
+			}
+			return handleAdminPatchGuest(ctx, in.Body, in.Origin)
 		}
 	}
 
@@ -165,6 +173,24 @@ func handleAdminPatchInvite(ctx context.Context, body, origin string) (apiRespon
 		}
 	}
 	return jsonResponseWithCORS(http.StatusOK, map[string]string{"status": "saved"}, origin, adminCORSMethods, adminCORSHeaders)
+}
+
+func handleAdminPatchGuest(ctx context.Context, body, origin string) (apiResponse, error) {
+	var patch store.AdminGuestPatch
+	if err := json.Unmarshal([]byte(body), &patch); err != nil {
+		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin, adminCORSMethods, adminCORSHeaders)
+	}
+	guest, err := store.UpdateGuestName(ctx, patch)
+	if errors.Is(err, store.ErrGuestNotFound) {
+		return jsonResponseWithCORS(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin, adminCORSMethods, adminCORSHeaders)
+	}
+	if errors.Is(err, store.ErrInviteHasResponses) {
+		return jsonResponseWithCORS(http.StatusConflict, errorResponse{Error: err.Error()}, origin, adminCORSMethods, adminCORSHeaders)
+	}
+	if err != nil {
+		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: err.Error()}, origin, adminCORSMethods, adminCORSHeaders)
+	}
+	return jsonResponseWithCORS(http.StatusOK, guest, origin, adminCORSMethods, adminCORSHeaders)
 }
 
 func handleAdminDeleteInvite(ctx context.Context, params map[string]string, origin string) (apiResponse, error) {

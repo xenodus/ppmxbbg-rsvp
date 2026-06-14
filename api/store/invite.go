@@ -81,8 +81,9 @@ func envOrDefault(key, fallback string) string {
 }
 
 var (
-	ErrInviteNotFound = errors.New("invite not found")
-	ErrGuestNotFound  = errors.New("guest not found")
+	ErrInviteNotFound     = errors.New("invite not found")
+	ErrGuestNotFound      = errors.New("guest not found")
+	ErrInviteHasResponses = errors.New("guest names cannot be changed after an RSVP response")
 )
 
 func GetInvite(ctx context.Context, id string) (*Invite, error) {
