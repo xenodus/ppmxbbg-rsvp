@@ -279,6 +279,15 @@ html.landing-page.landing-ready .landing-hero-heading__line-two {
   animation: landing-sprite-play 4.5s steps(8) forwards;
 }
 
+.landing-sprite--replayable {
+  cursor: pointer;
+}
+
+.landing-sprite--replayable:focus-visible {
+  outline: 2px solid #dd774a;
+  outline-offset: 4px;
+}
+
 @keyframes landing-sprite-play {
   from {
     background-position: left bottom;
