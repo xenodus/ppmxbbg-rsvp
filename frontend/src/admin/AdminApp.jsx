@@ -8,6 +8,7 @@ import {
   login,
   markInviteSent,
   setStoredToken,
+  updateGuestName,
 } from "./adminApi.js";
 import { downloadInvitesCsv } from "./exportCsv.js";
 import {
@@ -433,6 +434,100 @@ function MessageTemplateEditor({ template, onSave, onClose }) {
   );
 }
 
+function EditableGuestName({ guest, disabled, onSaved }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(guest.name);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!editing) {
+      setDraft(guest.name);
+    }
+  }, [guest.name, editing]);
+
+  async function handleSave() {
+    const name = draft.trim();
+    if (!name) {
+      alert("Guest name cannot be empty.");
+      return;
+    }
+    if (name === guest.name) {
+      setEditing(false);
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateGuestName(guest.id, name);
+      setEditing(false);
+      await onSaved();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleCancel() {
+    setDraft(guest.name);
+    setEditing(false);
+  }
+
+  if (!editing) {
+    return (
+      <div className="admin-guest-name-cell">
+        <span>{guest.name}</span>
+        <button
+          type="button"
+          className="admin-inline-btn"
+          disabled={disabled}
+          onClick={() => setEditing(true)}
+        >
+          Edit
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-guest-name-edit">
+      <input
+        className="admin-input admin-guest-name-input"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        disabled={saving}
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSave();
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            handleCancel();
+          }
+        }}
+      />
+      <div className="admin-guest-name-edit-actions">
+        <button
+          type="button"
+          className="admin-inline-btn"
+          disabled={saving}
+          onClick={handleSave}
+        >
+          {saving ? "Saving…" : "Save"}
+        </button>
+        <button
+          type="button"
+          className="admin-inline-btn"
+          disabled={saving}
+          onClick={handleCancel}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function InviteRow({ invite, messageTemplate, onRefresh }) {
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -564,7 +659,13 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
             <tbody>
               {(invite.guests || []).map((guest) => (
                 <tr key={guest.id}>
-                  <td>{guest.name}</td>
+                  <td>
+                    <EditableGuestName
+                      guest={guest}
+                      disabled={busy}
+                      onSaved={onRefresh}
+                    />
+                  </td>
                   <td>{formatBool(guest.is_attending)}</td>
                   <td>{formatBool(guest.attend_solemnisation)}</td>
                   <td>{guest.dietary_restriction || "—"}</td>

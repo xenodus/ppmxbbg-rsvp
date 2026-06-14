@@ -23,6 +23,11 @@ type AdminInvitePatch struct {
 	IsSent *bool  `json:"is_sent"`
 }
 
+type AdminGuestPatch struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 func ListInvites(ctx context.Context) ([]AdminInvite, error) {
 	conn, err := DB()
 	if err != nil {
@@ -223,6 +228,71 @@ func EnrichAdminInvite(ctx context.Context, invite *Invite) (*AdminInvite, error
 		out.IsSent = &v
 	}
 	return out, nil
+}
+
+func UpdateGuestName(ctx context.Context, patch AdminGuestPatch) (*Guest, error) {
+	name := strings.TrimSpace(patch.Name)
+	if patch.ID <= 0 {
+		return nil, errors.New("id is required")
+	}
+	if name == "" {
+		return nil, errors.New("name is required")
+	}
+
+	conn, err := DB()
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := conn.ExecContext(ctx, `UPDATE guests SET name = ? WHERE id = ?`, name, patch.ID)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if rows == 0 {
+		return nil, ErrGuestNotFound
+	}
+
+	var guest Guest
+	var dietaryRestriction sql.NullString
+	var isAttending sql.NullBool
+	var attendSolemnisation sql.NullBool
+	var guestUpdated sql.NullTime
+	err = conn.QueryRowContext(ctx, `
+		SELECT id, name, dietary_restriction, is_attending, attend_solemnisation, last_updated
+		FROM guests
+		WHERE id = ?
+	`, patch.ID).Scan(
+		&guest.ID,
+		&guest.Name,
+		&dietaryRestriction,
+		&isAttending,
+		&attendSolemnisation,
+		&guestUpdated,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if dietaryRestriction.Valid {
+		v := dietaryRestriction.String
+		guest.DietaryRestriction = &v
+	}
+	if isAttending.Valid {
+		v := isAttending.Bool
+		guest.IsAttending = &v
+	}
+	if attendSolemnisation.Valid {
+		v := attendSolemnisation.Bool
+		guest.AttendSolemnisation = &v
+	}
+	if guestUpdated.Valid {
+		v := guestUpdated.Time.Format("2006-01-02 15:04:05")
+		guest.LastUpdated = &v
+	}
+	return &guest, nil
 }
 
 func normalizeGuestNames(names []string) []string {

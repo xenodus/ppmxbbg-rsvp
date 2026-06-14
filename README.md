@@ -34,6 +34,8 @@ Base URL: your API Gateway URL, e.g. `https://abc123.execute-api.ap-southeast-1.
 | `PATCH` | `/admin/invites` | Bearer | Update invite (`is_sent` only) |
 | `DELETE` | `/admin/invites?id={invite_id}` | Bearer | Delete invite and its guests |
 | `OPTIONS` | `/admin/invites` | None | CORS preflight |
+| `PATCH` | `/admin/guests` | Bearer | Update a guest's name |
+| `OPTIONS` | `/admin/guests` | None | CORS preflight |
 
 Admin requests (except login) send `Authorization: Bearer {token}` from `POST /admin/login`. Credentials are `ADMIN_USERNAME` and `ADMIN_PASSWORD` on Lambda.
 
@@ -297,6 +299,39 @@ Update invite metadata. Only `is_sent` is supported today.
 
 ---
 
+### PATCH /admin/guests
+
+Update a guest's name. RSVP fields are not changed by this endpoint.
+
+**Request body**
+
+```json
+{
+  "id": 1,
+  "name": "Jane Smith"
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | yes | Guest id |
+| `name` | yes | New guest name (non-empty after trim) |
+
+**200 OK** — updated guest object.
+
+**404 Not Found** — `{"error":"guest not found"}`.
+
+**Example**
+
+```bash
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"id":1,"name":"Jane Smith"}' \
+  "https://YOUR_API_URL/admin/guests"
+```
+
+---
+
 ### DELETE /admin/invites
 
 **Query parameters**
@@ -396,7 +431,7 @@ make test
 
 ## Admin UI
 
-Password-protected admin app at **`/admin.html`** on the deployed site (e.g. `https://alvinandvivian.rsvp/admin.html`) or locally at `http://localhost:5173/admin.html`. It uses the admin API (`POST /admin/login`, `/admin/invites`) documented above.
+Password-protected admin app at **`/admin.html`** on the deployed site (e.g. `https://alvinandvivian.rsvp/admin.html`) or locally at `http://localhost:5173/admin.html`. It uses the admin API (`POST /admin/login`, `/admin/invites`, `/admin/guests`) documented above.
 
 Sign in with `ADMIN_USERNAME` and `ADMIN_PASSWORD` (Lambda env vars, or `api/.env` when running the API locally). The session token is stored in `sessionStorage` for the browser tab.
 
@@ -407,11 +442,12 @@ Sign in with `ADMIN_USERNAME` and `ADMIN_PASSWORD` (Lambda env vars, or `api/.en
 | **Create invite** | Enter guest names (one per line); the server assigns a snowflake id and the RSVP link is copied to the clipboard after create |
 | **Invite list** | Search by guest name; see counts of invites and guests |
 | **Per invite** | QR code for the RSVP link, **Copy link**, **Copy message** (uses the template below), **Mark sent** / **Mark unsent**, **Delete**, **Responses** (expand RSVP table) |
+| **Guest names** | In **Responses**, use **Edit** next to a guest name to rename them |
 | **Message template** | **Edit message** — customize the WhatsApp/SMS-style invite text stored in `localStorage`; placeholders `[Names]` and `[Link]` are replaced per invite |
 | **Export** | **Download CSV** — one row per guest with invite id, sent/parking flags, attendance, solemnisation, dietary needs, and timestamps |
 | **Session** | **Sign out** clears the stored token |
 
-Expanded **Responses** shows attending, solemnisation, dietary, and last-updated per guest. Summary lines show responded/attending counts plus sent and parking status.
+Expanded **Responses** shows attending, solemnisation, dietary, and last-updated per guest. Guest names can be edited inline from this table. Summary lines show responded/attending counts plus sent and parking status.
 
 ### Screenshots
 
