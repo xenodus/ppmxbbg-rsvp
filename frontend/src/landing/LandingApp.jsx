@@ -2,6 +2,7 @@ import { useState } from "react";
 import Faq from "../components/Faq.jsx";
 import GettingThere from "../components/GettingThere.jsx";
 import LandingHeroHeading from "./LandingHeroHeading.jsx";
+import LandingSprite from "./LandingSprite.jsx";
 import RsvpModal from "../components/RsvpModal.jsx";
 import SiteNav from "../components/SiteNav.jsx";
 import { WEDDING } from "../constants.js";
@@ -11,7 +12,6 @@ import {
   joinUsImg,
   lotsOfLoveImg,
   rsvpImg,
-  spriteImg,
   weddingDayImg,
   whereBgImg,
   whereForegroundImg,
@@ -31,12 +31,7 @@ export default function LandingApp() {
       <main className="landing">
         <section className="landing-section landing-section--hero" aria-label="Welcome animation">
           <LandingHeroHeading />
-          <div
-            className="landing-sprite"
-            style={{ backgroundImage: `url(${spriteImg})` }}
-            role="img"
-            aria-label="Animated wedding invitation illustration"
-          />
+          <LandingSprite />
         </section>
 
         <section
