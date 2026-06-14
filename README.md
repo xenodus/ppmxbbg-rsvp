@@ -390,7 +390,7 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" \
 - Docker with `buildx`
 - ECR repository created
 - Lambda function created (container image, `x86_64`, 256 MB, 30 s timeout)
-- HTTP API Gateway with routes pointing to the Lambda (`make deploy-api` syncs required routes from the Makefile `API_ROUTES` list)
+- HTTP API Gateway with routes pointing to the Lambda
 - S3 bucket + CloudFront distribution for the frontend
 - MySQL database with `invites` and `guests` tables
 
@@ -426,6 +426,8 @@ make deploy-frontend
 # Both
 make deploy
 ```
+
+When you add a new API path, create the matching HTTP API Gateway route in the AWS console (or run `make api-gateway-routes` locally with credentials that have `apigateway:GET` and `apigateway:POST` on the API). The GitHub Actions deploy role does not include API Gateway permissions.
 
 ---
 

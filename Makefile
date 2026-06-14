@@ -28,7 +28,8 @@ endif
 # HTTP API id is the subdomain of the execute-api invoke URL.
 HTTP_API_ID ?= $(shell echo "$(VITE_API_BASE_URL)" | sed -E 's|https?://([^.]+)\.execute-api\..*|\1|')
 
-# Routes the Lambda handler expects. deploy-api ensures these exist on API Gateway.
+# Routes the Lambda handler expects. Run `make api-gateway-routes` manually when adding
+# new API paths (requires apigatewayv2 permissions on the deploy role).
 API_ROUTES ?= \
 	GET /guest \
 	POST /guest \
@@ -135,7 +136,7 @@ lambda-wait:
 		--function-name $(LAMBDA_FUNCTION) \
 		--region $(AWS_REGION)
 
-deploy-api: docker-build docker-tag docker-push lambda-update api-gateway-routes
+deploy-api: docker-build docker-tag docker-push lambda-update
 
 deploy-frontend: frontend-update
 
