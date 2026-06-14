@@ -265,11 +265,19 @@ body {
 }
 
 .nav-drawer-title {
+  display: block;
   margin: 0 2rem 2.5rem 0;
   font-family: "Font Two", serif;
   font-size: clamp(1.75rem, 7vw, 2.25rem);
   font-weight: 400;
   line-height: 1.15;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a.nav-drawer-title:hover {
+  color: var(--muted);
 }
 
 .nav-drawer-links {

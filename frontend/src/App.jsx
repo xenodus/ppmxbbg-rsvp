@@ -15,7 +15,7 @@ function Divider() {
 
 export default function App() {
   return (
-    <div className="page">
+    <div className="page" id="top">
       <SiteNav coupleNames={WEDDING.coupleNames} />
 
       <header className="header">
