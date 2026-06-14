@@ -130,11 +130,11 @@ func TestAdminPatchGuestInvalidBody(t *testing.T) {
 
 	raw := mustJSON(map[string]any{
 		"httpMethod": "PATCH",
-		"path":       "/admin/guests",
+		"path":       "/admin/invites",
 		"headers": map[string]string{
 			"Authorization": "Bearer " + loginBody["token"],
 		},
-		"body": `{"id":1}`,
+		"body": `{"guest_id":1}`,
 	})
 
 	resp, err := RSVP(context.Background(), raw)

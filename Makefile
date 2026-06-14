@@ -1,5 +1,5 @@
 .PHONY: test api-test frontend-dev frontend-build frontend-update cloudfront-invalidate \
-	check-vite-api-url docker-build docker-tag docker-push aws-login \
+	check-vite-api-url api-gateway-routes docker-build docker-tag docker-push aws-login \
 	lambda-update lambda-wait deploy-api deploy-frontend deploy \
 	print-aws-deploy-role-arn print-aws-region print-site-domain
 
@@ -24,6 +24,46 @@ check-vite-api-url:
 ifeq ($(VITE_API_BASE_URL),)
 	$(error VITE_API_BASE_URL is empty. Set it in the Makefile)
 endif
+
+# HTTP API id is the subdomain of the execute-api invoke URL.
+HTTP_API_ID ?= $(shell echo "$(VITE_API_BASE_URL)" | sed -E 's|https?://([^.]+)\.execute-api\..*|\1|')
+
+# Routes the Lambda handler expects. deploy-api ensures these exist on API Gateway.
+API_ROUTES ?= \
+	GET /guest \
+	POST /guest \
+	OPTIONS /guest \
+	POST /admin/login \
+	OPTIONS /admin/login \
+	GET /admin/invites \
+	POST /admin/invites \
+	PATCH /admin/invites \
+	DELETE /admin/invites \
+	OPTIONS /admin/invites \
+	PATCH /admin/guests \
+	OPTIONS /admin/guests
+
+api-gateway-routes: check-vite-api-url
+	@API_ID="$(HTTP_API_ID)"; \
+	if [ -z "$$API_ID" ] || [ "$$API_ID" = "$(VITE_API_BASE_URL)" ]; then \
+	  echo "error: Could not parse HTTP_API_ID from VITE_API_BASE_URL=$(VITE_API_BASE_URL)" >&2; \
+	  exit 1; \
+	fi; \
+	INTEGRATION_ID=$$(aws apigatewayv2 get-integrations --api-id "$$API_ID" --region $(AWS_REGION) \
+	  --query 'Items[0].IntegrationId' --output text); \
+	if [ -z "$$INTEGRATION_ID" ] || [ "$$INTEGRATION_ID" = "None" ]; then \
+	  echo "error: No Lambda integration found for API $$API_ID" >&2; \
+	  exit 1; \
+	fi; \
+	for ROUTE_KEY in $(API_ROUTES); do \
+	  EXISTS=$$(aws apigatewayv2 get-routes --api-id "$$API_ID" --region $(AWS_REGION) \
+	    --query "Items[?RouteKey=='$$ROUTE_KEY'].RouteId | [0]" --output text); \
+	  if [ -z "$$EXISTS" ] || [ "$$EXISTS" = "None" ]; then \
+	    echo "Creating route $$ROUTE_KEY on API $$API_ID"; \
+	    aws apigatewayv2 create-route --api-id "$$API_ID" --region $(AWS_REGION) \
+	      --route-key "$$ROUTE_KEY" --target "integrations/$$INTEGRATION_ID" >/dev/null; \
+	  fi; \
+	done
 
 test: api-test
 
@@ -95,7 +135,7 @@ lambda-wait:
 		--function-name $(LAMBDA_FUNCTION) \
 		--region $(AWS_REGION)
 
-deploy-api: docker-build docker-tag docker-push lambda-update
+deploy-api: docker-build docker-tag docker-push lambda-update api-gateway-routes
 
 deploy-frontend: frontend-update
 

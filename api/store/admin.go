@@ -19,8 +19,10 @@ type CreateInviteInput struct {
 }
 
 type AdminInvitePatch struct {
-	ID     string `json:"id"`
-	IsSent *bool  `json:"is_sent"`
+	ID      string `json:"id"`
+	IsSent  *bool  `json:"is_sent"`
+	GuestID int64  `json:"guest_id"`
+	Name    string `json:"name"`
 }
 
 type AdminGuestPatch struct {
