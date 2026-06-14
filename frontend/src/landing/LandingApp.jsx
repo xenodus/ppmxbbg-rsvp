@@ -29,7 +29,7 @@ export default function LandingApp() {
       <SiteNav coupleNames={WEDDING.coupleNames} onRsvpOpen={openRsvp} />
 
       <main className="landing">
-        <section className="landing-section landing-section--hero" aria-label="Welcome animation">
+        <section id="top" className="landing-section landing-section--hero" aria-label="Welcome animation">
           <LandingHeroHeading />
           <LandingSprite />
         </section>

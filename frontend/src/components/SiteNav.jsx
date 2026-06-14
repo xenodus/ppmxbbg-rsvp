@@ -96,7 +96,9 @@ export default function SiteNav({ coupleNames, onRsvpOpen }) {
           ×
         </button>
 
-        <h2 className="nav-drawer-title">{coupleNames}</h2>
+        <a href="#top" className="nav-drawer-title" onClick={closeMenu}>
+          {coupleNames}
+        </a>
 
         {sectionLinks.length > 0 ? (
           <nav className="nav-drawer-links" aria-label="Page sections">
