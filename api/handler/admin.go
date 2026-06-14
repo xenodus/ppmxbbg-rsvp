@@ -157,6 +157,9 @@ func handleAdminPatchInvite(ctx context.Context, body, origin string) (apiRespon
 	if err := json.Unmarshal([]byte(body), &patch); err != nil {
 		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin, adminCORSMethods, adminCORSHeaders)
 	}
+	if patch.GuestID > 0 {
+		return patchGuestName(ctx, store.AdminGuestPatch{ID: patch.GuestID, Name: patch.Name}, origin)
+	}
 	patch.ID = strings.TrimSpace(patch.ID)
 	if patch.ID == "" {
 		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: "id is required"}, origin, adminCORSMethods, adminCORSHeaders)
@@ -180,6 +183,10 @@ func handleAdminPatchGuest(ctx context.Context, body, origin string) (apiRespons
 	if err := json.Unmarshal([]byte(body), &patch); err != nil {
 		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin, adminCORSMethods, adminCORSHeaders)
 	}
+	return patchGuestName(ctx, patch, origin)
+}
+
+func patchGuestName(ctx context.Context, patch store.AdminGuestPatch, origin string) (apiResponse, error) {
 	guest, err := store.UpdateGuestName(ctx, patch)
 	if errors.Is(err, store.ErrGuestNotFound) {
 		return jsonResponseWithCORS(http.StatusNotFound, errorResponse{Error: "guest not found"}, origin, adminCORSMethods, adminCORSHeaders)

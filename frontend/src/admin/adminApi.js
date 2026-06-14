@@ -93,8 +93,8 @@ export function deleteInvite(id) {
 }
 
 export function updateGuestName(id, name) {
-  return request("/admin/guests", {
+  return request("/admin/invites", {
     method: "PATCH",
-    body: JSON.stringify({ id, name }),
+    body: JSON.stringify({ guest_id: id, name }),
   });
 }

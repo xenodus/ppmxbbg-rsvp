@@ -31,7 +31,7 @@ Base URL: your API Gateway URL, e.g. `https://abc123.execute-api.ap-southeast-1.
 | `GET` | `/admin/invites` | Bearer | List all invites with guests and RSVP responses |
 | `GET` | `/admin/invites?id={invite_id}` | Bearer | Get one invite |
 | `POST` | `/admin/invites` | Bearer | Create invite and guests |
-| `PATCH` | `/admin/invites` | Bearer | Update invite (`is_sent` only) |
+| `PATCH` | `/admin/invites` | Bearer | Update invite (`is_sent`) or guest name (`guest_id` + `name`) |
 | `DELETE` | `/admin/invites?id={invite_id}` | Bearer | Delete invite and its guests |
 | `OPTIONS` | `/admin/invites` | None | CORS preflight |
 | `PATCH` | `/admin/guests` | Bearer | Update a guest's name |
@@ -284,9 +284,9 @@ Create a new invite. The server generates a snowflake `id`.
 
 ### PATCH /admin/invites
 
-Update invite metadata. Only `is_sent` is supported today.
+Update invite metadata or a guest's name.
 
-**Request body**
+**Invite update** — set `is_sent`:
 
 ```json
 {
@@ -295,13 +295,42 @@ Update invite metadata. Only `is_sent` is supported today.
 }
 ```
 
-**200 OK** — updated invite object, or `{"status":"saved"}`.
+**Guest name update** — set `guest_id` and `name` (RSVP fields are not changed). Rejected with **409 Conflict** once any guest on the same invite has submitted an RSVP (`is_attending` is set):
+
+```json
+{
+  "guest_id": 1,
+  "name": "Jane Smith"
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | yes (invite update) | Invite snowflake id |
+| `is_sent` | yes (invite update) | Whether the invite was sent |
+| `guest_id` | yes (name update) | Guest id |
+| `name` | yes (name update) | New guest name (non-empty after trim) |
+
+**200 OK** — updated invite object, updated guest object (name update), or `{"status":"saved"}`.
+
+**404 Not Found** — `{"error":"invite not found"}` or `{"error":"guest not found"}`.
+
+**409 Conflict** — `{"error":"guest names cannot be changed after an RSVP response"}` (name update only).
+
+**Example (guest name)**
+
+```bash
+curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"guest_id":1,"name":"Jane Smith"}' \
+  "https://YOUR_API_URL/admin/invites"
+```
 
 ---
 
 ### PATCH /admin/guests
 
-Update a guest's name. RSVP fields are not changed by this endpoint. Rejected with **409 Conflict** once any guest on the same invite has submitted an RSVP (`is_attending` is set).
+Update a guest's name. Same behaviour as `PATCH /admin/invites` with `guest_id` and `name`. Prefer the `/admin/invites` path in production — it uses an existing API Gateway route.
 
 **Request body**
 
@@ -361,7 +390,7 @@ curl -X DELETE -H "Authorization: Bearer YOUR_TOKEN" \
 - Docker with `buildx`
 - ECR repository created
 - Lambda function created (container image, `x86_64`, 256 MB, 30 s timeout)
-- HTTP API Gateway with routes pointing to the Lambda
+- HTTP API Gateway with routes pointing to the Lambda (`make deploy-api` syncs required routes from the Makefile `API_ROUTES` list)
 - S3 bucket + CloudFront distribution for the frontend
 - MySQL database with `invites` and `guests` tables
 
