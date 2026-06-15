@@ -49,7 +49,18 @@ test("computeInviteStats counts sent invites and guest responses separately", ()
     sent: 2,
     accepted: 3,
     rejected: 1,
+    totalInvites: 3,
+    totalGuests: 5,
   });
+});
+
+test("computeInviteStats includes invite and guest totals for display", () => {
+  const stats = computeInviteStats(sampleInvites);
+
+  assert.equal(stats.totalInvites, sampleInvites.length);
+  assert.equal(stats.totalGuests, countGuestsInInvites(sampleInvites));
+  assert.equal(stats.sent, stats.totalInvites - 1);
+  assert.equal(stats.accepted + stats.rejected, stats.totalGuests - 1);
 });
 
 test("accepted is the total number of attending guests, not invites", () => {

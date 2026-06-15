@@ -132,6 +132,15 @@ function AdminFooter() {
   );
 }
 
+function StatValue({ value, total }) {
+  return (
+    <p className="admin-stat-value">
+      {value}
+      <span className="admin-stat-total"> / {total}</span>
+    </p>
+  );
+}
+
 function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFilterChange }) {
   const invitesForStats = filterInvitesByGuestName(invites, guestSearch);
   const stats = computeInviteStats(invitesForStats);
@@ -150,7 +159,7 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
         title="Invites marked as sent"
         onClick={() => handleFilterClick("sent")}
       >
-        <p className="admin-stat-value">{stats.sent}</p>
+        <StatValue value={stats.sent} total={stats.totalInvites} />
         <p className="admin-stat-label">Sent</p>
       </button>
       <button
@@ -164,7 +173,7 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
         }
         onClick={() => handleFilterClick("accepted")}
       >
-        <p className="admin-stat-value">{stats.accepted}</p>
+        <StatValue value={stats.accepted} total={stats.totalGuests} />
         <p className="admin-stat-label">Guests accepted</p>
       </button>
       <button
@@ -178,7 +187,7 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
         }
         onClick={() => handleFilterClick("rejected")}
       >
-        <p className="admin-stat-value">{stats.rejected}</p>
+        <StatValue value={stats.rejected} total={stats.totalGuests} />
         <p className="admin-stat-label">Guests declined</p>
       </button>
     </section>
