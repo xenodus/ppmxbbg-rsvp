@@ -87,6 +87,34 @@ function countGuestsInInvites(inviteList) {
   return inviteList.reduce((sum, invite) => sum + (invite.guests?.length ?? 0), 0);
 }
 
+function inviteIsSent(invite) {
+  return invite.is_sent === true;
+}
+
+function inviteIsAccepted(invite) {
+  return (invite.guests || []).some((guest) => guest.is_attending === true);
+}
+
+function inviteIsRejected(invite) {
+  const guests = invite.guests || [];
+  if (guests.length === 0) return false;
+  const allResponded = guests.every(
+    (guest) => guest.is_attending !== undefined && guest.is_attending !== null,
+  );
+  return allResponded && guests.every((guest) => guest.is_attending === false);
+}
+
+function computeInviteStats(inviteList) {
+  return inviteList.reduce(
+    (stats, invite) => ({
+      sent: stats.sent + (inviteIsSent(invite) ? 1 : 0),
+      accepted: stats.accepted + (inviteIsAccepted(invite) ? 1 : 0),
+      rejected: stats.rejected + (inviteIsRejected(invite) ? 1 : 0),
+    }),
+    { sent: 0, accepted: 0, rejected: 0 },
+  );
+}
+
 function formatInviteListHeading(invites, filteredInvites, searchActive) {
   const inviteCount = filteredInvites.length;
   const guestCount = countGuestsInInvites(filteredInvites);
@@ -103,6 +131,27 @@ function AdminFooter() {
     <footer className="admin-footer">
       <p>© 2026 alvinandvivian.rsvp</p>
     </footer>
+  );
+}
+
+function InviteStatsSummary({ invites }) {
+  const stats = computeInviteStats(invites);
+
+  return (
+    <section className="admin-stats" aria-label="Invite summary">
+      <div className="admin-stat">
+        <p className="admin-stat-value">{stats.sent}</p>
+        <p className="admin-stat-label">Sent</p>
+      </div>
+      <div className="admin-stat">
+        <p className="admin-stat-value">{stats.accepted}</p>
+        <p className="admin-stat-label">Accepted</p>
+      </div>
+      <div className="admin-stat">
+        <p className="admin-stat-value">{stats.rejected}</p>
+        <p className="admin-stat-label">Rejected</p>
+      </div>
+    </section>
   );
 }
 
@@ -811,6 +860,8 @@ export default function AdminApp() {
             onDownloadCsv={() => downloadInvitesCsv(invites)}
             onLogout={handleLogout}
           />
+
+          <InviteStatsSummary invites={invites} />
 
           {pageError ? <p className="banner banner-error">{pageError}</p> : null}
 
