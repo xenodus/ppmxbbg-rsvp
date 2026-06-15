@@ -27,6 +27,7 @@ import {
   inviteHasAttendingGuest,
   inviteHasRejectedGuest,
   inviteIsSent,
+  inviteRequiresParking,
 } from "./inviteStats.js";
 
 function guestSiteOrigin() {
@@ -100,6 +101,9 @@ function filterInvitesByResponse(invites, responseFilter) {
   if (responseFilter === "sent") {
     return invites.filter(inviteIsSent);
   }
+  if (responseFilter === "parking") {
+    return invites.filter(inviteRequiresParking);
+  }
   if (responseFilter === "accepted") {
     return invites.filter(inviteHasAcceptedResponse);
   }
@@ -143,7 +147,7 @@ function StatValue({ value, total }) {
 
 function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFilterChange }) {
   const invitesForStats = filterInvitesByGuestName(invites, guestSearch);
-  const { sent, accepted, rejected, totalInvites, totalGuests } = computeInviteStats(invitesForStats);
+  const { sent, parking, accepted, rejected, totalInvites, totalGuests } = computeInviteStats(invitesForStats);
   const searchActive = guestSearch.trim().length > 0;
 
   function handleFilterClick(filter) {
@@ -161,6 +165,16 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
       >
         <StatValue value={sent} total={totalInvites} />
         <p className="admin-stat-label">Sent</p>
+      </button>
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "parking" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "parking"}
+        title="Invites that require parking"
+        onClick={() => handleFilterClick("parking")}
+      >
+        <StatValue value={parking} total={totalInvites} />
+        <p className="admin-stat-label">Parking</p>
       </button>
       <button
         type="button"

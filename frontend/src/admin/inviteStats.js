@@ -14,6 +14,10 @@ export function inviteIsSent(invite) {
   return invite.is_sent === true;
 }
 
+export function inviteRequiresParking(invite) {
+  return invite.require_parking === true;
+}
+
 export function inviteHasAttendingGuest(invite) {
   return (invite.guests || []).some(guestIsAttending);
 }
@@ -28,11 +32,12 @@ export function computeInviteStats(inviteList) {
       const guests = invite.guests || [];
       return {
         sent: stats.sent + (inviteIsSent(invite) ? 1 : 0),
+        parking: stats.parking + (inviteRequiresParking(invite) ? 1 : 0),
         accepted: stats.accepted + guests.filter(guestIsAttending).length,
         rejected: stats.rejected + guests.filter(guestIsRejected).length,
       };
     },
-    { sent: 0, accepted: 0, rejected: 0 },
+    { sent: 0, parking: 0, accepted: 0, rejected: 0 },
   );
   return {
     ...counts,

@@ -11,6 +11,7 @@ const sampleInvites = [
   {
     id: "a",
     is_sent: true,
+    require_parking: true,
     guests: [
       { id: 1, name: "Jane", is_attending: true },
       { id: 2, name: "John", is_attending: false },
@@ -19,6 +20,7 @@ const sampleInvites = [
   {
     id: "b",
     is_sent: true,
+    require_parking: false,
     guests: [
       { id: 3, name: "Bob", is_attending: true },
       { id: 4, name: "Sue", is_attending: true },
@@ -47,6 +49,7 @@ test("guestIsRejected counts only guests who declined after responding", () => {
 test("computeInviteStats counts sent invites and guest responses separately", () => {
   assert.deepEqual(computeInviteStats(sampleInvites), {
     sent: 2,
+    parking: 1,
     accepted: 3,
     rejected: 1,
     totalInvites: 3,
@@ -61,6 +64,16 @@ test("computeInviteStats includes invite and guest totals for display", () => {
   assert.equal(stats.totalGuests, countGuestsInInvites(sampleInvites));
   assert.equal(stats.sent, stats.totalInvites - 1);
   assert.equal(stats.accepted + stats.rejected, stats.totalGuests - 1);
+});
+
+test("parking is the total number of invites that require parking, not guests", () => {
+  const stats = computeInviteStats(sampleInvites);
+
+  assert.equal(stats.parking, 1);
+  assert.notEqual(
+    stats.parking,
+    sampleInvites.flatMap((invite) => invite.guests || []).length,
+  );
 });
 
 test("accepted is the total number of attending guests, not invites", () => {
