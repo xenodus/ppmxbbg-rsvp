@@ -108,9 +108,9 @@ function guestResponseUnchanged(guest, payload) {
 }
 
 function guestSaveSuccessMessage(guestList) {
-  const { allDeclined: everyoneDeclined } = guestRsvpState(guestList);
-  if (everyoneDeclined) {
-    return RSVP.bigQuestion.declinedMessage;
+  const { allDeclined } = guestRsvpState(guestList);
+  if (allDeclined) {
+    return "";
   }
   return RESPONSE_SAVED_MESSAGE;
 }
