@@ -466,7 +466,7 @@ make test
 
 Password-protected admin app at **`/admin.html`** on the deployed site (e.g. `https://alvinandvivian.rsvp/admin.html`) or locally at `http://localhost:5173/admin.html`. It uses the admin API (`POST /admin/login`, `/admin/invites`, `/admin/guests`) documented above.
 
-Sign in with `ADMIN_USERNAME` and `ADMIN_PASSWORD` (Lambda env vars, or `api/.env` when running the API locally). The session token is stored in `sessionStorage` for the browser tab.
+Sign in with `ADMIN_USERNAME` and `ADMIN_PASSWORD` (Lambda env vars, or `api/.env` when running the API locally). The session token is stored in `localStorage` and remains valid for 24 hours (see `expires_at` from `POST /admin/login`), including across browser restarts on the same device.
 
 ### What you can do
 

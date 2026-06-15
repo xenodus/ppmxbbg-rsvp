@@ -1,21 +1,72 @@
 import { API_BASE_URL } from "../constants.js";
 
 const TOKEN_KEY = "admin_token";
+const EXPIRES_KEY = "admin_token_expires_at";
 
-export function getStoredToken() {
-  return sessionStorage.getItem(TOKEN_KEY) || "";
+function readStorage(storage) {
+  const token = storage.getItem(TOKEN_KEY) || "";
+  if (!token) {
+    return { token: "", expiresAt: "" };
+  }
+  return {
+    token,
+    expiresAt: storage.getItem(EXPIRES_KEY) || "",
+  };
 }
 
-export function setStoredToken(token) {
+function isExpired(expiresAt) {
+  if (!expiresAt) {
+    return false;
+  }
+  const expiresMs = Date.parse(expiresAt);
+  return !Number.isNaN(expiresMs) && Date.now() >= expiresMs;
+}
+
+function migrateLegacySessionStorage() {
+  const legacy = readStorage(sessionStorage);
+  if (!legacy.token || localStorage.getItem(TOKEN_KEY)) {
+    return;
+  }
+  localStorage.setItem(TOKEN_KEY, legacy.token);
+  if (legacy.expiresAt) {
+    localStorage.setItem(EXPIRES_KEY, legacy.expiresAt);
+  }
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(EXPIRES_KEY);
+}
+
+export function getStoredToken() {
+  migrateLegacySessionStorage();
+
+  const { token, expiresAt } = readStorage(localStorage);
+  if (!token) {
+    return "";
+  }
+  if (isExpired(expiresAt)) {
+    clearSession();
+    return "";
+  }
+  return token;
+}
+
+export function setStoredToken(token, expiresAt = "") {
   if (token) {
-    sessionStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(TOKEN_KEY, token);
+    if (expiresAt) {
+      localStorage.setItem(EXPIRES_KEY, expiresAt);
+    } else {
+      localStorage.removeItem(EXPIRES_KEY);
+    }
   } else {
-    sessionStorage.removeItem(TOKEN_KEY);
+    clearSession();
   }
 }
 
 export function clearSession() {
-  setStoredToken("");
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(EXPIRES_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(EXPIRES_KEY);
 }
 
 function networkErrorMessage(err) {

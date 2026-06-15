@@ -817,7 +817,7 @@ export default function AdminApp() {
     setLoading(true);
     try {
       const data = await login(username, password);
-      setStoredToken(data.token);
+      setStoredToken(data.token, data.expires_at);
       setAuthed(true);
       await loadInvites();
     } catch (err) {
