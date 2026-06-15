@@ -83,6 +83,31 @@ function filterInvitesByGuestName(invites, query) {
   return invites.filter((invite) => inviteMatchesGuestSearch(invite, query));
 }
 
+function inviteHasAcceptedResponse(invite) {
+  return (invite.guests || []).some(guestIsAccepted);
+}
+
+function inviteHasRejectedResponse(invite) {
+  return (invite.guests || []).some(guestIsRejected);
+}
+
+function filterInvitesByResponse(invites, responseFilter) {
+  if (responseFilter === "sent") {
+    return invites.filter(inviteIsSent);
+  }
+  if (responseFilter === "accepted") {
+    return invites.filter(inviteHasAcceptedResponse);
+  }
+  if (responseFilter === "rejected") {
+    return invites.filter(inviteHasRejectedResponse);
+  }
+  return invites;
+}
+
+function filterInvites(invites, { guestSearch, responseFilter }) {
+  return filterInvitesByResponse(filterInvitesByGuestName(invites, guestSearch), responseFilter);
+}
+
 function countGuestsInInvites(inviteList) {
   return inviteList.reduce((sum, invite) => sum + (invite.guests?.length ?? 0), 0);
 }
@@ -116,10 +141,10 @@ function computeInviteStats(inviteList) {
   );
 }
 
-function formatInviteListHeading(invites, filteredInvites, searchActive) {
+function formatInviteListHeading(invites, filteredInvites, filtersActive) {
   const inviteCount = filteredInvites.length;
   const guestCount = countGuestsInInvites(filteredInvites);
-  if (searchActive) {
+  if (filtersActive) {
     const totalInvites = invites.length;
     const totalGuests = countGuestsInInvites(invites);
     return ` (${inviteCount} of ${totalInvites} invites · ${guestCount} of ${totalGuests} guests)`;
@@ -135,23 +160,42 @@ function AdminFooter() {
   );
 }
 
-function InviteStatsSummary({ invites }) {
+function InviteStatsSummary({ invites, responseFilter, onResponseFilterChange }) {
   const stats = computeInviteStats(invites);
+
+  function handleFilterClick(filter) {
+    onResponseFilterChange(responseFilter === filter ? null : filter);
+  }
 
   return (
     <section className="admin-stats" aria-label="RSVP summary">
-      <div className="admin-stat">
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "sent" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "sent"}
+        onClick={() => handleFilterClick("sent")}
+      >
         <p className="admin-stat-value">{stats.sent}</p>
         <p className="admin-stat-label">Sent</p>
-      </div>
-      <div className="admin-stat">
+      </button>
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "accepted" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "accepted"}
+        onClick={() => handleFilterClick("accepted")}
+      >
         <p className="admin-stat-value">{stats.accepted}</p>
         <p className="admin-stat-label">Accepted</p>
-      </div>
-      <div className="admin-stat">
+      </button>
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "rejected" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "rejected"}
+        onClick={() => handleFilterClick("rejected")}
+      >
         <p className="admin-stat-value">{stats.rejected}</p>
         <p className="admin-stat-label">Rejected</p>
-      </div>
+      </button>
     </section>
   );
 }
@@ -753,6 +797,7 @@ export default function AdminApp() {
   const [pageError, setPageError] = useState("");
   const [guestNames, setGuestNames] = useState("");
   const [guestSearch, setGuestSearch] = useState("");
+  const [responseFilter, setResponseFilter] = useState(null);
   const [creating, setCreating] = useState(false);
   const [messageTemplate, setMessageTemplate] = useState(getStoredInviteMessageTemplate);
   const [editingMessageTemplate, setEditingMessageTemplate] = useState(false);
@@ -844,8 +889,13 @@ export default function AdminApp() {
     setEditingMessageTemplate(false);
   }
 
-  const filteredInvites = filterInvitesByGuestName(invites, guestSearch);
-  const searchActive = guestSearch.trim().length > 0;
+  const filteredInvites = filterInvites(invites, { guestSearch, responseFilter });
+  const filtersActive = guestSearch.trim().length > 0 || responseFilter !== null;
+
+  function clearFilters() {
+    setGuestSearch("");
+    setResponseFilter(null);
+  }
 
   return (
     <div className="admin-page">
@@ -862,7 +912,11 @@ export default function AdminApp() {
             onLogout={handleLogout}
           />
 
-          <InviteStatsSummary invites={invites} />
+          <InviteStatsSummary
+            invites={invites}
+            responseFilter={responseFilter}
+            onResponseFilterChange={setResponseFilter}
+          />
 
           {pageError ? <p className="banner banner-error">{pageError}</p> : null}
 
@@ -894,25 +948,32 @@ export default function AdminApp() {
           <section className="admin-list-section">
             <h2>
               All invites
-              {formatInviteListHeading(invites, filteredInvites, searchActive)}
+              {formatInviteListHeading(invites, filteredInvites, filtersActive)}
             </h2>
-            <div className="field-group">
-              <label className="field-label" htmlFor="guest-search">
-                Search by guest name
-              </label>
-              <input
-                id="guest-search"
-                type="search"
-                className="admin-input"
-                placeholder="e.g. Jane"
-                value={guestSearch}
-                onChange={(e) => setGuestSearch(e.target.value)}
-                autoComplete="off"
-              />
+            <div className="admin-list-filters">
+              <div className="field-group">
+                <label className="field-label" htmlFor="guest-search">
+                  Search by guest name
+                </label>
+                <input
+                  id="guest-search"
+                  type="search"
+                  className="admin-input"
+                  placeholder="e.g. Jane"
+                  value={guestSearch}
+                  onChange={(e) => setGuestSearch(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+              {filtersActive ? (
+                <button type="button" className="secondary-btn admin-clear-filters" onClick={clearFilters}>
+                  Clear filters
+                </button>
+              ) : null}
             </div>
             {loading && invites.length === 0 ? <p className="admin-muted">Loading…</p> : null}
-            {!loading && invites.length > 0 && searchActive && filteredInvites.length === 0 ? (
-              <p className="admin-muted">No invites match that guest name.</p>
+            {!loading && invites.length > 0 && filtersActive && filteredInvites.length === 0 ? (
+              <p className="admin-muted">No invites match the current filters.</p>
             ) : null}
             <div className="admin-invite-list">
               {filteredInvites.map((invite) => (
