@@ -91,26 +91,27 @@ function inviteIsSent(invite) {
   return invite.is_sent === true;
 }
 
-function inviteIsAccepted(invite) {
-  return (invite.guests || []).some((guest) => guest.is_attending === true);
+function guestIsAccepted(guest) {
+  return guest.is_attending === true;
 }
 
-function inviteIsRejected(invite) {
-  const guests = invite.guests || [];
-  if (guests.length === 0) return false;
-  const allResponded = guests.every(
-    (guest) => guest.is_attending !== undefined && guest.is_attending !== null,
-  );
-  return allResponded && guests.every((guest) => guest.is_attending === false);
+function guestIsRejected(guest) {
+  return guestResponded(guest) && guest.is_attending === false;
 }
 
 function computeInviteStats(inviteList) {
   return inviteList.reduce(
-    (stats, invite) => ({
-      sent: stats.sent + (inviteIsSent(invite) ? 1 : 0),
-      accepted: stats.accepted + (inviteIsAccepted(invite) ? 1 : 0),
-      rejected: stats.rejected + (inviteIsRejected(invite) ? 1 : 0),
-    }),
+    (stats, invite) => {
+      const guests = invite.guests || [];
+      const sentGuests = inviteIsSent(invite) ? guests.length : 0;
+      const acceptedGuests = guests.filter(guestIsAccepted).length;
+      const rejectedGuests = guests.filter(guestIsRejected).length;
+      return {
+        sent: stats.sent + sentGuests,
+        accepted: stats.accepted + acceptedGuests,
+        rejected: stats.rejected + rejectedGuests,
+      };
+    },
     { sent: 0, accepted: 0, rejected: 0 },
   );
 }
@@ -138,7 +139,7 @@ function InviteStatsSummary({ invites }) {
   const stats = computeInviteStats(invites);
 
   return (
-    <section className="admin-stats" aria-label="Invite summary">
+    <section className="admin-stats" aria-label="Guest summary">
       <div className="admin-stat">
         <p className="admin-stat-value">{stats.sent}</p>
         <p className="admin-stat-label">Sent</p>
