@@ -103,11 +103,11 @@ function computeInviteStats(inviteList) {
   return inviteList.reduce(
     (stats, invite) => {
       const guests = invite.guests || [];
-      const sentGuests = inviteIsSent(invite) ? guests.length : 0;
+      const sentInvites = inviteIsSent(invite) ? 1 : 0;
       const acceptedGuests = guests.filter(guestIsAccepted).length;
       const rejectedGuests = guests.filter(guestIsRejected).length;
       return {
-        sent: stats.sent + sentGuests,
+        sent: stats.sent + sentInvites,
         accepted: stats.accepted + acceptedGuests,
         rejected: stats.rejected + rejectedGuests,
       };
@@ -139,7 +139,7 @@ function InviteStatsSummary({ invites }) {
   const stats = computeInviteStats(invites);
 
   return (
-    <section className="admin-stats" aria-label="Guest summary">
+    <section className="admin-stats" aria-label="RSVP summary">
       <div className="admin-stat">
         <p className="admin-stat-value">{stats.sent}</p>
         <p className="admin-stat-label">Sent</p>
