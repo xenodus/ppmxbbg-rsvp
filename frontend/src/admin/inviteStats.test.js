@@ -94,8 +94,16 @@ test("countGuestsInInvites with accepted filter counts only attending guests", (
   assert.equal(computeInviteStats(invitesWithMixedHousehold).accepted, 1);
 });
 
+test("computeInviteStats uses all guests as totalGuests, not only declined guests", () => {
+  const stats = computeInviteStats(sampleInvites);
+
+  assert.equal(stats.totalGuests, countGuestsInInvites(sampleInvites));
+  assert.notEqual(stats.totalGuests, countGuestsInInvites(sampleInvites, "rejected"));
+});
+
 test("countGuestsInInvites with rejected filter counts only declined guests", () => {
   assert.equal(countGuestsInInvites(sampleInvites, "rejected"), 1);
+  assert.notEqual(countGuestsInInvites(sampleInvites, "rejected"), countGuestsInInvites(sampleInvites));
 });
 
 function inviteHasAttending(invite) {
