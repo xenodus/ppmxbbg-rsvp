@@ -22,12 +22,20 @@ function ChoiceSection({
   yesLabel,
   noLabel,
   disabled,
+  submitting,
+  submitDisabled,
   savedMessage,
   savedMessageKey,
   onSavedMessageDismiss,
   onSelectYes,
   onSelectNo,
+  onSubmit,
 }) {
+  async function handleSubmit(event) {
+    event.preventDefault();
+    await onSubmit();
+  }
+
   return (
     <section className="form-section">
       <h2 className="section-heading">
@@ -35,24 +43,33 @@ function ChoiceSection({
       </h2>
       <p className="section-question">{question}</p>
       {note && <p className="section-note">{note}</p>}
-      <div className="attendance-options">
+      <form className="choice-section-form" onSubmit={handleSubmit} noValidate>
+        <div className="attendance-options">
+          <button
+            type="button"
+            className={`choice-btn ${value === true ? "is-selected" : ""}`}
+            onClick={onSelectYes}
+            disabled={disabled}
+          >
+            {yesLabel}
+          </button>
+          <button
+            type="button"
+            className={`choice-btn ${value === false ? "is-selected" : ""}`}
+            onClick={onSelectNo}
+            disabled={disabled}
+          >
+            {noLabel}
+          </button>
+        </div>
         <button
-          type="button"
-          className={`choice-btn ${value === true ? "is-selected" : ""}`}
-          onClick={onSelectYes}
-          disabled={disabled}
+          type="submit"
+          className="submit-btn"
+          disabled={disabled || submitDisabled || submitting}
         >
-          {yesLabel}
+          {submitting ? "SAVING..." : "SAVE RESPONSE"}
         </button>
-        <button
-          type="button"
-          className={`choice-btn ${value === false ? "is-selected" : ""}`}
-          onClick={onSelectNo}
-          disabled={disabled}
-        >
-          {noLabel}
-        </button>
-      </div>
+      </form>
       <FadeAwayMessage
         message={savedMessage}
         messageKey={savedMessageKey}
@@ -115,6 +132,7 @@ export default function RsvpForm({
   const [now, setNow] = useState(() => new Date());
   const [guests, setGuests] = useState([]);
   const [requireParking, setRequireParking] = useState(null);
+  const [pendingParking, setPendingParking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingInvite, setSavingInvite] = useState(false);
   const [savingGuest, setSavingGuest] = useState(false);
@@ -163,6 +181,9 @@ export default function RsvpForm({
           setGuests(invite.guests || []);
           if (invite.require_parking !== undefined && invite.require_parking !== null) {
             setRequireParking(invite.require_parking);
+            setPendingParking(invite.require_parking);
+          } else {
+            setPendingParking(null);
           }
           setError("");
         }
@@ -211,15 +232,27 @@ export default function RsvpForm({
     setSuccessMessageKey(Date.now());
   }
 
-  async function handleInviteChoice(value) {
-    if (value === requireParking) {
+  function handleParkingSelect(value) {
+    setPendingParking(value);
+    setError("");
+    setParkingSavedMessage("");
+    setParkingSavedMessageKey(0);
+  }
+
+  async function handleParkingSubmit() {
+    if (pendingParking === null) {
+      return;
+    }
+
+    if (pendingParking === requireParking) {
       setError("");
       showParkingSavedMessage();
       return;
     }
 
     const previousParking = requireParking;
-    setRequireParking(value);
+    const previousPending = pendingParking;
+    setRequireParking(pendingParking);
     setError("");
     setParkingSavedMessage("");
     setSavingInvite(true);
@@ -227,15 +260,17 @@ export default function RsvpForm({
     try {
       const updated = await saveInvite({
         id: inviteId,
-        require_parking: value,
+        require_parking: pendingParking,
       });
       setGuests(updated.guests || []);
       if (updated.require_parking !== undefined && updated.require_parking !== null) {
         setRequireParking(updated.require_parking);
+        setPendingParking(updated.require_parking);
       }
       showParkingSavedMessage();
     } catch (err) {
       setRequireParking(previousParking);
+      setPendingParking(previousPending);
       setParkingSavedMessage("");
       setParkingSavedMessageKey(0);
       setError(err.message);
@@ -323,18 +358,21 @@ export default function RsvpForm({
                 number={RSVP.parking.number}
                 title={RSVP.parking.title}
                 question={RSVP.parking.question}
-                value={requireParking}
+                value={pendingParking}
                 yesLabel={RSVP.parking.yes}
                 noLabel={RSVP.parking.no}
                 disabled={inviteChoicesDisabled}
+                submitting={savingInvite}
+                submitDisabled={pendingParking === null}
                 savedMessage={parkingSavedMessage}
                 savedMessageKey={parkingSavedMessageKey}
                 onSavedMessageDismiss={() => {
                   setParkingSavedMessage("");
                   setParkingSavedMessageKey(0);
                 }}
-                onSelectYes={() => handleInviteChoice(true)}
-                onSelectNo={() => handleInviteChoice(false)}
+                onSelectYes={() => handleParkingSelect(true)}
+                onSelectNo={() => handleParkingSelect(false)}
+                onSubmit={handleParkingSubmit}
               />
             )}
           </>
