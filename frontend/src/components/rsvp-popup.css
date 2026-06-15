@@ -191,6 +191,7 @@
   color: #fff;
 }
 
+.rsvp-modal-backdrop .submit-btn,
 .rsvp-popup-backdrop .submit-btn {
   align-self: stretch;
   width: 100%;
@@ -207,10 +208,18 @@
   text-transform: uppercase;
 }
 
+.rsvp-modal-backdrop .submit-btn:hover:not(:disabled),
 .rsvp-popup-backdrop .submit-btn:hover:not(:disabled) {
   background: #c9683f;
   border-color: transparent;
   color: #fff;
+}
+
+.rsvp-modal-backdrop .choice-section-form,
+.rsvp-popup-backdrop .choice-section-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
 .rsvp-popup-card {
