@@ -15,7 +15,7 @@ We're getting married! 💍
 We would absolutely love for you to join us and celebrate the start of our greatest adventure yet.
 
 The Details:
-Date: Saturday, 1 November 2026
+Date: Sunday, 1 November 2026
 Venue: Hortus, Flower Dome at Gardens by the Bay (18 Marina Gardens Dr, #01-09, Singapore 018953)
 
 The Game Plan:
