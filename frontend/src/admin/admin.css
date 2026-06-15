@@ -296,6 +296,11 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   line-height: 1.2;
 }
 
+.admin-stat-total {
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
 .admin-stat-label {
   margin: 0.35rem 0 0;
   font-size: 0.78rem;

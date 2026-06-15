@@ -23,7 +23,7 @@ export function inviteHasRejectedGuest(invite) {
 }
 
 export function computeInviteStats(inviteList) {
-  return inviteList.reduce(
+  const counts = inviteList.reduce(
     (stats, invite) => {
       const guests = invite.guests || [];
       return {
@@ -34,6 +34,11 @@ export function computeInviteStats(inviteList) {
     },
     { sent: 0, accepted: 0, rejected: 0 },
   );
+  return {
+    ...counts,
+    totalInvites: inviteList.length,
+    totalGuests: countGuestsInInvites(inviteList),
+  };
 }
 
 function guestsMatchingResponseFilter(guests, responseFilter) {

@@ -132,9 +132,18 @@ function AdminFooter() {
   );
 }
 
+function StatValue({ value, total }) {
+  return (
+    <p className="admin-stat-value">
+      {value}
+      <span className="admin-stat-total"> / {total}</span>
+    </p>
+  );
+}
+
 function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFilterChange }) {
   const invitesForStats = filterInvitesByGuestName(invites, guestSearch);
-  const stats = computeInviteStats(invitesForStats);
+  const { sent, accepted, rejected, totalInvites, totalGuests } = computeInviteStats(invitesForStats);
   const searchActive = guestSearch.trim().length > 0;
 
   function handleFilterClick(filter) {
@@ -150,7 +159,7 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
         title="Invites marked as sent"
         onClick={() => handleFilterClick("sent")}
       >
-        <p className="admin-stat-value">{stats.sent}</p>
+        <StatValue value={sent} total={totalInvites} />
         <p className="admin-stat-label">Sent</p>
       </button>
       <button
@@ -159,12 +168,12 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
         aria-pressed={responseFilter === "accepted"}
         title={
           searchActive
-            ? "Guests who accepted among search results"
-            : "Total guests who accepted"
+            ? "Guests who accepted among search results, out of total guests"
+            : "Guests who accepted out of total guests"
         }
         onClick={() => handleFilterClick("accepted")}
       >
-        <p className="admin-stat-value">{stats.accepted}</p>
+        <StatValue value={accepted} total={totalGuests} />
         <p className="admin-stat-label">Guests accepted</p>
       </button>
       <button
@@ -173,12 +182,12 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
         aria-pressed={responseFilter === "rejected"}
         title={
           searchActive
-            ? "Guests who declined among search results"
-            : "Total guests who declined"
+            ? "Guests who declined among search results, out of total guests"
+            : "Guests who declined out of total guests"
         }
         onClick={() => handleFilterClick("rejected")}
       >
-        <p className="admin-stat-value">{stats.rejected}</p>
+        <StatValue value={rejected} total={totalGuests} />
         <p className="admin-stat-label">Guests declined</p>
       </button>
     </section>
