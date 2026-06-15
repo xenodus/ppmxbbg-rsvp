@@ -19,6 +19,14 @@ import {
   setStoredInviteMessageTemplate,
 } from "./inviteMessage.js";
 import { generateQrCodeDataUrl } from "./qrCode.js";
+import {
+  computeInviteStats,
+  guestIsAttending,
+  guestResponded,
+  inviteHasAttendingGuest,
+  inviteHasRejectedGuest,
+  inviteIsSent,
+} from "./inviteStats.js";
 
 function guestSiteOrigin() {
   const path = window.location.pathname.replace(/admin\.html$/, "");
@@ -56,10 +64,6 @@ function formatBool(value) {
   return "—";
 }
 
-function guestResponded(guest) {
-  return guest.is_attending !== undefined && guest.is_attending !== null;
-}
-
 function inviteHasResponses(invite) {
   return (invite.guests || []).some(guestResponded);
 }
@@ -67,7 +71,7 @@ function inviteHasResponses(invite) {
 function inviteSummary(invite) {
   const guests = invite.guests || [];
   const responded = guests.filter(guestResponded).length;
-  const attending = guests.filter((g) => g.is_attending === true).length;
+  const attending = guests.filter(guestIsAttending).length;
   return { guests: guests.length, responded, attending };
 }
 
@@ -84,11 +88,11 @@ function filterInvitesByGuestName(invites, query) {
 }
 
 function inviteHasAcceptedResponse(invite) {
-  return (invite.guests || []).some(guestIsAccepted);
+  return inviteHasAttendingGuest(invite);
 }
 
 function inviteHasRejectedResponse(invite) {
-  return (invite.guests || []).some(guestIsRejected);
+  return inviteHasRejectedGuest(invite);
 }
 
 function filterInvitesByResponse(invites, responseFilter) {
@@ -112,35 +116,6 @@ function countGuestsInInvites(inviteList) {
   return inviteList.reduce((sum, invite) => sum + (invite.guests?.length ?? 0), 0);
 }
 
-function inviteIsSent(invite) {
-  return invite.is_sent === true;
-}
-
-function guestIsAccepted(guest) {
-  return guest.is_attending === true;
-}
-
-function guestIsRejected(guest) {
-  return guestResponded(guest) && guest.is_attending === false;
-}
-
-function computeInviteStats(inviteList) {
-  return inviteList.reduce(
-    (stats, invite) => {
-      const guests = invite.guests || [];
-      const sentInvites = inviteIsSent(invite) ? 1 : 0;
-      const acceptedGuests = guests.filter(guestIsAccepted).length;
-      const rejectedGuests = guests.filter(guestIsRejected).length;
-      return {
-        sent: stats.sent + sentInvites,
-        accepted: stats.accepted + acceptedGuests,
-        rejected: stats.rejected + rejectedGuests,
-      };
-    },
-    { sent: 0, accepted: 0, rejected: 0 },
-  );
-}
-
 function formatInviteListHeading(invites, filteredInvites, filtersActive) {
   const inviteCount = filteredInvites.length;
   const guestCount = countGuestsInInvites(filteredInvites);
@@ -160,8 +135,10 @@ function AdminFooter() {
   );
 }
 
-function InviteStatsSummary({ invites, responseFilter, onResponseFilterChange }) {
-  const stats = computeInviteStats(invites);
+function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFilterChange }) {
+  const invitesForStats = filterInvitesByGuestName(invites, guestSearch);
+  const stats = computeInviteStats(invitesForStats);
+  const searchActive = guestSearch.trim().length > 0;
 
   function handleFilterClick(filter) {
     onResponseFilterChange(responseFilter === filter ? null : filter);
@@ -173,6 +150,7 @@ function InviteStatsSummary({ invites, responseFilter, onResponseFilterChange })
         type="button"
         className={`admin-stat admin-stat-filter${responseFilter === "sent" ? " is-active" : ""}`}
         aria-pressed={responseFilter === "sent"}
+        title="Invites marked as sent"
         onClick={() => handleFilterClick("sent")}
       >
         <p className="admin-stat-value">{stats.sent}</p>
@@ -182,19 +160,29 @@ function InviteStatsSummary({ invites, responseFilter, onResponseFilterChange })
         type="button"
         className={`admin-stat admin-stat-filter${responseFilter === "accepted" ? " is-active" : ""}`}
         aria-pressed={responseFilter === "accepted"}
+        title={
+          searchActive
+            ? "Guests who accepted among search results"
+            : "Total guests who accepted"
+        }
         onClick={() => handleFilterClick("accepted")}
       >
         <p className="admin-stat-value">{stats.accepted}</p>
-        <p className="admin-stat-label">Accepted</p>
+        <p className="admin-stat-label">Guests accepted</p>
       </button>
       <button
         type="button"
         className={`admin-stat admin-stat-filter${responseFilter === "rejected" ? " is-active" : ""}`}
         aria-pressed={responseFilter === "rejected"}
+        title={
+          searchActive
+            ? "Guests who declined among search results"
+            : "Total guests who declined"
+        }
         onClick={() => handleFilterClick("rejected")}
       >
         <p className="admin-stat-value">{stats.rejected}</p>
-        <p className="admin-stat-label">Rejected</p>
+        <p className="admin-stat-label">Guests declined</p>
       </button>
     </section>
   );
@@ -914,6 +902,7 @@ export default function AdminApp() {
 
           <InviteStatsSummary
             invites={invites}
+            guestSearch={guestSearch}
             responseFilter={responseFilter}
             onResponseFilterChange={setResponseFilter}
           />
