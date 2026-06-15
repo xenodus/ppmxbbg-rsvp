@@ -92,6 +92,9 @@ function inviteHasRejectedResponse(invite) {
 }
 
 function filterInvitesByResponse(invites, responseFilter) {
+  if (responseFilter === "sent") {
+    return invites.filter(inviteIsSent);
+  }
   if (responseFilter === "accepted") {
     return invites.filter(inviteHasAcceptedResponse);
   }
@@ -166,10 +169,15 @@ function InviteStatsSummary({ invites, responseFilter, onResponseFilterChange })
 
   return (
     <section className="admin-stats" aria-label="RSVP summary">
-      <div className="admin-stat">
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "sent" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "sent"}
+        onClick={() => handleFilterClick("sent")}
+      >
         <p className="admin-stat-value">{stats.sent}</p>
         <p className="admin-stat-label">Sent</p>
-      </div>
+      </button>
       <button
         type="button"
         className={`admin-stat admin-stat-filter${responseFilter === "accepted" ? " is-active" : ""}`}
