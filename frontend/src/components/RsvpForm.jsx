@@ -25,8 +25,6 @@ function ChoiceSection({
   submitting,
   submitDisabled,
   savedMessage,
-  savedMessageKey,
-  onSavedMessageDismiss,
   onSelectYes,
   onSelectNo,
   onSubmit,
@@ -70,11 +68,7 @@ function ChoiceSection({
           {submitting ? "SAVING..." : "SAVE RESPONSE"}
         </button>
       </form>
-      <FadeAwayMessage
-        message={savedMessage}
-        messageKey={savedMessageKey}
-        onDismiss={onSavedMessageDismiss}
-      />
+      <FadeAwayMessage message={savedMessage} />
     </section>
   );
 }
@@ -140,8 +134,6 @@ export default function RsvpForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [parkingSavedMessage, setParkingSavedMessage] = useState("");
-  const [parkingSavedMessageKey, setParkingSavedMessageKey] = useState(0);
-  const [successMessageKey, setSuccessMessageKey] = useState(0);
   const [inviteValid, setInviteValid] = useState(false);
   const rsvpClosed = now.getTime() >= RSVP_CUTOFF_MS;
 
@@ -224,19 +216,16 @@ export default function RsvpForm({
 
   function showParkingSavedMessage() {
     setParkingSavedMessage(RESPONSE_SAVED_MESSAGE);
-    setParkingSavedMessageKey(Date.now());
   }
 
   function showSuccessMessage(message) {
     setSuccess(message);
-    setSuccessMessageKey(Date.now());
   }
 
   function handleParkingSelect(value) {
     setPendingParking(value);
     setError("");
     setParkingSavedMessage("");
-    setParkingSavedMessageKey(0);
   }
 
   async function handleParkingSubmit() {
@@ -272,7 +261,6 @@ export default function RsvpForm({
       setRequireParking(previousParking);
       setPendingParking(previousPending);
       setParkingSavedMessage("");
-      setParkingSavedMessageKey(0);
       setError(err.message);
     } finally {
       setSavingInvite(false);
@@ -342,11 +330,7 @@ export default function RsvpForm({
                 disabled={formDisabled || savingGuest}
                 onRespond={setActiveGuest}
               />
-              <FadeAwayMessage
-                message={success}
-                messageKey={successMessageKey}
-                onDismiss={() => setSuccess("")}
-              />
+              <FadeAwayMessage message={success} />
             </section>
 
             {allDeclined && (
@@ -365,11 +349,6 @@ export default function RsvpForm({
                 submitting={savingInvite}
                 submitDisabled={pendingParking === null}
                 savedMessage={parkingSavedMessage}
-                savedMessageKey={parkingSavedMessageKey}
-                onSavedMessageDismiss={() => {
-                  setParkingSavedMessage("");
-                  setParkingSavedMessageKey(0);
-                }}
                 onSelectYes={() => handleParkingSelect(true)}
                 onSelectNo={() => handleParkingSelect(false)}
                 onSubmit={handleParkingSubmit}
