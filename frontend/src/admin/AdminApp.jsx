@@ -21,6 +21,7 @@ import {
 import { generateQrCodeDataUrl } from "./qrCode.js";
 import {
   computeInviteStats,
+  countGuestsInInvites,
   guestIsAttending,
   guestResponded,
   inviteHasAttendingGuest,
@@ -112,13 +113,9 @@ function filterInvites(invites, { guestSearch, responseFilter }) {
   return filterInvitesByResponse(filterInvitesByGuestName(invites, guestSearch), responseFilter);
 }
 
-function countGuestsInInvites(inviteList) {
-  return inviteList.reduce((sum, invite) => sum + (invite.guests?.length ?? 0), 0);
-}
-
-function formatInviteListHeading(invites, filteredInvites, filtersActive) {
+function formatInviteListHeading(invites, filteredInvites, filtersActive, responseFilter) {
   const inviteCount = filteredInvites.length;
-  const guestCount = countGuestsInInvites(filteredInvites);
+  const guestCount = countGuestsInInvites(filteredInvites, responseFilter);
   if (filtersActive) {
     const totalInvites = invites.length;
     const totalGuests = countGuestsInInvites(invites);
@@ -937,7 +934,7 @@ export default function AdminApp() {
           <section className="admin-list-section">
             <h2>
               All invites
-              {formatInviteListHeading(invites, filteredInvites, filtersActive)}
+              {formatInviteListHeading(invites, filteredInvites, filtersActive, responseFilter)}
             </h2>
             <div className="admin-list-filters">
               <div className="field-group">

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   computeInviteStats,
+  countGuestsInInvites,
   guestIsAttending,
   guestIsRejected,
 } from "./inviteStats.js";
@@ -59,6 +60,31 @@ test("accepted is the total number of attending guests, not invites", () => {
 
   assert.equal(stats.accepted, attendingGuests);
   assert.notEqual(stats.accepted, sampleInvites.filter((invite) => inviteHasAttending(invite)).length);
+});
+
+test("countGuestsInInvites counts all guests by default", () => {
+  assert.equal(countGuestsInInvites(sampleInvites), 5);
+});
+
+test("countGuestsInInvites with accepted filter counts only attending guests", () => {
+  const invitesWithMixedHousehold = [
+    {
+      id: "household",
+      guests: [
+        { id: 1, name: "Jane", is_attending: true },
+        { id: 2, name: "John", is_attending: false },
+        { id: 3, name: "Joan" },
+      ],
+    },
+  ];
+
+  assert.equal(countGuestsInInvites(invitesWithMixedHousehold), 3);
+  assert.equal(countGuestsInInvites(invitesWithMixedHousehold, "accepted"), 1);
+  assert.equal(computeInviteStats(invitesWithMixedHousehold).accepted, 1);
+});
+
+test("countGuestsInInvites with rejected filter counts only declined guests", () => {
+  assert.equal(countGuestsInInvites(sampleInvites, "rejected"), 1);
 });
 
 function inviteHasAttending(invite) {
