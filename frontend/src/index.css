@@ -642,14 +642,8 @@ form {
   margin: 0.75rem 0 0;
   text-align: center;
   line-height: 1.5;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   color: var(--success);
-  opacity: 1;
-  transition: opacity 0.5s ease;
-}
-
-.choice-saved--fading {
-  opacity: 0;
 }
 
 .choice-btn {
