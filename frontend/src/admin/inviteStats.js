@@ -35,3 +35,20 @@ export function computeInviteStats(inviteList) {
     { sent: 0, accepted: 0, rejected: 0 },
   );
 }
+
+function guestsMatchingResponseFilter(guests, responseFilter) {
+  if (responseFilter === "accepted") {
+    return guests.filter(guestIsAttending);
+  }
+  if (responseFilter === "rejected") {
+    return guests.filter(guestIsRejected);
+  }
+  return guests;
+}
+
+export function countGuestsInInvites(inviteList, responseFilter = null) {
+  return inviteList.reduce((sum, invite) => {
+    const guests = invite.guests || [];
+    return sum + guestsMatchingResponseFilter(guests, responseFilter).length;
+  }, 0);
+}
