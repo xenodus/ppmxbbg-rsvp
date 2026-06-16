@@ -735,7 +735,12 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
     <article className="admin-invite-card">
       <div className="admin-invite-top">
         <div className="admin-invite-header">
-          <strong>{invite.guests?.map((g) => g.name).join(", ") || "No guests"}</strong>
+          <div className="admin-invite-title-row">
+            <strong>{invite.guests?.map((g) => g.name).join(", ") || "No guests"}</strong>
+            {invite.is_sent ? (
+              <span className="admin-invite-sent-label">Sent</span>
+            ) : null}
+          </div>
           <p className="admin-muted admin-id">ID: {invite.id}</p>
         </div>
         <InviteQrCode url={inviteLink(invite.id)} />
@@ -789,7 +794,6 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
       </div>
       <p className="admin-summary">
         {summary.responded}/{summary.guests} guests responded · {summary.attending} attending
-        · Sent: {formatBool(invite.is_sent)}
         · Parking: {formatBool(invite.require_parking)}
       </p>
       {expanded ? (
