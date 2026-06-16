@@ -143,9 +143,22 @@ export function deleteInvite(id) {
   });
 }
 
-export function updateGuestName(id, name) {
+export function updateGuestName(inviteId, guestId, name, previousName) {
+  const guestIdNum = Number(guestId);
+  if (!Number.isInteger(guestIdNum) || guestIdNum <= 0) {
+    return Promise.reject(new Error("Invalid guest id"));
+  }
+  const body = {
+    id: inviteId,
+    guest_id: guestIdNum,
+    name,
+  };
+  const previous = (previousName || "").trim();
+  if (previous) {
+    body.previous_name = previous;
+  }
   return request("/admin/invites", {
     method: "PATCH",
-    body: JSON.stringify({ guest_id: id, name }),
+    body: JSON.stringify(body),
   });
 }

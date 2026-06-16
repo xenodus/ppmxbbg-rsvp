@@ -555,7 +555,7 @@ function MessageTemplateEditor({ template, onSave, onClose }) {
   );
 }
 
-function EditableGuestName({ guest, disabled, canEdit, onSaved }) {
+function EditableGuestName({ inviteId, guest, disabled, canEdit, onSaved }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(guest.name);
   const [saving, setSaving] = useState(false);
@@ -578,7 +578,7 @@ function EditableGuestName({ guest, disabled, canEdit, onSaved }) {
     }
     setSaving(true);
     try {
-      await updateGuestName(guest.id, name);
+      await updateGuestName(inviteId, guest.id, name, guest.name);
       setEditing(false);
       await onSaved();
     } catch (err) {
@@ -792,6 +792,7 @@ function InviteRow({ invite, messageTemplate, onRefresh }) {
                 <tr key={guest.id}>
                   <td>
                     <EditableGuestName
+                      inviteId={invite.id}
                       guest={guest}
                       disabled={busy}
                       canEdit={!namesLocked}

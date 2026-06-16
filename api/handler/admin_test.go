@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"testing"
+
+	"ppmxbbg-rsvp/store"
 )
 
 func TestAdminLoginSuccess(t *testing.T) {
@@ -142,6 +144,48 @@ func TestAdminPatchGuestInvalidBody(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	assertStatus(t, resp, http.StatusBadRequest)
+}
+
+func TestGuestNamePatchFromInvite(t *testing.T) {
+	t.Run("guest id and name", func(t *testing.T) {
+		patch, ok := guestNamePatchFromInvite(store.AdminInvitePatch{
+			ID:      "123",
+			GuestID: 5,
+			Name:    "Jane",
+		})
+		if !ok {
+			t.Fatal("expected guest name patch")
+		}
+		if patch.ID != 5 || patch.InviteID != "123" || patch.Name != "Jane" {
+			t.Fatalf("unexpected patch: %+v", patch)
+		}
+	})
+
+	t.Run("invite id and previous name fallback", func(t *testing.T) {
+		patch, ok := guestNamePatchFromInvite(store.AdminInvitePatch{
+			ID:           "123",
+			Name:         "Jane",
+			PreviousName: "John",
+		})
+		if !ok {
+			t.Fatal("expected guest name patch")
+		}
+		if patch.ID != 0 || patch.InviteID != "123" || patch.PreviousName != "John" {
+			t.Fatalf("unexpected patch: %+v", patch)
+		}
+	})
+
+	t.Run("invite update is not guest name patch", func(t *testing.T) {
+		sent := true
+		_, ok := guestNamePatchFromInvite(store.AdminInvitePatch{
+			ID:     "123",
+			IsSent: &sent,
+			Name:   "Jane",
+		})
+		if ok {
+			t.Fatal("expected invite patch")
+		}
+	})
 }
 
 func TestAdminOptionsV2(t *testing.T) {
