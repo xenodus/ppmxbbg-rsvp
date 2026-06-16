@@ -157,8 +157,8 @@ func handleAdminPatchInvite(ctx context.Context, body, origin string) (apiRespon
 	if err := json.Unmarshal([]byte(body), &patch); err != nil {
 		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin, adminCORSMethods, adminCORSHeaders)
 	}
-	if patch.GuestID > 0 {
-		return patchGuestName(ctx, store.AdminGuestPatch{ID: patch.GuestID, Name: patch.Name}, origin)
+	if guestPatch, ok := guestNamePatchFromInvite(patch); ok {
+		return patchGuestName(ctx, guestPatch, origin)
 	}
 	patch.ID = strings.TrimSpace(patch.ID)
 	if patch.ID == "" {
@@ -184,6 +184,31 @@ func handleAdminPatchGuest(ctx context.Context, body, origin string) (apiRespons
 		return jsonResponseWithCORS(http.StatusBadRequest, errorResponse{Error: "invalid request body"}, origin, adminCORSMethods, adminCORSHeaders)
 	}
 	return patchGuestName(ctx, patch, origin)
+}
+
+func guestNamePatchFromInvite(patch store.AdminInvitePatch) (store.AdminGuestPatch, bool) {
+	name := strings.TrimSpace(patch.Name)
+	if name == "" || patch.IsSent != nil {
+		return store.AdminGuestPatch{}, false
+	}
+	inviteID := strings.TrimSpace(patch.ID)
+	previousName := strings.TrimSpace(patch.PreviousName)
+	if patch.GuestID > 0 {
+		return store.AdminGuestPatch{
+			ID:           patch.GuestID,
+			Name:         name,
+			InviteID:     inviteID,
+			PreviousName: previousName,
+		}, true
+	}
+	if inviteID != "" && previousName != "" {
+		return store.AdminGuestPatch{
+			Name:         name,
+			InviteID:     inviteID,
+			PreviousName: previousName,
+		}, true
+	}
+	return store.AdminGuestPatch{}, false
 }
 
 func patchGuestName(ctx context.Context, patch store.AdminGuestPatch, origin string) (apiResponse, error) {

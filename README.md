@@ -295,21 +295,24 @@ Update invite metadata or a guest's name.
 }
 ```
 
-**Guest name update** — set `guest_id` and `name` (RSVP fields are not changed). Rejected with **409 Conflict** once any guest on the same invite has submitted an RSVP (`is_attending` is set):
+**Guest name update** — set `guest_id` and `name` (RSVP fields are not changed). Include `id` (invite snowflake id) and `previous_name` (current guest name) so the server can resolve the guest if `guest_id` is stale. Rejected with **409 Conflict** once any guest on the same invite has submitted an RSVP (`is_attending` is set):
 
 ```json
 {
+  "id": "1234567890123456789",
   "guest_id": 1,
-  "name": "Jane Smith"
+  "name": "Jane Smith",
+  "previous_name": "Jane"
 }
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `id` | yes (invite update) | Invite snowflake id |
+| `id` | yes (invite update); recommended (name update) | Invite snowflake id |
 | `is_sent` | yes (invite update) | Whether the invite was sent |
 | `guest_id` | yes (name update) | Guest id |
 | `name` | yes (name update) | New guest name (non-empty after trim) |
+| `previous_name` | recommended (name update) | Current guest name; used to find the guest when `guest_id` no longer matches |
 
 **200 OK** — updated invite object, updated guest object (name update), or `{"status":"saved"}`.
 
@@ -322,7 +325,7 @@ Update invite metadata or a guest's name.
 ```bash
 curl -X PATCH -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"guest_id":1,"name":"Jane Smith"}' \
+  -d '{"id":"1234567890123456789","guest_id":1,"name":"Jane Smith","previous_name":"Jane"}' \
   "https://YOUR_API_URL/admin/invites"
 ```
 

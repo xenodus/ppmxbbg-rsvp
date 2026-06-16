@@ -19,15 +19,18 @@ type CreateInviteInput struct {
 }
 
 type AdminInvitePatch struct {
-	ID      string `json:"id"`
-	IsSent  *bool  `json:"is_sent"`
-	GuestID int64  `json:"guest_id"`
-	Name    string `json:"name"`
+	ID          string `json:"id"`
+	IsSent      *bool  `json:"is_sent"`
+	GuestID     int64  `json:"guest_id"`
+	Name        string `json:"name"`
+	PreviousName string `json:"previous_name"`
 }
 
 type AdminGuestPatch struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	InviteID     string `json:"invite_id"`
+	PreviousName string `json:"previous_name"`
 }
 
 func ListInvites(ctx context.Context) ([]AdminInvite, error) {
@@ -233,22 +236,21 @@ func EnrichAdminInvite(ctx context.Context, invite *Invite) (*AdminInvite, error
 }
 
 func UpdateGuestName(ctx context.Context, patch AdminGuestPatch) (*Guest, error) {
-	name := strings.TrimSpace(patch.Name)
-	if patch.ID <= 0 {
-		return nil, errors.New("id is required")
-	}
-	if name == "" {
-		return nil, errors.New("name is required")
-	}
-
 	conn, err := DB()
 	if err != nil {
 		return nil, err
 	}
+	return updateGuestName(ctx, conn, patch)
+}
 
-	var inviteID string
-	err = conn.QueryRowContext(ctx, `SELECT invite_id FROM guests WHERE id = ?`, patch.ID).Scan(&inviteID)
-	if errors.Is(err, sql.ErrNoRows) {
+func updateGuestName(ctx context.Context, conn *sql.DB, patch AdminGuestPatch) (*Guest, error) {
+	name := strings.TrimSpace(patch.Name)
+	if name == "" {
+		return nil, errors.New("name is required")
+	}
+
+	guestID, inviteID, err := resolveGuestForNameUpdate(ctx, conn, patch)
+	if errors.Is(err, ErrGuestNotFound) {
 		return nil, ErrGuestNotFound
 	}
 	if err != nil {
@@ -267,7 +269,7 @@ func UpdateGuestName(ctx context.Context, patch AdminGuestPatch) (*Guest, error)
 		return nil, ErrInviteHasResponses
 	}
 
-	result, err := conn.ExecContext(ctx, `UPDATE guests SET name = ? WHERE id = ?`, name, patch.ID)
+	result, err := conn.ExecContext(ctx, `UPDATE guests SET name = ? WHERE id = ?`, name, guestID)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +290,7 @@ func UpdateGuestName(ctx context.Context, patch AdminGuestPatch) (*Guest, error)
 		SELECT id, name, dietary_restriction, is_attending, attend_solemnisation, last_updated
 		FROM guests
 		WHERE id = ?
-	`, patch.ID).Scan(
+	`, guestID).Scan(
 		&guest.ID,
 		&guest.Name,
 		&dietaryRestriction,
@@ -316,6 +318,50 @@ func UpdateGuestName(ctx context.Context, patch AdminGuestPatch) (*Guest, error)
 		guest.LastUpdated = &v
 	}
 	return &guest, nil
+}
+
+func resolveGuestForNameUpdate(ctx context.Context, conn *sql.DB, patch AdminGuestPatch) (guestID int64, inviteID string, err error) {
+	inviteID = strings.TrimSpace(patch.InviteID)
+	previousName := strings.TrimSpace(patch.PreviousName)
+
+	if patch.ID > 0 {
+		var foundInviteID string
+		err = conn.QueryRowContext(ctx, `SELECT invite_id FROM guests WHERE id = ?`, patch.ID).Scan(&foundInviteID)
+		if errors.Is(err, sql.ErrNoRows) {
+			if inviteID == "" || previousName == "" {
+				return 0, "", ErrGuestNotFound
+			}
+			return lookupGuestByInviteAndName(ctx, conn, inviteID, previousName)
+		}
+		if err != nil {
+			return 0, "", err
+		}
+		if inviteID != "" && foundInviteID != inviteID {
+			return 0, "", ErrGuestNotFound
+		}
+		return patch.ID, foundInviteID, nil
+	}
+
+	if inviteID != "" && previousName != "" {
+		return lookupGuestByInviteAndName(ctx, conn, inviteID, previousName)
+	}
+
+	return 0, "", errors.New("id is required")
+}
+
+func lookupGuestByInviteAndName(ctx context.Context, conn *sql.DB, inviteID, name string) (int64, string, error) {
+	var guestID int64
+	err := conn.QueryRowContext(ctx, `
+		SELECT id FROM guests
+		WHERE invite_id = ? AND name = ?
+	`, inviteID, name).Scan(&guestID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, "", ErrGuestNotFound
+	}
+	if err != nil {
+		return 0, "", err
+	}
+	return guestID, inviteID, nil
 }
 
 func normalizeGuestNames(names []string) []string {
