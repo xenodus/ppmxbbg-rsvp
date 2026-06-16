@@ -49,6 +49,7 @@ test("guestIsRejected counts only guests who declined after responding", () => {
 test("computeInviteStats counts sent invites and guest responses separately", () => {
   assert.deepEqual(computeInviteStats(sampleInvites), {
     sent: 2,
+    unsent: 1,
     parking: 1,
     accepted: 3,
     rejected: 1,
@@ -62,7 +63,8 @@ test("computeInviteStats includes invite and guest totals for display", () => {
 
   assert.equal(stats.totalInvites, sampleInvites.length);
   assert.equal(stats.totalGuests, countGuestsInInvites(sampleInvites));
-  assert.equal(stats.sent, stats.totalInvites - 1);
+  assert.equal(stats.sent, stats.totalInvites - stats.unsent);
+  assert.equal(stats.sent + stats.unsent, stats.totalInvites);
   assert.equal(stats.accepted + stats.rejected, stats.totalGuests - 1);
 });
 
