@@ -248,7 +248,9 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
     padding: 0.5rem 0.7rem;
     font-size: 0.9rem;
   }
+}
 
+@media (max-width: 48rem) {
   .admin-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
