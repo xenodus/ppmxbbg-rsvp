@@ -250,9 +250,15 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   }
 }
 
+@media (max-width: 48rem) {
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.75rem;
   margin-bottom: 2rem;
 }
