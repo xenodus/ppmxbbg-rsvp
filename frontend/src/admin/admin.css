@@ -395,6 +395,26 @@ body.admin-app :is(h1, h2, h3, h4, h5, h6, button, input, textarea, select) {
   min-width: 0;
 }
 
+.admin-invite-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-invite-sent-label {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0a2e0a;
+  background: #22c55e;
+  border: 1px solid #16a34a;
+}
+
 .admin-invite-qr {
   flex-shrink: 0;
   width: 96px;
