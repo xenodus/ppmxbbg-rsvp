@@ -26,6 +26,7 @@ import {
   guestResponded,
   inviteHasAttendingGuest,
   inviteHasRejectedGuest,
+  inviteHasUnrespondedGuest,
   inviteIsSent,
   inviteIsUnsent,
   inviteRequiresParking,
@@ -98,6 +99,10 @@ function inviteHasRejectedResponse(invite) {
   return inviteHasRejectedGuest(invite);
 }
 
+function inviteHasPendingResponse(invite) {
+  return inviteHasUnrespondedGuest(invite);
+}
+
 function filterInvitesByResponse(invites, responseFilter) {
   if (responseFilter === "sent") {
     return invites.filter(inviteIsSent);
@@ -110,6 +115,9 @@ function filterInvitesByResponse(invites, responseFilter) {
   }
   if (responseFilter === "accepted") {
     return invites.filter(inviteHasAcceptedResponse);
+  }
+  if (responseFilter === "pending") {
+    return invites.filter(inviteHasPendingResponse);
   }
   if (responseFilter === "rejected") {
     return invites.filter(inviteHasRejectedResponse);
@@ -151,7 +159,7 @@ function StatValue({ value, total }) {
 
 function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFilterChange }) {
   const invitesForStats = filterInvitesByGuestName(invites, guestSearch);
-  const { sent, unsent, parking, accepted, rejected, totalInvites, totalGuests } =
+  const { sent, unsent, parking, pending, accepted, rejected, totalInvites, totalGuests } =
     computeInviteStats(invitesForStats);
   const searchActive = guestSearch.trim().length > 0;
 
@@ -190,6 +198,20 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
       >
         <StatValue value={parking} total={totalInvites} />
         <p className="admin-stat-label">Parking</p>
+      </button>
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "pending" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "pending"}
+        title={
+          searchActive
+            ? "Guests with no response among search results, out of total guests"
+            : "Guests with no response out of total guests"
+        }
+        onClick={() => handleFilterClick("pending")}
+      >
+        <StatValue value={pending} total={totalGuests} />
+        <p className="admin-stat-label">No response</p>
       </button>
       <button
         type="button"

@@ -5,6 +5,7 @@ import {
   countGuestsInInvites,
   guestIsAttending,
   guestIsRejected,
+  guestNotResponded,
 } from "./inviteStats.js";
 
 const sampleInvites = [
@@ -46,6 +47,13 @@ test("guestIsRejected counts only guests who declined after responding", () => {
   assert.equal(guestIsRejected({}), false);
 });
 
+test("guestNotResponded counts only guests who have not responded", () => {
+  assert.equal(guestNotResponded({}), true);
+  assert.equal(guestNotResponded({ is_attending: null }), true);
+  assert.equal(guestNotResponded({ is_attending: true }), false);
+  assert.equal(guestNotResponded({ is_attending: false }), false);
+});
+
 test("computeInviteStats counts sent invites and guest responses separately", () => {
   assert.deepEqual(computeInviteStats(sampleInvites), {
     sent: 2,
@@ -53,6 +61,7 @@ test("computeInviteStats counts sent invites and guest responses separately", ()
     parking: 1,
     accepted: 3,
     rejected: 1,
+    pending: 1,
     totalInvites: 3,
     totalGuests: 5,
   });
@@ -65,7 +74,7 @@ test("computeInviteStats includes invite and guest totals for display", () => {
   assert.equal(stats.totalGuests, countGuestsInInvites(sampleInvites));
   assert.equal(stats.sent, stats.totalInvites - stats.unsent);
   assert.equal(stats.sent + stats.unsent, stats.totalInvites);
-  assert.equal(stats.accepted + stats.rejected, stats.totalGuests - 1);
+  assert.equal(stats.accepted + stats.rejected + stats.pending, stats.totalGuests);
 });
 
 test("parking is the total number of invites that require parking, not guests", () => {
@@ -119,6 +128,11 @@ test("computeInviteStats uses all guests as totalGuests, not only declined guest
 test("countGuestsInInvites with rejected filter counts only declined guests", () => {
   assert.equal(countGuestsInInvites(sampleInvites, "rejected"), 1);
   assert.notEqual(countGuestsInInvites(sampleInvites, "rejected"), countGuestsInInvites(sampleInvites));
+});
+
+test("countGuestsInInvites with pending filter counts only guests with no response", () => {
+  assert.equal(countGuestsInInvites(sampleInvites, "pending"), 1);
+  assert.equal(countGuestsInInvites(sampleInvites, "pending"), computeInviteStats(sampleInvites).pending);
 });
 
 function inviteHasAttending(invite) {

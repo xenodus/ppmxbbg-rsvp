@@ -10,6 +10,10 @@ export function guestIsRejected(guest) {
   return guestResponded(guest) && guest.is_attending === false;
 }
 
+export function guestNotResponded(guest) {
+  return !guestResponded(guest);
+}
+
 export function inviteIsSent(invite) {
   return invite.is_sent === true;
 }
@@ -30,6 +34,10 @@ export function inviteHasRejectedGuest(invite) {
   return (invite.guests || []).some(guestIsRejected);
 }
 
+export function inviteHasUnrespondedGuest(invite) {
+  return (invite.guests || []).some(guestNotResponded);
+}
+
 export function computeInviteStats(inviteList) {
   const counts = inviteList.reduce(
     (stats, invite) => {
@@ -40,9 +48,10 @@ export function computeInviteStats(inviteList) {
         parking: stats.parking + (inviteRequiresParking(invite) ? 1 : 0),
         accepted: stats.accepted + guests.filter(guestIsAttending).length,
         rejected: stats.rejected + guests.filter(guestIsRejected).length,
+        pending: stats.pending + guests.filter(guestNotResponded).length,
       };
     },
-    { sent: 0, unsent: 0, parking: 0, accepted: 0, rejected: 0 },
+    { sent: 0, unsent: 0, parking: 0, accepted: 0, rejected: 0, pending: 0 },
   );
   return {
     ...counts,
@@ -57,6 +66,9 @@ function guestsMatchingResponseFilter(guests, responseFilter) {
   }
   if (responseFilter === "rejected") {
     return guests.filter(guestIsRejected);
+  }
+  if (responseFilter === "pending") {
+    return guests.filter(guestNotResponded);
   }
   return guests;
 }
