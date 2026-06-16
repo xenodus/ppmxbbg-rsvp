@@ -27,6 +27,7 @@ import {
   inviteHasAttendingGuest,
   inviteHasRejectedGuest,
   inviteIsSent,
+  inviteIsUnsent,
   inviteRequiresParking,
 } from "./inviteStats.js";
 
@@ -101,6 +102,9 @@ function filterInvitesByResponse(invites, responseFilter) {
   if (responseFilter === "sent") {
     return invites.filter(inviteIsSent);
   }
+  if (responseFilter === "unsent") {
+    return invites.filter(inviteIsUnsent);
+  }
   if (responseFilter === "parking") {
     return invites.filter(inviteRequiresParking);
   }
@@ -147,7 +151,8 @@ function StatValue({ value, total }) {
 
 function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFilterChange }) {
   const invitesForStats = filterInvitesByGuestName(invites, guestSearch);
-  const { sent, parking, accepted, rejected, totalInvites, totalGuests } = computeInviteStats(invitesForStats);
+  const { sent, unsent, parking, accepted, rejected, totalInvites, totalGuests } =
+    computeInviteStats(invitesForStats);
   const searchActive = guestSearch.trim().length > 0;
 
   function handleFilterClick(filter) {
@@ -165,6 +170,16 @@ function InviteStatsSummary({ invites, guestSearch, responseFilter, onResponseFi
       >
         <StatValue value={sent} total={totalInvites} />
         <p className="admin-stat-label">Sent</p>
+      </button>
+      <button
+        type="button"
+        className={`admin-stat admin-stat-filter${responseFilter === "unsent" ? " is-active" : ""}`}
+        aria-pressed={responseFilter === "unsent"}
+        title="Invites not yet marked as sent"
+        onClick={() => handleFilterClick("unsent")}
+      >
+        <StatValue value={unsent} total={totalInvites} />
+        <p className="admin-stat-label">Unsent</p>
       </button>
       <button
         type="button"
