@@ -6,6 +6,72 @@ Go Lambda API + React SPA for wedding RSVPs. One invite can include multiple gue
 - **Frontend:** React SPA on S3 + CloudFront
 - **Database:** Remote MySQL (`invites`, `guests` tables — populated separately)
 
+## Architecture
+
+Go Lambda API backed by MySQL, with a React SPA served through **CloudFront** (S3 is the origin only — browsers do not hit S3 directly). Guests open personalized invite links; admins manage invites through a separate SPA entry point.
+
+```mermaid
+flowchart TB
+  subgraph clients["Clients"]
+    Guest["Guest browser\n/?id={invite_id}"]
+    Admin["Admin browser\n/admin.html"]
+  end
+
+  subgraph frontend["Frontend — CloudFront serves SPA + static assets"]
+    CF["CloudFront\nalvinandvivian.rsvp"]
+    S3["S3 origin\nppmxbbg-rsvp-frontend"]
+    CF -->|"cache miss"| S3
+
+    subgraph spa["React SPA (Vite build)"]
+      IDX["index.html\nLandingApp → RsvpModal\napi.js"]
+      ADM["admin.html\nAdminApp\nadminApi.js"]
+    end
+  end
+
+  subgraph backend["Backend API"]
+    APIGW["API Gateway\nHTTP API"]
+    Lambda["Lambda — Go container\nhandler.RSVP"]
+    APIGW --> Lambda
+
+    subgraph dispatch["handler dispatch"]
+      GUEST["/guest\nGET · POST"]
+      ADMIN["/admin/login\n/admin/invites\n/admin/guests"]
+    end
+    Lambda --> dispatch
+  end
+
+  DB[("MySQL rsvp\ninvites 1──N guests")]
+
+  subgraph cicd["CI/CD — merge to master"]
+    GHA["GitHub Actions\nOIDC → IAM"]
+    GHA -->|"make deploy-frontend"| S3
+    GHA -->|"CloudFront invalidate"| CF
+    GHA -->|"make deploy-api\nDocker → ECR"| Lambda
+  end
+
+  Guest -->|"HTTPS HTML / JS / CSS / images"| CF
+  Admin -->|"HTTPS HTML / JS / CSS / images"| CF
+  CF -.-> spa
+  S3 -.-> spa
+
+  Guest --> IDX
+  Admin --> ADM
+  IDX -->|"fetch /guest"| APIGW
+  ADM -->|"fetch /admin/*"| APIGW
+  dispatch --> DB
+```
+
+| Layer | Technology | Role |
+|-------|------------|------|
+| Frontend | React 18 + Vite | Guest landing page, RSVP modal, admin UI |
+| CDN / hosting | CloudFront → S3 | CloudFront serves the SPA on the custom domain; S3 is the private origin |
+| API | API Gateway HTTP API | Routes to Lambda, CORS |
+| Compute | AWS Lambda (container) | Single Go handler for all routes |
+| Database | MySQL | `invites` and `guests` tables |
+| Deploy | Makefile + GitHub Actions | OIDC to AWS on PR merge |
+
+More detail: [docs/architecture.md](docs/architecture.md).
+
 ---
 
 ## API
