@@ -6,6 +6,23 @@ Go Lambda API + React SPA for wedding RSVPs. One invite can include multiple gue
 - **Frontend:** React SPA on S3 + CloudFront
 - **Database:** Remote MySQL (`invites`, `guests` tables — populated separately)
 
+## Architecture
+
+Go Lambda API backed by MySQL, with a React SPA served through **CloudFront** (S3 is the origin only — browsers do not hit S3 directly). Guests open personalized invite links; admins manage invites through a separate SPA entry point.
+
+![Architecture diagram](docs/readme/architecture.png)
+
+| Layer | Technology | Role |
+|-------|------------|------|
+| Frontend | React 18 + Vite | Guest landing page, RSVP modal, admin UI |
+| CDN / hosting | CloudFront → S3 | CloudFront serves the SPA on the custom domain; S3 is the private origin |
+| API | API Gateway HTTP API | Routes to Lambda, CORS |
+| Compute | AWS Lambda (container) | Single Go handler for all routes |
+| Database | MySQL | `invites` and `guests` tables |
+| Deploy | Makefile + GitHub Actions | OIDC to AWS on PR merge |
+
+More detail: [docs/architecture.md](docs/architecture.md).
+
 ---
 
 ## API
@@ -565,7 +582,7 @@ CREATE TABLE guests (
 ├── api/           # Go Lambda (handler, store, config)
 ├── docs/
 │   ├── architecture.md  # System and component diagrams (Mermaid)
-│   └── readme/    # Images committed for README (admin UI screenshots)
+│   └── readme/    # Images committed for README (architecture diagram, admin UI screenshots)
 ├── frontend/      # React + Vite SPA (`index.html` landing + RSVP popup, `admin.html` admin)
 │   └── public/
 │       ├── original/  # Source PNG/GIF illustrations (masters)
