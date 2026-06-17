@@ -10,56 +10,7 @@ Go Lambda API + React SPA for wedding RSVPs. One invite can include multiple gue
 
 Go Lambda API backed by MySQL, with a React SPA served through **CloudFront** (S3 is the origin only — browsers do not hit S3 directly). Guests open personalized invite links; admins manage invites through a separate SPA entry point.
 
-```mermaid
-flowchart TB
-  subgraph clients["Clients"]
-    Guest["Guest browser\n/?id={invite_id}"]
-    Admin["Admin browser\n/admin.html"]
-  end
-
-  subgraph frontend["Frontend — CloudFront serves SPA + static assets"]
-    CF["CloudFront\nalvinandvivian.rsvp"]
-    S3["S3 origin\nppmxbbg-rsvp-frontend"]
-    CF -->|"cache miss"| S3
-
-    subgraph spa["React SPA (Vite build)"]
-      IDX["index.html\nLandingApp → RsvpModal\napi.js"]
-      ADM["admin.html\nAdminApp\nadminApi.js"]
-    end
-  end
-
-  subgraph backend["Backend API"]
-    APIGW["API Gateway\nHTTP API"]
-    Lambda["Lambda — Go container\nhandler.RSVP"]
-    APIGW --> Lambda
-
-    subgraph dispatch["handler dispatch"]
-      GUEST["/guest\nGET · POST"]
-      ADMIN["/admin/login\n/admin/invites\n/admin/guests"]
-    end
-    Lambda --> dispatch
-  end
-
-  DB[("MySQL rsvp\ninvites 1──N guests")]
-
-  subgraph cicd["CI/CD — merge to master"]
-    GHA["GitHub Actions\nOIDC → IAM"]
-    GHA -->|"make deploy-frontend"| S3
-    GHA -->|"CloudFront invalidate"| CF
-    GHA -->|"make deploy-api\nDocker → ECR"| Lambda
-  end
-
-  Guest -->|"HTTPS HTML / JS / CSS / images"| CF
-  Admin -->|"HTTPS HTML / JS / CSS / images"| CF
-  CF -.-> spa
-  S3 -.-> spa
-
-  Guest --> IDX
-  Admin --> ADM
-  IDX -->|"fetch /guest"| APIGW
-  ADM -->|"fetch /admin/*"| APIGW
-  dispatch --> DB
-```
+![Architecture diagram](docs/readme/architecture.png)
 
 | Layer | Technology | Role |
 |-------|------------|------|
@@ -631,7 +582,7 @@ CREATE TABLE guests (
 ├── api/           # Go Lambda (handler, store, config)
 ├── docs/
 │   ├── architecture.md  # System and component diagrams (Mermaid)
-│   └── readme/    # Images committed for README (admin UI screenshots)
+│   └── readme/    # Images committed for README (architecture diagram, admin UI screenshots)
 ├── frontend/      # React + Vite SPA (`index.html` landing + RSVP popup, `admin.html` admin)
 │   └── public/
 │       ├── original/  # Source PNG/GIF illustrations (masters)
