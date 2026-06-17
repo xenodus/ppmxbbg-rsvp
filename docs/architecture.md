@@ -1,6 +1,6 @@
 # Architecture
 
-Wedding RSVP application: a Go Lambda API backed by MySQL, with a React SPA served from S3 + CloudFront. Guests open personalized invite links; admins manage invites through a separate SPA entry point.
+Wedding RSVP application: a Go Lambda API backed by MySQL, with a React SPA served through **CloudFront** (S3 is the origin only — browsers do not hit S3 directly). Guests open personalized invite links; admins manage invites through a separate SPA entry point.
 
 ---
 
@@ -14,11 +14,14 @@ flowchart TB
   end
 
   subgraph aws["AWS (ap-southeast-1)"]
-  CF["CloudFront\nalvinandvivian.rsvp"]
-  S3["S3 bucket\nppmxbbg-rsvp-frontend"]
-  APIGW["API Gateway\nHTTP API"]
-  Lambda["Lambda\nppmxbbg-rsvp-api\n(Go container)"]
-  ECR["ECR\nDocker image"]
+    subgraph frontend_hosting["Frontend hosting"]
+      CF["CloudFront\nalvinandvivian.rsvp\n(serves SPA + static assets)"]
+      S3["S3 bucket\nppmxbbg-rsvp-frontend\n(origin only)"]
+      CF --> S3
+    end
+    APIGW["API Gateway\nHTTP API"]
+    Lambda["Lambda\nppmxbbg-rsvp-api\n(Go container)"]
+    ECR["ECR\nDocker image"]
   end
 
   subgraph data["Data"]
@@ -29,11 +32,10 @@ flowchart TB
     GHA["GitHub Actions\non merge to master"]
   end
 
-  Guest --> CF
-  Admin --> CF
-  CF --> S3
-  Guest -->|"HTTPS /guest"| APIGW
-  Admin -->|"HTTPS /admin/*"| APIGW
+  Guest -->|"HTTPS HTML/JS/CSS/images"| CF
+  Admin -->|"HTTPS HTML/JS/CSS/images"| CF
+  Guest -->|"HTTPS API /guest"| APIGW
+  Admin -->|"HTTPS API /admin/*"| APIGW
   APIGW --> Lambda
   Lambda --> MySQL
   ECR -.->|"image"| Lambda
@@ -45,7 +47,7 @@ flowchart TB
 | Layer | Technology | Role |
 |-------|------------|------|
 | Frontend | React 18 + Vite | Guest landing page, RSVP modal, admin UI |
-| CDN / hosting | CloudFront + S3 | Static assets, custom domain |
+| CDN / hosting | CloudFront → S3 | CloudFront serves the SPA and static assets on the custom domain; S3 is the private origin |
 | API | API Gateway HTTP API | Routes to Lambda, CORS |
 | Compute | AWS Lambda (container) | Single Go handler for all routes |
 | Database | MySQL | `invites` and `guests` tables |
@@ -54,6 +56,24 @@ flowchart TB
 ---
 
 ## Frontend applications
+
+### Production delivery
+
+In production, all frontend traffic goes through CloudFront. The built SPA (`frontend/dist`) is synced to S3; CloudFront fetches from S3 on cache miss and serves `index.html`, `admin.html`, hashed `/assets/*`, and `/images/*` to browsers.
+
+```mermaid
+flowchart LR
+  B["Browser"]
+  CF["CloudFront\nalvinandvivian.rsvp"]
+  S3["S3 origin\nppmxbbg-rsvp-frontend"]
+  APIGW["API Gateway\n(separate host)"]
+
+  B -->|"GET /, /admin.html, /assets/*, /images/*"| CF
+  CF -->|"origin fetch on miss"| S3
+  B -->|"fetch() /guest, /admin/*"| APIGW
+```
+
+### Vite entry points
 
 Vite builds two HTML entry points from the same `frontend/` tree:
 
@@ -84,8 +104,10 @@ flowchart LR
 
 | Entry | URL | Purpose |
 |-------|-----|---------|
-| `index.html` | `/` or `/?id=…` | Wedding landing page; RSVP opens in a modal when `?id=` is present |
-| `admin.html` | `/admin.html` | Password-protected invite management, CSV export, QR codes |
+| `index.html` | `https://alvinandvivian.rsvp/` or `/?id=…` | Wedding landing page; RSVP opens in a modal when `?id=` is present |
+| `admin.html` | `https://alvinandvivian.rsvp/admin.html` | Password-protected invite management, CSV export, QR codes |
+
+Both URLs are served by CloudFront (same distribution, S3 origin).
 
 Local dev: Vite can proxy `/guest` and `/admin` to a remote API when `VITE_API_PROXY_TARGET` is set.
 
