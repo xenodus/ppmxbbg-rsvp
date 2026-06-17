@@ -564,6 +564,7 @@ CREATE TABLE guests (
 .
 ├── api/           # Go Lambda (handler, store, config)
 ├── docs/
+│   ├── architecture.md  # System and component diagrams (Mermaid)
 │   └── readme/    # Images committed for README (admin UI screenshots)
 ├── frontend/      # React + Vite SPA (`index.html` landing + RSVP popup, `admin.html` admin)
 │   └── public/
